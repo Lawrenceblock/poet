@@ -1,5 +1,7 @@
 ---
-layout: none
+layout: default
+title: 题记
+permalink: /preface/
 ---
 
 <link rel="stylesheet" href="style.css">
