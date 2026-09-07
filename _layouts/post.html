@@ -1,0 +1,14 @@
+---
+layout: default
+---
+
+<div class="poem-page">
+  <div class="poem-title">{{ page.title }}</div>
+  <div class="poem-date">{{ page.date | date: "%Y.%m.%d" }}</div>
+  <div class="poem-content">
+    {{ content }}
+  </div>
+  <div class="poem-back">
+    <a href="/archive.html">← 卷目</a>
+  </div>
+</div>

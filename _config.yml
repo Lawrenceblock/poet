@@ -1,0 +1,44 @@
+# ── 基础信息 ─────────────────────────────
+title: 安然诗客栈
+author: 安然
+description: 未赴之境 · 安然诗集
+lang: zh-CN
+
+# ── 仓库与域名（关键） ───────────────────
+repository: Lawrenceblock/poet
+url: "https://poet.ismaelan.com"
+baseurl: ""
+
+# ── 构建设置 ─────────────────────────────
+markdown: kramdown
+highlighter: rouge
+permalink: /:title/
+
+# ── 分页（以后诗多了再用，先留着） ───────
+paginate: 10
+paginate_path: "/page:num/"
+
+# ── 默认 Front Matter ────────────────────
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: post
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: default
+
+# ── 排除文件（不参加构建） ───────────────
+exclude:
+  - README.md
+  - "元宝代码"
+  - vendor
+  - Gemfile
+  - Gemfile.lock
+
+# ── GitHub Pages 兼容 ────────────────────
+github:
+  is_public: true
