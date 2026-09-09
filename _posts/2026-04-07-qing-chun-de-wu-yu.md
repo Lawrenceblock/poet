@@ -8,11 +8,11 @@ tags: [诗歌]
 
 <div class="poem">
 
-# 青春的物语
-<br>
+
 <br>
 
-文/**安然**<br>
+
+文/安然<br>
 <br>
 
 <div style="text-align: center;">
