@@ -293,6 +293,10 @@ def build():
             f"A 类 {len(by_cat['A'])}，B 类 {len(by_cat['B'])}，C/D 类 {len(by_cat['CD'])}。"
             f"其中 C 类 {sum(1 for m in by_cat['CD'] if m['category']=='C')}，"
             f"D 类 {sum(1 for m in by_cat['CD'] if m['category']=='D')}。</p>",
+            "<h2>旧站现有页面</h2>",
+            "<div class=\"card\"><h3><a href=\"oldsite/index.html\">旧站现有页面（审阅）</a></h3>"
+            "<p class=\"meta\">那拉提（未赴）· 青春的物语 · 诗人小传 · 题记 —— "
+            "这些页面现在已在 poet.ismaelan.com 上线，迁移前请作者确认。</p></div>",
             "<h2>按批次阅读</h2>"]
     for key, label, n, cnt, fn in batch_files:
         body.append(f"<div class=\"card\"><h3><a href=\"{fn}\">{label} · 第 {n} 批</a></h3>"

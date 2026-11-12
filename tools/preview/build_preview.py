@@ -33,6 +33,9 @@ def main():
                     os.path.join(ROOT, "tools", "author-review", "build_review_site.py")],
                    check=True, cwd=ROOT)
     subprocess.run([sys.executable,
+                    os.path.join(ROOT, "tools", "author-review", "build_oldsite_review.py")],
+                   check=True, cwd=ROOT)
+    subprocess.run([sys.executable,
                     os.path.join(ROOT, "tools", "author-review", "verify_verbatim.py")],
                    check=True, cwd=ROOT)
 
