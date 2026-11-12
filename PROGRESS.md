@@ -18,7 +18,7 @@
 | `review/hugo-deployment-readiness-phase2` | Phase 2/3：Hugo/Vercel + 排版保护（PR #5） | ✅ 已推送 |
 | `review/author-review-materials` | 阶段A：作者审阅材料（PR #6） | ✅ 已推送 |
 | `site/hugo-poetry-site-foundation` | 阶段B：Hugo 完整网站框架（PR #7） | ✅ 已推送 |
-| `site/poetry-site-v1-2026-11-12` | 阶段C：整合 + 作者审阅全文站 + 旧站存档（PR #8） | 🔄 进行中 |
+| `site/poetry-site-v1-2026-11-12` | 阶段C：整合 + 作者审阅全文站 + 旧站存档（PR #9） | ✅ 已推送 |
 
 ---
 
@@ -149,6 +149,7 @@
 | review/hugo-deployment-readiness-phase2 | `92d4686`（PR #5） |
 | review/author-review-materials | `044341b`（PR #6） |
 | site/hugo-poetry-site-foundation | `f4f28c1`（PR #7） |
+| site/poetry-site-v1-2026-11-12 | `07e23b2`（PR #9） |
 
 > 上表 SHA 以 `git ls-remote` / GitHub 远程为准（2026-11-12 核验）。
 
@@ -163,3 +164,5 @@
 | #5 | review/hugo-deployment-readiness-phase2 | Phase 2：Hugo/Vercel + 排版保护 |
 | #6 | review/author-review-materials | 阶段A：作者审阅材料 |
 | #7 | site/hugo-poetry-site-foundation | 阶段B：Hugo 完整网站框架 |
+| #8 | audit/phase-c-production-readiness-2026-11-12 | Phase C 审计（只读） |
+| #9 | site/poetry-site-v1-2026-11-12 | **阶段C：Hugo v1 + 作者审阅全文站 + 旧站存档**（draft） |
