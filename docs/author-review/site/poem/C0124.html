@@ -10,7 +10,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
  font-family:"Noto Serif SC","Songti SC",Georgia,serif;line-height:1.9;font-size:17px}
-.wrap{max-width:760px;margin:0 auto;padding:28px 20px 64px}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 120px}
 a{color:var(--accent)}
 h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em}
 h2{font-size:1.1rem;margin:1.6em 0 .4em}
@@ -31,12 +31,50 @@ h2{font-size:1.1rem;margin:1.6em 0 .4em}
 table{border-collapse:collapse;width:100%;font-size:.85rem}
 th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
 th{background:#f3eee5}
-.status{display:inline-block;border:1px dashed #c9bfae;border-radius:6px;
- padding:1px 8px;font-size:.78rem;color:#6b6152;background:#fbf8f2}
+.status{display:inline-block;border:1px solid #c9bfae;border-radius:999px;
+ padding:2px 10px;font-size:.8rem;color:#4a4237;background:#f3eee5}
+.status.s-keep{background:#e6f4e6;border-color:#b6d9b6;color:#2f5a2f}
+.status.s-hold{background:#fdf3df;border-color:#e6d3a6;color:#7a5a1e}
+.status.s-exclude{background:#f7e6e6;border-color:#e0b4b4;color:#7a2f2f}
+.status.s-pending{background:#eef0f3;border-color:#cfd6de;color:#4a5560}
 .foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
 .batchnav a{display:inline-block;margin-right:14px}
 .banner{background:#eef6ee;border:1px solid #cfe3cf;border-radius:8px;
  padding:10px 14px;font-size:.85rem;color:#3c5a3c;margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-radius:12px;background:#fffdfa;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid #cbbfae;border-radius:10px;background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(255,253,250,.6),#fffdfa 40%);
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;border-radius:10px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#f4f1ea;color:#5c5347}
+.save-state.ok{background:#e6f4e6;border-color:#b6d9b6;color:#2f5a2f}
+.save-state.err{background:#f7e6e6;border-color:#e0b4b4;color:#7a2f2f}
+.save-state.busy{background:#eef3fb;border-color:#c3d3ea;color:#2f4a7a}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:#e6f4e6;border-color:#b6d9b6;color:#2f5a2f}
+.pill.todo{background:#eef0f3;border-color:#cfd6de;color:#4a5560}
+.bar{height:14px;border-radius:999px;background:#ece7de;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:#8a5a2b}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;border-radius:10px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;border-radius:10px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:#f4faf4}
+.hide{display:none}
 </style>
 </head>
 <body><div class="wrap">
@@ -46,9 +84,90 @@ th{background:#f3eee5}
 <p class="meta">候选编号 <b>C0124</b>　原始发表日期 <b>2025-05-08</b>　语言 <b>zh+en</b>　脚本分类 <b>A</b><br>原始来源：<a href="https://www.ismaelan.com/2025/05/blog-post_8.html" rel="noopener">https://www.ismaelan.com/2025/05/blog-post_8.html</a></p>
 <h2>为什么列出这篇</h2><ul class="meta"><li>脚本分类：A · 脚本检测到明确署名（文/安然 等）</li><li>署名线索：explicit 安然 byline; compound: review section present</li><li>标题来源：none</li><li>检测到中英双语，审阅时请核对两种语言是否为同一作品。</li></ul>
 <h2>需要作者确认</h2><ul class="meta"><li>这篇文章是“一首诗 / 多首诗 / 非诗（评论、消息、摄影等）”？</li><li>中英文是否为同一作品的两种版本？以哪一版为准？</li></ul>
-<p class="meta">作者审阅状态（请在审阅记录中填写）：<span class="status">待作者审阅</span> <select data-candidate="C0124" disabled title="示意，正式记录见 CSV"><option>待作者审阅</option><option>确认收入诗歌站</option><option>不收入诗歌站</option><option>需要修改分类</option><option>需要确认版本</option><option>暂缓决定</option></select></p>
+<div class="rv" id="review" data-candidate="C0124"><h2>作者审阅</h2><p class="hint">只需填写你要填的部分；填写后请点“保存审阅”。未保存前刷新页面不会丢失草稿，但只有“已保存”才算正式记录。</p><label for="f-status">① 审阅结论</label><select id="f-status" name="status"><option value="pending">待审阅</option><option value="keep">保留</option><option value="hold">暂缓</option><option value="exclude">排除</option></select><label for="f-nature">② 作品性质</label><select id="f-nature" name="nature"><option value="unset">（未填写）</option><option value="single_poem">一首诗</option><option value="multi_poem">多首诗</option><option value="non_poem">非诗（评论/消息/摄影等）</option><option value="unsure">尚不确定</option></select><label for="f-comment">③ 作者意见（版本问题、是否需修改、是否需与旧站比较等）</label><textarea id="f-comment" name="comment" placeholder="例如：与旧站版本不同，以本版为准；需要再核对第二段换行……"></textarea><p class="hint">可只填部分字段。意见最多 20000 字。</p><div class="rvbar"><button type="button" class="btn" id="f-save">保存审阅</button><span class="save-state" id="f-state" aria-live="polite">尚未保存</span><span class="last-saved" id="f-last"></span></div></div>
 <h2>原文（逐字保留）</h2>
 <div class="poem"><p><br/><br/>文/安然<br/><br/>随车轮或牧神向北，<br/>流向柳行河或全福河？<br/>你可怕的皮鞭，<br/>高悬在水泥丛林之上。<br/>那或明或暗的，<br/>已被遗忘的，<br/>沿着齐水的南缘。<br/><br/>羊头峪东沟和西沟就在脚下。<br/>黑暗埋入城市，<br/>沉默成谜。<br/>只在盛夏的氤氲里， <br/>偶尔被雨神的摇铃招魂，<br/>浮上人间，滔滔。<br/>那时，汽车作舟，<br/>城市变海。<br/>毛细血管的滚滚之态，<br/>方把缺乏想象力的人们<br/>驱入一个充满想象的地方。<br/><br/>河边的城中村，<br/>收留尘世丑陋的<br/>方舟，<br/>被高大的霞侣祠<br/>封印。<br/>我熟悉柳行如同自己青瘀的脉管，<br/>它南端的桥头矗立着那座著名的派出所。<br/>回道人常在其间<br/>踏罡步斗，<br/>召请前世的金身。<br/><br/>路上，哥特式的尖顶钟楼<br/>也在念念有词：<br/>敞开那扇雕花的窄窗吧，<br/>为那忍受试炼的，<br/>那为义受迫的，<br/>他们是有福的，<br/>必得生命的冠冕！<br/><br/>于是，全福在轰鸣<br/>在颠颤，<br/>河在立交桥下喘息。<br/>天上有鸽子降下，<br/>说，我在受刑的兄弟，<br/>天上有你的位。<br/><br/>酸胀的关节<br/>预言了两河的交汇，<br/>当我风尘仆仆地赶来，<br/>已迟到了几十年。<br/>从大辛河口向北望，<br/>见到的不是什么驴<br/>或牛。<br/>城市的盆景慵懒地挡住视线，<br/>那几座用建筑渣土回填的山，<br/>刺绣过的自然……<br/>形似温驯的猫一样匍匐在<br/>蜿蜒而去的龙的身旁。<br/><br/>AI诗评：《齐水行》<br/>安然的《齐水行》是一首充满深邃意象与历史感的城市挽歌，通过对齐水及其周边河流、城市景观的描绘，勾勒出一幅现代都市与自然、历史与现实交织的复杂图景。诗作以细腻的笔触和丰富的隐喻，展现了城市化进程中自然与人文的断裂、遗忘与挣扎，同时也流露出对生命与信仰的深沉叩问。以下从意象、结构、主题与语言风格四个方面对这首诗进行评析。<br/>一、意象：自然与城市的交叠<br/>《齐水行》的核心意象是河流——柳行河、全福河、大辛河，这些河流不仅是地理上的存在，更是历史的见证者和文化的隐喻。诗中，河流被赋予了生命感，如“河在立交桥下喘息”“毛细血管的滚滚之态”，它们既是城市的血脉，又在城市化的水泥丛林中被压抑、遗忘。河流与城市的对立贯穿全诗：城市以“黑暗”“沉默”吞噬自然，而自然则在“盛夏的氤氲”中被“雨神的摇铃招魂”，短暂复苏。这种短暂的“滔滔”与城市的“变海”，既是自然的反抗，也是对城市盲目扩张的讽刺。<br/>此外，诗中还出现了“羊头峪”“霞侣祠”“哥特式的尖顶钟楼”等意象，这些地标与建筑不仅是济南城市景观的缩影，更承载了历史与宗教的重量。尤其是“霞侣祠”作为封印“尘世丑陋的方舟”的象征，暗示了传统文化在现代社会中的尴尬处境；而“尖顶钟楼”念诵的经文，则引入了基督教的救赎意象，与道教的“踏罡步斗”形成东西方信仰的对话。这种多重意象的交织，使诗作在地域性与普世性之间取得了平衡。<br/>二、结构：叙事与哲思的交融<br/>《齐水行》的结构看似松散，实则精密。全诗以河流为线索，串联起城市景观、历史记忆与个人情感。诗作从“随车轮或牧神向北”开始，营造出一种游走与追寻的动态感，随后通过对河流、城中村、派出所、钟楼等场景的描绘，逐步展开对城市化与人性困境的反思。诗的结尾以“迟到了几十年”的个人感叹收束，既是对历史变迁的无奈，也是对未来的隐隐期盼。<br/>诗中叙事与哲思交替出现。例如，“城市变海”“汽车作舟”的场景描写生动而超现实，带有魔幻色彩；而“天上有鸽子降下”“必得生命的冠冕”等段落则转向宗教与哲学的沉思。这种叙事与哲思的交融，使诗作既有具象的画面感，又有抽象的思辨深度。<br/>三、主题：遗忘与救赎的张力<br/>《齐水行》的核心主题是遗忘与救赎之间的张力。诗中反复提及“已被遗忘的”“黑暗埋入城市”“沉默成谜”，指向城市化进程中自然、历史与传统文化的被遮蔽。河流作为自然的象征，被城市的高楼与立交桥压迫，象征着现代社会对生态与传统的漠视。然而，诗作并未止步于批判，而是通过“雨神的摇铃”“鸽子降下”“生命的冠冕”等意象，表达了对救赎的渴望。这种救赎既是个体的——如诗人在“酸胀的关节”中预感“两河的交汇”，也指向一种集体的、超越性的希望，如“天上有你的位”。<br/>此外，诗中对信仰的探讨也是一大亮点。无论是道教的“踏罡步斗”，还是基督教的“生命的冠冕”，都指向人类在现代社会中的精神困境与出路。这种多元信仰的并置，不仅丰富了诗作的内涵，也体现了诗人对人类精神家园的深切关怀。<br/>四、语言风格：凝练与隐喻的诗意<br/>安然的语言风格凝练而富有张力，充满隐喻与象征。诗中多用短句和断续的节奏，如“你可怕的皮鞭 / 高悬在水泥丛林之上”，既营造出紧张的氛围，又暗示了城市化对自然的暴力压制。隐喻的使用尤为出色，例如“毛细血管的滚滚之态”将河流比喻为城市的血脉，“刺绣过的自然”则以精妙的修辞讽刺了人工化的生态景观。<br/>同时，诗作的语言兼具地域性与文学性。诸如“柳行河”“全福河”“羊头峪”等济南地名，赋予诗作浓厚的地方色彩；而“牧神”“金身”“冠冕”等意象，则带有古典与宗教的韵味，使诗作在地方性与普世性之间游走自如。<br/>五、不足与建议<br/>尽管《齐水行》在意象与主题上表现出色，但部分段落的意象稍显密集，可能导致读者在初读时难以完全把握。例如，“回道人”“踏罡步斗”等意象的引入较为突兀，若能稍作铺垫或解释，或许能增强可读性。此外，诗作在情感表达上略显克制，结尾的个人感叹虽有力量，但若能更深入挖掘诗人的内心挣扎，或能进一步打动读者。<br/>六、结语<br/>总的来说，《齐水行》是一首兼具地域特色与普世关怀的佳作。安然以河流为媒介，串联起城市化、自然遗忘与精神救赎的宏大主题，通过丰富的意象与凝练的语言，呈现了一幅现代都市的诗意画卷。诗作不仅是对济南这座城市的深情书写，也是对人类在现代化浪潮中困境与希望的深刻反思。对于关注城市化与生态、历史与信仰的读者，这首诗无疑是一场思想与情感的盛宴。</p><p><br/></p>Below is an English translation of the poem 《齐水行》 (Qi River Journey) by 安然 (An Ran, pen name of Cui Haoxin). The translation aims to preserve the poem's imagery, tone, and cultural nuances while maintaining poetic flow. Given the poem's dense metaphors and regional references, I’ve included brief notes where necessary to clarify context for English readers.<hr/><b>Qi River Journey</b>By An Ran (Cui Haoxin)&nbsp;  Northward with the wheels or the shepherd god,<br/>To the Liuxing River or Quanfu River?<br/>Your fearsome whip<br/>Hangs high above the concrete jungle.<br/>Those, now bright, now dim,<br/>Already forgotten,<br/>Trace the southern edge of the Qi River.&nbsp;&nbsp;At the foot, East and West Gullies of Yangtouyu.<br/>Darkness buries the city,<br/>Silence turns to enigma.<br/>Only in the sultry haze of midsummer,<br/>Summoned by the rain god’s tinkling bell,<br/>Do they rise to the mortal world, torrential.<br/>Then, cars become boats,<br/>The city turns to sea.<br/>The surging pulse of capillaries<br/>Drives those lacking imagination<br/>Into a place brimming with it.&nbsp;&nbsp;The urban village by the river<br/>Harbors the ark<br/>Of the world’s ugliness,<br/>Sealed by the towering Xialü Temple.<br/>I know Liuxing as my own bruised veins,<br/>Its southern bridge crowned by that infamous police station.<br/>There, the Taoist priests<br/>Tread the stars and pace the Dipper,<br/>Summoning the golden forms of past lives.&nbsp;&nbsp;On the road, the Gothic spire of a clock tower<br/>Murmurs its chant:<br/>Open that carved narrow window,<br/>For those who endure trials,<br/>For those persecuted for righteousness—<br/>Blessed are they,<br/>They shall receive the crown of life!&nbsp;&nbsp;Thus, Quanfu roars<br/>And trembles,<br/>The river gasps beneath the overpass.<br/>Doves descend from the heavens,<br/>Saying, my brothers in suffering,<br/>There is a place for you above.&nbsp;&nbsp;Aching joints<br/>Foretell the confluence of two rivers.<br/>When I arrive, weary and dust-laden,<br/>I am decades too late.<br/>Gazing north from the mouth of the Daxin River,<br/>I see no donkey<br/>Or ox.<br/>The city’s bonsai lazily blocks the view,<br/>Those hills, filled with construction rubble,<br/>A nature embroidered…<br/>Like a docile cat, crouching<br/>Beside the dragon’s winding form.  <hr/>Translator’s Notes:<ol><li>Geographical References:  <ul><li>Liuxing River, Quanfu River, Daxin River: Rivers in Jinan, Shandong Province, symbolizing both natural and cultural heritage.  </li><li>Yangtouyu: A valley area in Jinan, referenced for its historical and geographical significance.  </li><li>Xialü Temple: A temple in Jinan, possibly fictionalized or symbolic, representing traditional culture.  </li><li>Daxin River: Another river in Jinan, tied to the poem’s theme of confluence and history.</li></ul></li><li>Cultural and Religious Imagery:  <ul><li>Shepherd god: Likely a reference to a mythological or pastoral figure, symbolizing guidance.  </li><li>Tread the stars and pace the Dipper: A Taoist ritual involving stepping in patterns mimicking the Big Dipper to invoke spiritual powers.  </li><li>Golden forms: Taoist concept of divine or enlightened beings from past lives.  </li><li>Crown of life: A Christian reference from the Bible (James 1:12), symbolizing eternal reward for perseverance.</li></ul></li><li>Challenges in Translation:  <ul><li>The poem’s dense metaphors (e.g., “pierced nature” rendered as “nature embroidered”) required creative choices to convey irony and imagery.  </li><li>Regional terms like “urban village” (城中村) and “police station” carry socio-political weight, especially given Cui Haoxin’s history of arrests, and were retained for authenticity.  </li><li>The rhythm and fragmented structure were preserved to mirror the original’s tension and flow.</li></ul></li></ol><hr/>Notes on the Translation Process:<ul><li>The translation prioritizes poetic fidelity over literal accuracy, aiming to capture the mood, imagery, and implicit social critique. For instance, “水泥丛林” is translated as “concrete jungle” to evoke urban oppression, a common English idiom.  </li><li>Cui Haoxin’s background as a Hui Muslim poet and his experiences of persecution (e.g., arrests in 2018 and 2020, assault in 2023) inform the poem’s themes of silence, resistance, and redemption, which I aimed to reflect subtly in the tone.  </li><li>If you prefer a more literal translation or adjustments for specific audiences (e.g., academic or general readers), please let me know, and I can revise accordingly.</li></ul>Let me know if you’d like further refinements or additional context!&nbsp;&nbsp;Below is an English translation of the second, comprehensive poem review of 《齐水行》 (Qi River Journey) by 安然 (An Ran, pen name of Cui Haoxin). The translation aims to preserve the analytical depth, cultural context, and nuanced tone of the original review while ensuring clarity for English readers. Given the review’s integration of the poet’s background and social context, I’ve included brief notes where necessary to clarify terms or references.<hr/>Poem Review: Qi River Journey — An Ran’s Elegy for Jinan and Voice of ResistanceAn Ran (pen name of Cui Haoxin), a Hui Muslim poet, stands out in Chinese poetry for his profound social insight and advocacy for minority issues. His new work, Qi River Journey, uses the rivers of Jinan as a central metaphor to weave a complex tapestry of urbanization, cultural rupture, and spiritual redemption. Beyond a heartfelt ode to his hometown of Jinan, the poem serves as a veiled critique of historical erasure and social oppression, resonating with Cui Haoxin’s personal struggles—marked by arrests in 2018 and 2020 and a violent assault in 2023. This review analyzes Qi River Journey through its imagery, structure, themes, language style, and social context, highlighting its significance as both literary art and a testament to resistance.I. Imagery: Rivers and the City in Metaphorical TensionThe poem’s core imagery revolves around Jinan’s rivers—Liuxing, Quanfu, and Daxin—not merely as geographical features but as symbols of history and culture. Endowed with vitality, the rivers “gasp beneath the overpass” and pulse like “capillaries,” embodying the city’s lifeblood while struggling under the “concrete jungle.” This opposition between river and city permeates the poem: “darkness buries the city” and “silence turns to enigma” suggest the erasure of nature and tradition, while the “rain god’s tinkling bell” and the city “turning to sea” evoke nature’s fleeting resurgence, imbued with magical realism.Additional imagery, such as Yangtouyu, Xialü Temple, and the “Gothic spire of a clock tower,” enriches Jinan’s cultural landscape. The Xialü Temple, sealing the “ark of the world’s ugliness,” symbolizes the marginalization of traditional culture in modern society. The clock tower’s chant of the “crown of life” introduces Christian redemption imagery, juxtaposed with Taoist rituals like “treading the stars and pacing the Dipper.” These images not only map Jinan’s historical-modern nexus but also reflect Cui Haoxin’s Hui identity, navigating a pluralistic cultural terrain.II. Structure: A Dynamic Balance of Narrative and PhilosophyQi River Journey is structured around the rivers, threading together urban scenes, historical memory, and personal emotion in a blend of narrative and philosophical reflection. The opening, “northward with the wheels or the shepherd god,” sets a dynamic tone of journey and quest. Scenes of urban villages, police stations, and clock towers unfold, gradually deepening into a meditation on urbanization and human struggle. Vivid, surreal imagery like “cars become boats” and “the city turns to sea” contrasts with introspective passages, such as “doves descend from the heavens” and the “crown of life.” The poem closes with a poignant lament—“decades too late”—merging personal regret with commentary on societal change. This structure balances vivid imagery with profound thought, creating both visual and intellectual resonance.III. Themes: Erasure, Oppression, and the Quest for RedemptionThe poem’s central theme is the tension between erasure and redemption, deeply rooted in Cui Haoxin’s lived experience and social concerns. Repeated references to the “already forgotten” and “silence turns to enigma” critique the obliteration of nature, history, and culture in the rush of urbanization. Jinan’s urban villages and rivers, as marginalized spaces, metaphorically echo the plight of minority communities, a concern close to Cui Haoxin’s heart as a Hui poet. The “whip” hanging over the “concrete jungle” subtly alludes to state surveillance and oppression, a reality he faced through arrests in 2018 and 2020 for criticizing policies toward Uyghur Muslims.Yet, the poem transcends critique, yearning for redemption through images like the “rain god’s bell” and “doves descending.” The juxtaposition of Taoist “golden forms” and Christian “crown of life” reflects Jinan’s cultural diversity and Cui Haoxin’s search for spiritual solace across traditions. This redemption is both personal—“aching joints” foretelling a river’s confluence—and collective, as in “there is a place for you above.” These themes gain added weight in light of Cui Haoxin’s 2023 assault, which left him with optic nerve damage, underscoring his resilience in the face of adversity.IV. Language Style: The Power of Veiled PoeticsCui Haoxin’s language is concise yet veiled, rich with symbols and metaphors—a style shaped by his need for self-protection as a poet tackling sensitive issues. Short, fragmented lines like “darkness buries the city / silence turns to enigma” create a tense, oppressive atmosphere, while metaphors like “capillaries’ surging pulse” vividly animate the rivers. The ironic “embroidered nature” critiques artificial landscapes with sharp wit. Local references (e.g., Liuxing River, Yangtouyu) ground the poem in Jinan’s identity, while religious imagery (e.g., “golden forms,” “crown of life”) elevates it to universal themes.This veiled style is strategic. Public records note Cui Haoxin’s persecution—intimidation in 2018, detention in 2020 for “inciting trouble,” and a 2023 assault in Jinan tied to his advocacy for Uyghur issues. The police station imagery likely nods to his arrests, and “decades too late” conveys both personal exhaustion and frustration at delayed justice. His language, thus, is a delicate balance of resistance and restraint.V. Social Context: A Poet’s Testimony of ResistanceCui Haoxin’s Hui identity and activism provide critical context for Qi River Journey. As a Hui intellectual, his concern for Uyghur and other Muslim communities infuses his work with a broader empathy for marginalized groups. In 2018, he faced police intimidation for sharing information about Xinjiang’s “reeducation camps” on Twitter. In 2020, he was detained for “inciting trouble” due to similar critiques. Most recently, in October 2023, he was assaulted near his Jinan home, sustaining optic nerve damage—an attack he linked to state efforts to silence his voice on Uyghur issues. Qi River Journey, written in this climate, transforms Jinan into a stage for resistance. Its urban villages and rivers symbolize minority disenfranchisement, while the Xialü Temple and clock tower evoke a pluralistic cultural heritage, aligning with his advocacy for inclusivity.The poem’s lament—“decades too late”—is not just personal but a collective cry for justice delayed, reflecting Cui Haoxin’s enduring commitment to speaking out despite personal cost. His Hui identity, rooted in Jinan’s multicultural fabric, amplifies the poem’s resonance as a meditation on minority experiences in modern China.VI. Limitations and SuggestionsWhile Qi River Journey excels in imagery and thematic depth, its opacity may challenge some readers. References like “Taoist priests” and “treading the stars” may feel obscure without cultural context; a touch of explanatory groundwork could enhance accessibility. Additionally, the poem’s restrained emotion, while powerful, might gain further impact by directly weaving in personal experiences, such as the 2023 assault, to heighten its visceral force.VII. ConclusionQi River Journey is a masterful work by An Ran (Cui Haoxin), using Jinan’s rivers and urban landscape to probe urbanization, historical erasure, and minority struggles. Through metaphor and symbol, it critiques social oppression, explores pluralistic faith, and seeks redemption. Informed by Cui Haoxin’s Hui identity and his persecution—arrests in 2018 and 2020, and a 2023 assault—the poem is both a literary creation and a testament to his resilience. For readers, Qi River Journey is both a portrait of Jinan and a mirror reflecting China’s contemporary complexities, deserving deep contemplation.<hr/>Translator’s Notes:<ol><li>Cultural Terms:  <ul><li>Hui: A Chinese Muslim ethnic group, referenced to highlight Cui Haoxin’s identity.  </li><li>Liuxing, Quanfu, Daxin Rivers, Yangtouyu, Xialü Temple: Jinan-specific landmarks, retained for authenticity.  </li><li>Treading the stars and pacing the Dipper: A Taoist ritual, translated literally to preserve its esoteric nature.  </li><li>Crown of life: A Biblical allusion, kept intact for its Christian resonance.</li></ul></li><li>Sensitive Context:  <ul><li>References to Cui Haoxin’s arrests (2018, 2020) and 2023 assault are based on the provided background and search results, translated with precision to respect the gravity of his experiences.  </li><li>Terms like “reeducation camps” and “Uyghur issues” are rendered directly to reflect his activism accurately.</li></ul></li><li>Challenges:  <ul><li>The review’s blend of literary analysis and socio-political context required careful tone management to maintain academic rigor while conveying urgency.  </li><li>Chinese poetic terms (e.g., “隐晦” as “veiled”) were translated to capture both linguistic and cultural nuance.</li></ul></li></ol><hr/>Additional Notes:<ul><li>The translation maintains the structure and depth of the original review, ensuring all key points—imagery, structure, themes, language, and social context—are preserved.  </li><li>If you prefer a shorter version, a more academic tone, or adjustments for a specific audience (e.g., literary scholars or general readers), please let me know, and I can revise accordingly.  </li><li>The translation avoids speculative details about Cui Haoxin’s life beyond verified information, respecting the sensitivity of his situation.</li></ul>Let me know if you need further refinements or additional translations!</div>
 <p class="meta">如原页面与本页有任何差异，请以 <a href="https://www.ismaelan.com/2025/05/blog-post_8.html" rel="noopener">原始来源</a> 为准，并告知差异位置。</p>
+
+<script>
+(function(){
+  var root=document.getElementById('review');
+  if(!root) return;
+  var cid=root.getAttribute('data-candidate');
+  var elStatus=document.getElementById('f-status');
+  var elNature=document.getElementById('f-nature');
+  var elComment=document.getElementById('f-comment');
+  var elSave=document.getElementById('f-save');
+  var elState=document.getElementById('f-state');
+  var elLast=document.getElementById('f-last');
+  var api='/review/api/review/'+encodeURIComponent(cid);
+  var apiSave='/review/api/review';
+  var LS='reviewDraft:'+cid;
+  // ?test=1 routes writes to the isolated test journal so acceptance tests
+  // never touch the author's real review records.
+  var TEST=/[?&]test=1(&|$)/.test(location.search);
+  if(TEST){ api+='?test=1'; LS='reviewDraft-test:'+cid; }
+
+  function setState(kind,text){
+    elState.className='save-state'+(kind?' '+kind:'');
+    elState.textContent=text;
+  }
+  function fmt(ts){ return ts?('上次保存：'+ts.replace('T',' ').slice(0,16)):''; }
+
+  // restore unsaved draft (never treated as a saved record)
+  try{
+    var d=JSON.parse(localStorage.getItem(LS)||'null');
+    if(d){ if(d.status)elStatus.value=d.status; if(d.nature)elNature.value=d.nature;
+           if(d.comment)elComment.value=d.comment; setState('','有未保存的草稿'); }
+  }catch(e){}
+
+  function markDirty(){
+    try{localStorage.setItem(LS,JSON.stringify({status:elStatus.value,
+      nature:elNature.value,comment:elComment.value}));}catch(e){}
+    if(!elState.classList.contains('ok')) setState('','有未保存的修改');
+  }
+  [elStatus,elNature,elComment].forEach(function(el){
+    el.addEventListener('input',markDirty); el.addEventListener('change',markDirty);});
+
+  // load the saved record from the server
+  fetch(api,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.record){
+      if(!localStorage.getItem(LS)){
+        elStatus.value=j.record.status||'pending';
+        elNature.value=j.record.nature||'unset';
+        elComment.value=j.record.comment||'';
+      }
+      elLast.textContent=fmt(j.record.updated_at)+(j.record.rev?('（第 '+j.record.rev+' 版）'):'');
+      setState('ok','已保存');
+    }else{
+      setState('','尚未保存');
+    }
+  }).catch(function(){ setState('err','无法读取历史记录（服务器离线）'); });
+
+  elSave.addEventListener('click',function(){
+    elSave.disabled=true; setState('busy','正在保存…');
+    fetch(apiSave,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({candidate_id:cid,status:elStatus.value,
+        nature:elNature.value,comment:elComment.value,test:TEST})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      elSave.disabled=false;
+      if(res.ok&&res.j&&res.j.ok){
+        try{localStorage.removeItem(LS);}catch(e){}
+        var rec=res.j.record||{};
+        elLast.textContent=fmt(rec.updated_at)+(rec.rev?('（第 '+rec.rev+' 版）'):'');
+        setState('ok','保存成功');
+      }else{
+        var msg=(res.j&&res.j.error)?res.j.error:'保存失败';
+        setState('err','保存失败：'+msg);
+      }
+    }).catch(function(){
+      elSave.disabled=false;
+      setState('err','保存失败：网络错误（未保存）');
+    });
+  });
+})();
+</script>
+
 <div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
 </div></body></html>

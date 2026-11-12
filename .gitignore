@@ -3,3 +3,13 @@
 # Python
 __pycache__/
 *.pyc
+# Author review data — the author's private, unpublished opinions. This repo is
+# public, so the live records must never be committed. Keep DESIGN.md tracked
+# (it is documentation); ignore the data files themselves.
+/docs/author-review/review-records/journal.jsonl
+/docs/author-review/review-records/journal-test.jsonl
+/docs/author-review/review-records/snapshot.json
+/docs/author-review/review-records/export-review-records.csv
+/docs/author-review/review-records/export-review-records.json
+/docs/author-review/review-records/inbox/
+/docs/author-review/review-records/backups/

@@ -56,8 +56,10 @@ def main():
             continue
         with open(path, "rb") as fh:
             page = fh.read().decode("utf-8")
-        if re.search(r"<script", page, re.I):
-            fails.append(f"{cid}: contains <script>")
+        # Only our own inline review script is allowed; anything else fails.
+        scripts = re.findall(r"<script\b.*?</script>", page, re.S | re.I)
+        if len(scripts) != 1 or "review/api/review" not in scripts[0]:
+            fails.append(f"{cid}: unexpected <script> content (found {len(scripts)})")
         if re.search(r"\son\w+\s*=", page):
             fails.append(f"{cid}: contains on* handler")
         if re.search(r'(href|src)\s*=\s*["\']javascript:', page, re.I):
@@ -66,6 +68,8 @@ def main():
         if not m:
             fails.append(f"{cid}: could not locate poem block")
             continue
+        if "<script" in m.group(1):
+            fails.append(f"{cid}: script leaked into poem block")
         expected = sanitize(entries[c["source_post_id"]]["content"]["$t"])
         if m.group(1) != expected:
             fails.append(f"{cid}: poem block is NOT byte-identical to sanitized source")
@@ -84,7 +88,14 @@ def main():
         for href in set(re.findall(r'href="([^"]+)"', ph)):
             if not internal(href) or href.startswith("#"):
                 continue
-            target = os.path.normpath(os.path.join(SITE, rel_dir, href.split("#")[0]))
+            if href.startswith("/review/api/"):
+                continue  # dynamic API endpoint served by the review server
+            if href.startswith("/review/"):
+                target = os.path.join(SITE, href[len("/review/"):])
+            elif href.startswith("/"):
+                continue  # other absolute paths belong to the Hugo site, not review
+            else:
+                target = os.path.normpath(os.path.join(SITE, rel_dir, href.split("#")[0]))
             if not os.path.exists(target):
                 fails.append(f"{os.path.relpath(page_path, SITE)} -> broken link {href}")
 
