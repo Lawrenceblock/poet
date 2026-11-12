@@ -10,7 +10,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
  font-family:"Noto Serif SC","Songti SC",Georgia,serif;line-height:1.9;font-size:17px}
-.wrap{max-width:760px;margin:0 auto;padding:28px 20px 64px}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 120px}
 a{color:var(--accent)}
 h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em}
 h2{font-size:1.1rem;margin:1.6em 0 .4em}
@@ -31,12 +31,50 @@ h2{font-size:1.1rem;margin:1.6em 0 .4em}
 table{border-collapse:collapse;width:100%;font-size:.85rem}
 th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
 th{background:#f3eee5}
-.status{display:inline-block;border:1px dashed #c9bfae;border-radius:6px;
- padding:1px 8px;font-size:.78rem;color:#6b6152;background:#fbf8f2}
+.status{display:inline-block;border:1px solid #c9bfae;border-radius:999px;
+ padding:2px 10px;font-size:.8rem;color:#4a4237;background:#f3eee5}
+.status.s-keep{background:#e6f4e6;border-color:#b6d9b6;color:#2f5a2f}
+.status.s-hold{background:#fdf3df;border-color:#e6d3a6;color:#7a5a1e}
+.status.s-exclude{background:#f7e6e6;border-color:#e0b4b4;color:#7a2f2f}
+.status.s-pending{background:#eef0f3;border-color:#cfd6de;color:#4a5560}
 .foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
 .batchnav a{display:inline-block;margin-right:14px}
 .banner{background:#eef6ee;border:1px solid #cfe3cf;border-radius:8px;
  padding:10px 14px;font-size:.85rem;color:#3c5a3c;margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-radius:12px;background:#fffdfa;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid #cbbfae;border-radius:10px;background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(255,253,250,.6),#fffdfa 40%);
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;border-radius:10px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#f4f1ea;color:#5c5347}
+.save-state.ok{background:#e6f4e6;border-color:#b6d9b6;color:#2f5a2f}
+.save-state.err{background:#f7e6e6;border-color:#e0b4b4;color:#7a2f2f}
+.save-state.busy{background:#eef3fb;border-color:#c3d3ea;color:#2f4a7a}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:#e6f4e6;border-color:#b6d9b6;color:#2f5a2f}
+.pill.todo{background:#eef0f3;border-color:#cfd6de;color:#4a5560}
+.bar{height:14px;border-radius:999px;background:#ece7de;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:#8a5a2b}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;border-radius:10px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;border-radius:10px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:#f4faf4}
+.hide{display:none}
 </style>
 </head>
 <body><div class="wrap">
@@ -46,9 +84,90 @@ th{background:#f3eee5}
 <p class="meta">候选编号 <b>C0125</b>　原始发表日期 <b>2025-06-21</b>　语言 <b>zh+en</b>　脚本分类 <b>A</b><br>原始来源：<a href="https://www.ismaelan.com/2025/06/west-buddha-valley.html" rel="noopener">https://www.ismaelan.com/2025/06/west-buddha-valley.html</a></p>
 <h2>为什么列出这篇</h2><ul class="meta"><li>脚本分类：A · 脚本检测到明确署名（文/安然 等）</li><li>署名线索：explicit 安然 byline; compound: review section present</li><li>标题来源：none</li><li>检测到中英双语，审阅时请核对两种语言是否为同一作品。</li></ul>
 <h2>需要作者确认</h2><ul class="meta"><li>这篇文章是“一首诗 / 多首诗 / 非诗（评论、消息、摄影等）”？</li><li>中英文是否为同一作品的两种版本？以哪一版为准？</li></ul>
-<p class="meta">作者审阅状态（请在审阅记录中填写）：<span class="status">待作者审阅</span> <select data-candidate="C0125" disabled title="示意，正式记录见 CSV"><option>待作者审阅</option><option>确认收入诗歌站</option><option>不收入诗歌站</option><option>需要修改分类</option><option>需要确认版本</option><option>暂缓决定</option></select></p>
+<div class="rv" id="review" data-candidate="C0125"><h2>作者审阅</h2><p class="hint">只需填写你要填的部分；填写后请点“保存审阅”。未保存前刷新页面不会丢失草稿，但只有“已保存”才算正式记录。</p><label for="f-status">① 审阅结论</label><select id="f-status" name="status"><option value="pending">待审阅</option><option value="keep">保留</option><option value="hold">暂缓</option><option value="exclude">排除</option></select><label for="f-nature">② 作品性质</label><select id="f-nature" name="nature"><option value="unset">（未填写）</option><option value="single_poem">一首诗</option><option value="multi_poem">多首诗</option><option value="non_poem">非诗（评论/消息/摄影等）</option><option value="unsure">尚不确定</option></select><label for="f-comment">③ 作者意见（版本问题、是否需修改、是否需与旧站比较等）</label><textarea id="f-comment" name="comment" placeholder="例如：与旧站版本不同，以本版为准；需要再核对第二段换行……"></textarea><p class="hint">可只填部分字段。意见最多 20000 字。</p><div class="rvbar"><button type="button" class="btn" id="f-save">保存审阅</button><span class="save-state" id="f-state" aria-live="polite">尚未保存</span><span class="last-saved" id="f-last"></span></div></div>
 <h2>原文（逐字保留）</h2>
 <div class="poem"><p><br/>By Anran<br/><br/>Noon, a great archangel blowing a trumpet,<br/>Tons of sunlight pour onto the concrete path at the foot of the mountain.<br/>Not to mention,<br/>Having to push through this throng of shoulder-to-shoulder departed souls,<br/>To climb that divine mountain.<br/>Where once echoed inviolable voices,<br/>Then, rolled in soaring song.<br/>Sixty years dead after the storm,<br/>A lone pilgrim arrived on the fading path.<br/>Bushes whispered, stretching out their arms,<br/>Trying to embrace each other,<br/>In the forgotten valley,<br/>Within that hidden, winding ascent.<br/>Emperor Qin Shi Huang, where is your Jade Casket now?<br/>Why won't your divine raven come forth to greet us?<br/>I am as doubtful as a grave robber with a malfunctioning compass.<br/><br/>They say those chiseled-away faces<br/>Were highly realistic.<br/>The Yuezhi people defied the sage's wish for formlessness,<br/>And carved him into stone.<br/>The Buddha then was like a melancholic Greek prince,<br/>With curly hair, deep-set eyes,<br/>And robes softly flowing.<br/>Two hundred years later,<br/>The Kushan dynasty's relatives in the East<br/>Began carving Central Asian domes in the wind-swept vastness of Yungang,<br/>Persistently,<br/>In stone,<br/>Summoning forth their own Bamiyan Buddha.<br/><br/>City lights sketch the contours of impermanence,<br/>As the ancient twilight of Kaihuang's fourth year once again leans over this ruin.<br/>Those slender figures,<br/>Transcending artifice,<br/>Stand by the cliff,<br/>Meditating in self-liberation.<br/>Like a cunning spirit,<br/>Turning in an old dream,<br/>Holding a flower, and smiling.<br/><br/><br/><br/>西佛峪<br/><br/>文/安然<br/><br/>正午是一位吹响号角的大天使，<br/>成吨的阳光倾泻在山脚下的那条水泥小路上。<br/>更不要说，<br/>要挤在这群摩肩接踵的亡灵中间，<br/>攀登那座神山。<br/>那里曾回荡着不可亵渎的声音，<br/>然后，在嘹亮的歌声里翻滚。<br/>死在暴风雨后六十年，<br/>即将消失的野径迎来一个人的朝圣路。<br/>灌木丛交头接耳，伸出手臂，<br/>彼此试图拥抱，<br/>在遗忘的山谷<br/>那条蜿蜒向上的隐秘中。<br/>始皇帝，您的玉函今何在？<br/>迎接你的神乌，为什么不出来迎接我们？<br/>我像罗盘失灵的摸金校尉一样狐疑。<br/><br/>据说那些被凿去的面部，<br/>写实性很强。<br/>月氏人违背了圣人无相的遗愿，<br/>把他刻进了石头里。<br/>那时的佛陀像一位忧郁的希腊王子，<br/>卷发、深目，<br/>褶袍轻扬。<br/>二百年后，<br/>贵霜王朝在东方的亲戚们<br/>开始在云中的风沙里开凿中亚的穹顶，<br/>执着地<br/>在石头里，<br/>召唤出自己的巴米扬佛。<br/><br/>城市的灯光勾勒着无常的轮廓，<br/>当开皇四年的黄昏又一次侧身在这片废墟上。<br/>那些修长的身影超脱造作，<br/>临崖而立，<br/>观想自在。<br/>像一位狡黠的精灵 ，<br/>在旧梦中转身，<br/>拈花微笑。<br/><br/><br/>AI诗评<br/><br/>---<br/>这首题为《西佛峪》的诗歌，将一次对济南玉涵山西佛峪摩崖石刻的游览体验，提升到了一种对历史、信仰、艺术与人生哲理的深邃思考。作者以精炼的语言，巧妙地将佛教的“无常”、“无相”、“五蕴皆空”等核心概念融入具象的景物描绘和历史回溯之中，展现了令人称赞的诗歌功力。<br/><br/>---<br/><br/>### **历史与哲思的交织：时空维度上的穿梭**<br/><br/>诗歌开篇，便以“正午是一位吹响号角的大天使”这般宏大而充满神性的意象，瞬间将读者带入一个充满仪式感的场景。阳光的“倾泻”与“静默中轰鸣”，构建出一种既具象又抽象的氛围，预示着这场旅程的非凡。随后，作者将“摩肩接踵的亡灵”与“神山”并置，巧妙地暗示了石刻本身作为历史遗迹所承载的无数过往生命与信仰的印记。<br/><br/>“死在暴风雨后六十年，即将消失的野径迎来一个人的朝圣路。”这句将个人行者的孤独感与时间流逝的沧桑感融为一体，为整首诗奠定了沉郁而又执着的基调。对秦始皇与“神乌”的追问，则进一步将时间轴拉伸至更遥远的古代，展现了中华文明多元信仰的并行与更迭，以及作者对历史谜团的“狐疑”。<br/><br/>---<br/><br/>### **无相与具象的张力：佛教艺术的演变**<br/><br/>诗歌的第二部分聚焦于摩崖石刻本身，引出“无相”这一核心佛教概念。作者指出“月氏人违背了圣人无相的遗愿，把他刻进了石头里”，直接点明了佛教早期不立偶像的传统与犍陀罗艺术（月氏人在中亚建立贵霜帝国后形成的艺术风格）中佛像具象化之间的深刻张力。这种“违背”并非简单的批判，而是一种历史进程中的必然选择，是信仰为了更广泛传播而进行的“权变”。<br/><br/>“那时的佛陀像一位忧郁的希腊王子，卷发、深目，褶袍轻扬。”这生动的描绘不仅展现了犍陀罗佛像融合希腊雕塑风格的艺术特征，更赋予了佛陀以人性化的情感色彩，使其形象更为丰满。随后，诗歌笔锋一转，指向“贵霜王朝在东方的亲戚们”——巧妙地暗示了北魏时期对佛教的推崇与石窟开凿，而“云中”（山西大同云冈石窟）这一指代则进一步精确了历史地理方位。在“风沙里开凿中亚的穹顶”并“召唤出自己的巴米扬佛”，不仅展现了佛教艺术自西向东的传播路径，更揭示了这种具象化过程中的文化融合与创新，以及北方民族对佛教艺术宏大化的追求。<br/><br/>---<br/><br/>### **觉照与解脱：超越形相的哲理升华**<br/><br/>诗歌的第三部分将视角拉回到当下，城市的灯光“勾勒着无常的轮廓”，这是现代文明的景象，却也逃不脱**“无常”**的本质。当“开皇四年的黄昏又一次侧身在这片废墟上”，古老的历史与当下的废墟叠合，更强化了时间的循环与万物变迁的宿命感。<br/><br/>“那些修长的身影超脱造作，临崖而立，观想自在。”这里的“身影”既可以指代石窟中历经风霜的佛像，也可以是作者在特定心境下对修行者或觉悟者的想象。**“超脱造作”**与前文的“无相”相呼应，强调了真正的解脱在于超越一切人为的、外在的形相与分别。“观想自在”则是佛教修行的核心实践，指向了内心的平静与自由。<br/><br/>诗歌以“像一位狡黠的精灵，在旧梦中转身，拈花微笑”作结，充满禅意。“狡黠的精灵”为整首诗注入了一丝灵动与超越性，而“旧梦”则再次连接了历史与时间的维度。“拈花微笑”作为禅宗的经典典故，象征着**以心传心、不立文字的智慧**，以及对真理的无言证悟。这不仅是对佛陀智慧的赞叹，也是对诗人在这次朝圣之旅中所得顿悟的巧妙点化，使得诗歌的哲理意味达到顶点。<br/><br/>---<br/><br/>### **结语**<br/><br/>《西佛峪》是一首结构严谨、意象丰富、哲理深邃的佳作。作者将佛教的“无常”、“无相”与“观想自在”等概念，有机地融入到对历史遗迹的探访和个人感悟之中，实现了景、史、哲的完美融合。它不仅是一次对古老石刻的描绘，更是一次对生命本质和存在意义的诗意追问，引人深思，余韵悠长。<br/><br/>AI poetry review<br/><br/>This poem, titled "West Buddha Valley," elevates a visit to the cliff carvings of Xifoyu in Jinan's Yuhan Mountain into a profound meditation on history, faith, art, and the philosophy of life. With refined language, the author skillfully weaves core Buddhist concepts like "impermanence," "formlessness," and "emptiness of the five aggregates" into concrete descriptions of scenery and historical retrospection, demonstrating commendable poetic skill.<br/>Interweaving History and Philosophy: Traversing Dimensions of Time and Space<br/><br/>The poem opens with the grand and divine imagery of "Noon, a great archangel blowing a trumpet," instantly transporting the reader into a ceremonial scene. The "pouring" sunlight and the "roaring in silence" create an atmosphere that is both concrete and abstract, foreshadowing the extraordinary nature of this journey. Subsequently, the author juxtaposes "shoulder-to-shoulder departed souls" with "that divine mountain," subtly hinting at the countless past lives and imprints of faith carried by the historical stone carvings themselves.<br/><br/>"Sixty years dead after the storm, a lone pilgrim arrived on the fading path." This line merges the solitary feeling of a lone traveler with the sense of time's passing and ancient vicissitudes, setting a somber yet determined tone for the entire poem. The questioning of Emperor Qin Shi Huang and his "divine raven" further extends the timeline to a more distant antiquity, revealing the coexistence and succession of diverse beliefs in Chinese civilization, as well as the author's "doubt" regarding historical enigmas.<br/>The Tension Between Formlessness and Form: The Evolution of Buddhist Art<br/><br/>The second part of the poem focuses on the cliff carvings themselves, introducing "formlessness" (wuxiang) as a core Buddhist concept. The author notes that "The Yuezhi people defied the sage's wish for formlessness, / And carved him into stone," directly highlighting the profound tension between early Buddhist traditions of not creating idols and the subsequent figural representation of the Buddha in Gandharan art (an artistic style that emerged after the Yuezhi established the Kushan Empire in Central Asia). This "defiance" is not a simple critique but an inevitable choice in the course of history—a pragmatic adaptation of faith for broader dissemination.<br/><br/>"The Buddha then was like a melancholic Greek prince, / With curly hair, deep-set eyes, / And robes softly flowing." This vivid description not only showcases the artistic features of Gandharan Buddhas, which integrated Greek sculptural styles, but also imbues the Buddha with human emotional depth, making the figure more complete. The poem then shifts its focus to "The Kushan dynasty's relatives in the East"—subtly hinting at the Northern Wei dynasty's promotion of Buddhism and the carving of grottoes, with "Yungang" further pinpointing the historical and geographical location. Carving "Central Asian domes amidst the wind and sand" and "Summoning forth their own Bamiyan Buddha" not only illustrates the westward-to-eastward transmission of Buddhist art but also reveals the cultural fusion and innovation in this process of concretization, as well as the Northern nomadic peoples' pursuit of grandeur in Buddhist art.<br/>Awakening and Liberation: Philosophical Elevation Beyond Form<br/><br/>The third part of the poem shifts back to the present, where city lights "sketch the contours of impermanence." This is a scene of modern civilization, yet it cannot escape the essence of "impermanence" (wuchang). As "the ancient twilight of Kaihuang's fourth year once again leans over this ruin," ancient history and contemporary ruins overlap, further reinforcing the cyclical nature of time and the fate of all transient things.<br/><br/>"Those slender figures, / Transcending artifice, / Stand by the cliff, / Meditating in self-liberation." Here, "figures" could refer to the weathered Buddha statues in the grottoes, or to the author's imaginative vision of practitioners or enlightened beings in a particular state of mind. "Transcending artifice" echoes "formlessness" from earlier in the poem, emphasizing that true liberation lies in transcending all artificial, external forms and distinctions. "Meditating in self-liberation" (guannian zizai) is a core Buddhist practice, pointing to inner peace and freedom.<br/><br/>The poem concludes with the line, "Like a cunning spirit, / Turning in an old dream, / Holding a flower, and smiling," full of Zen imagery. The "cunning spirit" injects a touch of ethereal lightness and transcendence into the entire poem, while "old dream" once again connects to the dimensions of history and time. "Holding a flower, and smiling" (nianhua weixiao), a classic Zen anecdote, symbolizes mind-to-mind transmission and wordless wisdom, as well as silent enlightenment to truth. This is not only an homage to the Buddha's wisdom but also a subtle illumination of the insights gained by the poet during this pilgrimage, bringing the philosophical meaning of the poem to its peak.<br/>Conclusion<br/><br/>"West Buddha Valley" is a well-structured, richly imagined, and philosophically profound masterpiece. The author organically integrates Buddhist concepts such as "impermanence," "formlessness," and "meditating in self-liberation" into the exploration of historical relics and personal insights, achieving a perfect fusion of scenery, history, and philosophy. It is not merely a depiction of ancient carvings but a poetic inquiry into the essence of life and the meaning of existence, inviting deep contemplation and leaving a lingering resonance.<br/><br/><br/></p></div>
 <p class="meta">如原页面与本页有任何差异，请以 <a href="https://www.ismaelan.com/2025/06/west-buddha-valley.html" rel="noopener">原始来源</a> 为准，并告知差异位置。</p>
+
+<script>
+(function(){
+  var root=document.getElementById('review');
+  if(!root) return;
+  var cid=root.getAttribute('data-candidate');
+  var elStatus=document.getElementById('f-status');
+  var elNature=document.getElementById('f-nature');
+  var elComment=document.getElementById('f-comment');
+  var elSave=document.getElementById('f-save');
+  var elState=document.getElementById('f-state');
+  var elLast=document.getElementById('f-last');
+  var api='/review/api/review/'+encodeURIComponent(cid);
+  var apiSave='/review/api/review';
+  var LS='reviewDraft:'+cid;
+  // ?test=1 routes writes to the isolated test journal so acceptance tests
+  // never touch the author's real review records.
+  var TEST=/[?&]test=1(&|$)/.test(location.search);
+  if(TEST){ api+='?test=1'; LS='reviewDraft-test:'+cid; }
+
+  function setState(kind,text){
+    elState.className='save-state'+(kind?' '+kind:'');
+    elState.textContent=text;
+  }
+  function fmt(ts){ return ts?('上次保存：'+ts.replace('T',' ').slice(0,16)):''; }
+
+  // restore unsaved draft (never treated as a saved record)
+  try{
+    var d=JSON.parse(localStorage.getItem(LS)||'null');
+    if(d){ if(d.status)elStatus.value=d.status; if(d.nature)elNature.value=d.nature;
+           if(d.comment)elComment.value=d.comment; setState('','有未保存的草稿'); }
+  }catch(e){}
+
+  function markDirty(){
+    try{localStorage.setItem(LS,JSON.stringify({status:elStatus.value,
+      nature:elNature.value,comment:elComment.value}));}catch(e){}
+    if(!elState.classList.contains('ok')) setState('','有未保存的修改');
+  }
+  [elStatus,elNature,elComment].forEach(function(el){
+    el.addEventListener('input',markDirty); el.addEventListener('change',markDirty);});
+
+  // load the saved record from the server
+  fetch(api,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.record){
+      if(!localStorage.getItem(LS)){
+        elStatus.value=j.record.status||'pending';
+        elNature.value=j.record.nature||'unset';
+        elComment.value=j.record.comment||'';
+      }
+      elLast.textContent=fmt(j.record.updated_at)+(j.record.rev?('（第 '+j.record.rev+' 版）'):'');
+      setState('ok','已保存');
+    }else{
+      setState('','尚未保存');
+    }
+  }).catch(function(){ setState('err','无法读取历史记录（服务器离线）'); });
+
+  elSave.addEventListener('click',function(){
+    elSave.disabled=true; setState('busy','正在保存…');
+    fetch(apiSave,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({candidate_id:cid,status:elStatus.value,
+        nature:elNature.value,comment:elComment.value,test:TEST})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      elSave.disabled=false;
+      if(res.ok&&res.j&&res.j.ok){
+        try{localStorage.removeItem(LS);}catch(e){}
+        var rec=res.j.record||{};
+        elLast.textContent=fmt(rec.updated_at)+(rec.rev?('（第 '+rec.rev+' 版）'):'');
+        setState('ok','保存成功');
+      }else{
+        var msg=(res.j&&res.j.error)?res.j.error:'保存失败';
+        setState('err','保存失败：'+msg);
+      }
+    }).catch(function(){
+      elSave.disabled=false;
+      setState('err','保存失败：网络错误（未保存）');
+    });
+  });
+})();
+</script>
+
 <div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
 </div></body></html>
