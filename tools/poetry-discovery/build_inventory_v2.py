@@ -134,14 +134,26 @@ def main():
                 note = 'MULTI-POEM post (title marker) - needs manual split. ' + note
             if cat2 == 'A' and 'NO byline' in ' '.join(r2):
                 note = 'NO BYLINE: attributed by label+title only. ' + note
+            # title_source: article_title (title has poetry kw) | inner_byline | none
+            inner_byline = bool(re.search(r'[^\n]{2,30}?[ \t]*[/|｜][ \t]*安然', plain))
+            if bi.POETRY_TITLE_RE.search(title):
+                title_source = 'article_title'
+            elif inner_byline:
+                title_source = 'inner_byline'
+            else:
+                title_source = 'none'
+            work_count = '>=2' if multi == 'yes' else '1'
             candidates.append(OrderedDict([
                 ('candidate_id', f'C{cid:04d}'),
-                ('work_title', title if bi.POETRY_TITLE_RE.search(title) else ''),
+                ('source_post_id', e['id']['$t'].split('post-')[-1]),
+                ('candidate_title', title if bi.POETRY_TITLE_RE.search(title) else ''),
                 ('source_post_title', title), ('published', pub), ('source_url', url),
                 ('category', cat2), ('lang', lang),
+                ('title_source', title_source),
                 ('has_own_title', 'yes' if bi.POETRY_TITLE_RE.search(title) else 'unknown'),
                 ('full_text_present', 'yes' if plain.strip() else 'no'),
-                ('position_in_post', 'entire post (auto)'),
+                ('boundary_status', 'needs_split' if multi == 'yes' else 'entire_post_or_unknown'),
+                ('work_count_estimate', work_count),
                 ('multi_poem_flag', multi),
                 ('authorship_evidence', '; '.join(r2)[:160]),
                 ('labels', '|'.join(labels)),
