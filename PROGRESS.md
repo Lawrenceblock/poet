@@ -18,6 +18,38 @@
 | `review/hugo-deployment-readiness-phase2` | Phase 2/3：Hugo/Vercel + 排版保护（PR #5） | ✅ 已推送 |
 | `review/author-review-materials` | 阶段A：作者审阅材料（PR #6） | ✅ 已推送 |
 | `site/hugo-poetry-site-foundation` | 阶段B：Hugo 完整网站框架（PR #7） | ✅ 已推送 |
+| `site/poetry-site-v1-2026-11-12` | 阶段C：整合 + 作者审阅全文站 + 旧站存档（PR #8） | 🔄 进行中 |
+
+---
+
+## 阶段 C（整合与交付）· 2026-11-12
+
+**分支**：`site/poetry-site-v1-2026-11-12`（以 `main` `ee94501c` 为基线，整合 B/A/审阅分支）
+
+### 已完成
+
+- **C1 分支整合**：将 `review/author-review-materials`、`site/hugo-poetry-site-foundation`、
+  `audit/*` 合并进本分支（`PROGRESS.md` 冲突已解决）。
+- **C2 作者审阅全文站**：137 篇候选，逐字保留原文（含标点/诗行/段落/图片），
+  仅移除脚本类不安全代码；共 11 个分批页 + 137 个阅读页。
+  校验工具 `verify_verbatim.py`：**137/137 逐字一致**，内部链接全部可达。
+- **C3 旧站只读存档**：`hugo/static/legacy/`（首页/卷目/题记/小传/两首诗），
+  仅重写路径，未改动任何文字。
+- **C4 URL 方案**：博客 305 篇 → `/:year/:month/:slug/`（= 旧 URL 去掉 `.html`）；
+  映射表 `docs/migration/legacy-url-redirect-map.csv`，**0 冲突**。
+- **C5 旧路径兼容**：`/na-la-ti/`、`/qing-chun-de-wu-yu/`、`/style.css` 在新站不再 404
+  （正文是否搬入正式页面待作者确认，当前为指向存档的说明页）。
+- **C6 预览站**：`tools/preview/build_preview.py` 生成可点击预览；
+  **正式构建不含 `/review/`**（未经确认的作品不进入正式站）。
+- **C7 版本差异发现**：《青春的物语》在旧诗站与旧博客各有一版（正文一致，
+  旧诗站残留 `**`/`---` 字面量）；已建 `review/oldsite/` 供作者裁定。
+- **C8 线上核对**：旧站 8 条 URL 与新站逐条比对，全部 200 一致。
+
+### 待办（需授权）
+
+- 作者逐篇确认 137 候选（全部 `human_review=pending`）后方可迁移正文。
+- DNS `poet.ismaelan.com` → Vercel 切换、Jekyll Pages 退役（**需显式授权 + 回滚方案**）。
+- 旧域名 `www.ismaelan.com` 的 301 需**由旧站自身**实施（跨域，不能由新站代劳）。
 
 ## 已完成的阶段
 
