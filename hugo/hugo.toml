@@ -27,6 +27,9 @@ title = "安然诗歌档案"
   coverImage = "/assets/img/cover.png"
   # 站内搜索开关（纯前端，无第三方依赖）
   enableSearch = true
+  # 作者审阅材料入口（/review/）。默认 false：正式构建不发布未经确认的作品全文。
+  # 预览构建时由 tools/preview/build_preview.py 用环境变量 HUGO_PARAMS_ENABLEREVIEW=true 开启。
+  enableReview = false
 
 # 导航菜单
 [menu]
@@ -55,9 +58,14 @@ title = "安然诗歌档案"
     url = "/search/"
     weight = 60
 
-# 保持旧站 permalink：/:title/ → /:slug/
+# URL 方案（Phase C 决策，可回滚）：
+#   旧博客 305 篇 → /:year/:month/:slug/  （实测 305 条路径全部唯一，0 冲突；
+#                   与旧博客路径 /YYYY/MM/slug.html 一一对应，仅去掉 .html）
+#   旧诗站 3 篇 + 小传等 → 使用各文件 front matter 中的显式 url:（保持扁平旧路径）
+# 说明：旧博客域名 www.ismaelan.com 与本站 poet.ismaelan.com 不同，
+#       迁移后用 tools/migration/build_redirect_map.py 生成 301 映射。
 [permalinks]
-  posts = "/:slug/"
+  posts = "/:year/:month/:slug/"
 
 # 输出：HTML + RSS + sitemap + robots（Hugo 内置）+ 站内搜索 JSON 索引
 [outputs]

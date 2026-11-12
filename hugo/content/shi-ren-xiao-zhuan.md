@@ -13,3 +13,7 @@ layout: "about"
 > 说明：本页**不包含**任何未经作者确认的传记信息。
 > 旧站同名页面 `https://poet.ismaelan.com/shi-ren-xiao-zhuan/` 的内容，
 > 将在作者确认后逐字迁入。
+>
+> 旧站小传的**原文**已按只读方式保存在历史存档中：
+> [查看旧版诗人小传](/legacy/shi-ren-xiao-zhuan.html)。
+> 新版页面在本阶段**不复制、不改写**任何传记文字。

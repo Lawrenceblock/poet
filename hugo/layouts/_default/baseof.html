@@ -25,7 +25,10 @@
 
   <footer class="site-footer">
     <p class="copy">© {{ now.Format "2006" }} {{ .Site.Params.author | default .Site.Title }}</p>
-    <p class="copy-note"><a href="{{ "/about/" | relURL }}">档案说明</a></p>
+    <p class="copy-note">
+      <a href="{{ "/about/" | relURL }}">档案说明</a> ·
+      <a href="{{ "/legacy/" | relURL }}">旧版网站 · 历史存档</a>
+    </p>
   </footer>
 </body>
 </html>
