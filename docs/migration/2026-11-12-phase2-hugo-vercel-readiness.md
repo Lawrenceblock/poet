@@ -188,3 +188,116 @@ hugo/vercel.json          # Vercel 配置
 - **未**部署任何站点；
 - **未**修改 DNS、HTTPS、GitHub Pages 配置、分支保护；
 - 仅**只读**查询了 GitHub Pages 配置与 Vercel 官方源码/文档。
+
+---
+
+## 9. Phase 3 补充验证（**【已验证事实】**）
+
+> 日期：**2026-11-12** · 依据 ChatGPT 对 PR #5 的独立审阅。
+> 本阶段**只做本地/文档层验证**；**未**创建 Vercel 项目、**未**部署、**未**改 DNS。
+
+### 9.1 Jekyll 旧站隔离验证（在临时目录模拟构建）
+
+**方法**：安装 `jekyll 4.3.4`，把仓库**当前分支内容**复制到 `/tmp`，运行 `jekyll build`（**不影响线上**）。
+
+**【已验证事实 · 重要发现】** 未加隔离前，Jekyll **会**把 `hugo/`、`docs/` 目录**一并构建进 `_site/`**，例如：
+
+```
+_site/hugo/hugo.toml
+_site/hugo/vercel.json
+_site/hugo/README-HUGO.md
+_site/hugo/layouts/404.html
+_site/hugo/content/archive/index.html
+_site/docs/migration/url-compatibility.md
+...
+```
+
+并伴随构建告警：`Layout 'archive' requested in hugo/content/archive.md does not exist.`
+
+**结论**：
+- **【已验证事实】** `hugo/` **不**以 `_` 开头，**不在** Jekyll 默认忽略范围，因此**会被**根目录 Jekyll 纳入构建。
+- **【已验证事实】** 但**当前线上不受影响**：`main` 分支**根本没有** `hugo/`、`docs/`、`tools/`（它们只存在于 PR 分支）。线上抽查 `/hugo/hugo.toml`、`/docs/migration/url-compatibility.md` 均 **404**。→ **在把 `hugo/` 合并进 `main` 之前，不会污染线上**。
+- **【风险】** 一旦把 `hugo/` 合并进 `main` 并触发 Pages 构建，上述文件会出现在线上（`/hugo/...`、`/docs/...`），**且 `/hugo/content/**` 会生成多余的 HTML 页面**。
+
+**最小化隔离方案（**【建议】**，**未**应用到 `main`）**：在 `_config.yml` 的 `exclude:` 中加入：
+
+```yaml
+exclude:
+  - README.md
+  - "元宝代码"
+  - vendor
+  - Gemfile
+  - Gemfile.lock
+  - hugo      # Phase 3: 排除 Hugo 迁移框架
+  - docs      # Phase 3: 排除文档/审计报告
+  - tools     # Phase 3: 排除脚本
+  - PROGRESS.md
+```
+
+**验证（**【已验证事实】**）**：加 `exclude` 后重建，`_site/` **只剩**站点文件（`index.html`、`archive/`、`preface/`、`na-la-ti/`、`qing-chun-de-wu-yu/`、`shi-ren-xiao-zhuan/`、`assets/`、`style.css`、`CNAME`），**无**任何 `hugo/`、`docs/`、`tools/` 产物。
+
+> **【建议】** 该 `exclude` 增补应在**专门的分支/PR**中提出并评审，**不得**在本审计阶段直接改 `main`。
+
+### 9.2 `baseURL` 对预览构建的影响（**【已验证事实】**）
+
+| 构建 | canonical | og:url | sitemap `<loc>` | robots `Sitemap:` | 内部导航链接 |
+| --- | --- | --- | --- | --- | --- |
+| `baseURL = https://poet.ismaelan.com/`（当前） | `https://poet.ismaelan.com/` | 同 | 生产域名 | 生产域名 | `/archive/`（相对） |
+| `--baseURL https://poet-…vercel.app/` | **预览域名** | 预览域名 | **预览域名** | **预览域名** | `/archive/`（相对，**不变**） |
+
+**结论**：
+- **【已验证事实】** `baseURL` 决定 **canonical、og:url、sitemap、robots** 中的域名。**内部导航链接**用 `relURL`，为**相对路径**，**不**受 `baseURL` 影响。
+- **【风险】** 若在 Vercel **预览**上使用**生产 `baseURL`**，预览页面的 canonical/sitemap 会指向**生产域名**——虽不影响功能，但会造成 SEO 混淆。
+- **【建议】** 迁移期用 Vercel 环境变量 `HUGO_BASEURL` 或在构建命令中传 `--baseURL "$VERCEL_URL"`，使预览的 canonical 指向预览域名；**正式切换时**再固定为 `https://poet.ismaelan.com/`。
+- **【建议】** 确认 `trailingSlash: true` 与旧站一致（旧站 URL 均带尾斜杠）。
+
+### 9.3 `HUGO_VERSION` 锁定与 Extended 验证（**【已验证事实】**）
+
+- **【已验证事实】** 官方预设 `defaultVersion = 0.58.2`；`HUGO_VERSION` 环境变量可覆盖（Vercel fixture `33-hugo-zola-versions`）。
+- **【已验证事实】** Vercel 安装器**优先 Extended**（`packages/static-build/src/utils/hugo.ts` 先试 `hugo_extended_*`）；Hugo 0.168.0 存在 `hugo_extended_0.168.0_linux-amd64.tar.gz`。
+- **【已验证事实】** 本框架**未使用 SCSS/图片处理**，仅用 `resources.Get` + `minify` + `fingerprint`（**standard 版即可**）。故即使装到 standard 版也能构建；Extended 为**更保险**。
+- **【建议 · 最小 `vercel.json` 增补（**未**应用）】**：
+
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "hugo",
+  "buildCommand": "hugo --minify --gc",
+  "outputDirectory": "public",
+  "trailingSlash": true,
+  "build": { "env": { "HUGO_VERSION": "0.168.0" } },
+  "headers": [ /* 见 9.4 */ ]
+}
+```
+
+- **【建议】** `HUGO_VERSION` **同时**设为 Vercel 项目环境变量（更稳）。
+- **【已验证事实】** `hugo.toml` **不被** Vercel 官方预设检测器识别（只认 `config.toml/yaml/json`），故应**显式** `"framework": "hugo"`。
+
+### 9.4 指纹 CSS 与缓存头路径（**【已验证事实】+【建议】**）
+
+- **【已验证事实】** Hugo 产出 `public/css/style.min.<hash>.css`（经 `minify | fingerprint`），**未**产出 `/style.css`。
+- **【已验证事实】** `hugo/vercel.json` 现有两条 header：`/assets/(.*)` 与 **`/style.css`**。其中 **`/style.css` 规则是 no-op**（产物中不存在该路径）。
+- **【建议 · 缓存头修正（**未**应用）】**：
+
+```json
+"headers": [
+  { "source": "/assets/(.*)",  "headers": [ { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" } ] },
+  { "source": "/css/(.*)",     "headers": [ { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" } ] }
+]
+```
+
+> 指纹文件名本身即可安全长期缓存；用 `/css/(.*)` 覆盖所有指纹 CSS。
+
+### 9.5 其它发现（**【已验证事实】+【建议】**）
+
+- **【已验证事实】** `static/` 下**无** `style.css`（仅 `assets/img/cover.png`）。`url-compatibility.md` §3.3 声称“`static/style.css → /style.css`”，**与当前 Hugo 实现不符**：样式实际经 Hugo Pipes 指纹化为 `/css/style.min.<hash>.css`。
+- **【风险】** 旧站 `/style.css`（200）在新 Hugo 站**不存在**（会 404）。**【建议】** 若要保留旧 `/style.css` 链接，需在 `static/style.css` 放一份（或加 Vercel 重定向）。
+- **【已验证事实】** `layouts/_default/baseof.html` 引用 `/favicon.ico`，但 `static/` 中**无** favicon → 该请求会 404。**【建议】** 补 favicon 或移除该 link。
+- **【已验证事实】** 封面路径一致：`static/assets/img/cover.png → /assets/img/cover.png`（与旧站相同）。
+
+### 9.6 迁移期必须逐条验证（**【建议】**）
+
+1. 预览域名下每页 **200**，正文**逐字**一致（含标点/空格/分行）。
+2. `/style.css`（若需保留）与 `/assets/img/cover.png` 可达。
+3. 旧 URL 对应表（见 `url-compatibility.md` §4）逐条 curl 通过。
+4. canonical / sitemap / robots 的域名在预览期指向预览、切换后指向生产。

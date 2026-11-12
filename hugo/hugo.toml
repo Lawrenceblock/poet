@@ -49,6 +49,11 @@ title = "安然诗客栈"
 # Markdown 处理：诗歌依赖换行，务必开启 hardWraps 以保留行尾换行
 [markup]
   [markup.goldmark]
+    # typographer MUST stay off: Goldmark's typographer rewrites straight
+    # quotes -> curly, "..." -> ellipsis, "--" -> en dash. That silently
+    # mutates the poem text and breaks verbatim preservation.
+    [markup.goldmark.extensions]
+      typographer = false
     [markup.goldmark.renderer]
       # 允许诗歌正文内嵌原始 HTML（旧站诗歌为手工 HTML）
       unsafe = true

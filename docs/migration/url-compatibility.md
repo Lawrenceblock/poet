@@ -70,8 +70,12 @@ url: "/preface/"
 
 ### 3.3 静态资源
 
-- `static/style.css` → `/style.css`（与旧站一致）
 - `static/assets/img/cover.png` → `/assets/img/cover.png`（与旧站一致）
+- **样式**：`assets/css/style.css` 经 Hugo Pipes `minify | fingerprint` 输出为
+  **`/css/style.min.<hash>.css`**（**不是** `/style.css`）。
+  - **【风险 · Phase 3】** 旧站 `/style.css`（线上 200）在新 Hugo 站**不存在**。
+    若要保留旧 `/style.css` 链接，需在 `static/style.css` 另放一份（或加 Vercel 重定向）。
+  - **【已验证事实】** 当前 `hugo/static/` 下**无** `style.css`。
 
 ---
 
@@ -85,7 +89,7 @@ url: "/preface/"
 | `/qing-chun-de-wu-yu/` | `/qing-chun-de-wu-yu/` | `slug: "qing-chun-de-wu-yu"` |
 | `/na-la-ti/` | `/na-la-ti/` | `slug: "na-la-ti"` |
 | `/shi-ren-xiao-zhuan/` | `/shi-ren-xiao-zhuan/` | `slug: "shi-ren-xiao-zhuan"` |
-| `/style.css` | `/style.css` | `static/style.css` |
+| `/style.css` | `/css/style.min.<hash>.css`（指纹） | ⚠️ 需另存 `static/style.css` 才可保留 `/style.css` |
 | `/assets/img/cover.png` | `/assets/img/cover.png` | `static/assets/img/` |
 | `/index.html` | `/index.html` | Hugo 首页同时生成（可选保留） |
 
