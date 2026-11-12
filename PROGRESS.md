@@ -33,7 +33,7 @@
 | P3-2 | 关闭 typographer + 短代码矩阵 + Jekyll 隔离 + Vercel 预览修正 | review/hugo-deployment-readiness-phase2 | `22e3907` |
 | P3-3 | Phase 3.1 文档收尾：作品数量表述修正 + 阶段标识统一 | review/poetry-classification-phase2 | `c5f7f55` |
 | A2 | 阶段A：作者审阅材料（CSV + 分批 + 指南 + 边界说明 + 生成脚本） | review/author-review-materials | `044341b` |
-| B | 阶段B：Hugo 完整网站框架（首页/卷目/年份/题记/小传/说明/搜索/RSS/robots/预览隔离/Vercel 配置） | site/hugo-poetry-site-foundation | （见推送记录） |
+| B | 阶段B：Hugo 完整网站框架（首页/卷目/年份/题记/小传/说明/搜索/RSS/robots/预览隔离/Vercel 配置） | site/hugo-poetry-site-foundation | `f4f28c1` |
 
 ## 已推送的重要文件
 
@@ -116,7 +116,7 @@
 | review/poetry-classification-phase2 | `c5f7f55`（PR #4） |
 | review/hugo-deployment-readiness-phase2 | `92d4686`（PR #5） |
 | review/author-review-materials | `044341b`（PR #6） |
-| site/hugo-poetry-site-foundation | （本阶段推送后更新） |
+| site/hugo-poetry-site-foundation | `f4f28c1`（PR #7） |
 
 > 上表 SHA 以 `git ls-remote` / GitHub 远程为准（2026-11-12 核验）。
 
