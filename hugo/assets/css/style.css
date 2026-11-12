@@ -126,6 +126,8 @@ a:hover { text-decoration: underline; }
   word-break: break-word;
 }
 .poem-content p { margin: 0 0 1.4em; text-indent: 0; }
+/* 保留行首/行尾空格与连续空格（诗歌排版保护） */
+.poem-verse { white-space: pre-wrap; }
 .poem-content br { line-height: 2.4; }
 
 /* 英文诗行在移动端过长时左对齐更易读 */
@@ -174,3 +176,124 @@ a:hover { text-decoration: underline; }
   body { background: #fff; }
   .site-nav, .poem-footer, .skip-link { display: none; }
 }
+
+/* ---------- 首页区块（Phase B） ---------- */
+.home-block { margin-top: 2.6rem; text-align: left; }
+.block-title {
+  font-size: 1rem;
+  font-weight: normal;
+  letter-spacing: .18em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: .4rem;
+  margin: 0 0 1rem;
+}
+.poem-list { list-style: none; margin: 0; padding: 0; }
+.poem-item {
+  display: flex;
+  align-items: baseline;
+  gap: .6em;
+  margin-bottom: .7rem;
+}
+.poem-item a { flex: 1; }
+.poem-item .date { color: var(--faint); font-size: .8rem; }
+.poem-item.empty { color: var(--faint); }
+.home-disclaimer {
+  font-size: .86rem;
+  color: var(--muted);
+  line-height: 1.9;
+  background: rgba(255,255,255,.45);
+  border-left: 3px solid var(--rule);
+  padding: .8rem 1rem;
+  margin: 0;
+}
+.year-chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin: 0;
+  padding: 0;
+}
+.year-chips a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .35em;
+  padding: .25rem .7rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font-size: .86rem;
+  color: var(--muted);
+}
+.year-chips .count { color: var(--faint); font-size: .74rem; }
+
+/* ---------- 年份归档 ---------- */
+.year-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin: 0 0 1.5rem;
+}
+.year-jump a { font-size: .86rem; color: var(--muted); }
+.year-group { margin-top: 2rem; }
+.year-heading {
+  font-size: .95rem;
+  font-weight: normal;
+  letter-spacing: .14em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: .3rem;
+  margin: 0 0 .8rem;
+  display: flex;
+  justify-content: space-between;
+}
+.year-heading .count { color: var(--faint); font-size: .78rem; }
+
+/* ---------- 说明类长文 ---------- */
+.prose { text-align: left; line-height: 2; }
+.prose h2 { font-size: 1.02rem; margin: 1.8em 0 .6em; letter-spacing: .06em; }
+.prose p { margin: 0 0 1.1em; }
+.prose ul { padding-left: 1.2em; }
+.prose li { margin-bottom: .35em; }
+.prose blockquote {
+  margin: 1.4em 0;
+  padding-left: 1em;
+  border-left: 3px solid var(--rule);
+  color: var(--muted);
+}
+.prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .88em;
+  background: rgba(0,0,0,.05);
+  padding: .1em .35em;
+  border-radius: 3px;
+}
+
+/* ---------- 分页 ---------- */
+.pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .8rem;
+  margin-top: 2rem;
+  font-size: .86rem;
+  color: var(--muted);
+}
+.pager-info { color: var(--faint); }
+
+/* ---------- 站内搜索 ---------- */
+.search-form { margin: 1.2rem 0 0; }
+.search-label { display: block; font-size: .82rem; color: var(--muted); margin-bottom: .4rem; }
+.search-input {
+  width: 100%;
+  padding: .6rem .8rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+.search-input:focus { outline: 2px solid var(--link); outline-offset: 1px; }
+.search-status { font-size: .82rem; color: var(--faint); min-height: 1.2em; margin: .6rem 0 0; }
+.search-results { margin-top: 1rem; }

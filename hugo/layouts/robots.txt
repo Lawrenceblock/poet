@@ -1,5 +1,8 @@
 User-agent: *
+{{- $isProduction := eq (urls.Parse .Site.BaseURL).Host "poet.ismaelan.com" }}
+{{- if $isProduction }}
 Allow: /
-Disallow: /page/
-
+{{- else }}
+Disallow: /
+{{- end }}
 Sitemap: {{ "sitemap.xml" | absURL }}

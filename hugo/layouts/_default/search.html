@@ -1,0 +1,21 @@
+{{ define "main" }}
+<article class="poem-page">
+  <header class="poem-header">
+    <h1 class="poem-title">{{ .Title }}</h1>
+  </header>
+  <div class="poem-content list-content">
+    {{ .Content }}
+    {{- if .Site.Params.enableSearch }}
+    <form class="search-form" role="search" onsubmit="return false;">
+      <label class="search-label" for="search-input">输入关键词（标题或正文）</label>
+      <input id="search-input" class="search-input" type="search" placeholder="例如：雨、雪、信" autocomplete="off">
+    </form>
+    <p id="search-status" class="search-status" role="status" aria-live="polite"></p>
+    <ul id="search-results" class="archive search-results"></ul>
+    <noscript><p class="search-status">站内搜索需要启用 JavaScript。</p></noscript>
+    {{- else }}
+    <p>站内搜索当前未启用。</p>
+    {{- end }}
+  </div>
+</article>
+{{ end }}

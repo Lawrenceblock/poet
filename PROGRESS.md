@@ -16,6 +16,8 @@
 | `audit/pre-hugo-migration-2026-11-12` | 前序只读审计（PR #1） | ✅ **保留不动** |
 | `review/poetry-classification-phase2` | Phase 2/3：分类规则复核（PR #4） | ✅ 已推送 |
 | `review/hugo-deployment-readiness-phase2` | Phase 2/3：Hugo/Vercel + 排版保护（PR #5） | ✅ 已推送 |
+| `review/author-review-materials` | 阶段A：作者审阅材料（PR #6） | ✅ 已推送 |
+| `site/hugo-poetry-site-foundation` | 阶段B：Hugo 完整网站框架（PR #7） | ✅ 已推送 |
 
 ## 已完成的阶段
 
@@ -30,6 +32,8 @@
 | P3-1 | 分类规则修正（A 类须署名）+ 字段语义 + README + 复现验证 | review/poetry-classification-phase2 | `4ec62f7` |
 | P3-2 | 关闭 typographer + 短代码矩阵 + Jekyll 隔离 + Vercel 预览修正 | review/hugo-deployment-readiness-phase2 | `22e3907` |
 | P3-3 | Phase 3.1 文档收尾：作品数量表述修正 + 阶段标识统一 | review/poetry-classification-phase2 | `c5f7f55` |
+| A2 | 阶段A：作者审阅材料（CSV + 分批 + 指南 + 边界说明 + 生成脚本） | review/author-review-materials | `044341b` |
+| B | 阶段B：Hugo 完整网站框架（首页/卷目/年份/题记/小传/说明/搜索/RSS/robots/预览隔离/Vercel 配置） | site/hugo-poetry-site-foundation | （见推送记录） |
 
 ## 已推送的重要文件
 
@@ -111,6 +115,8 @@
 | audit/pre-hugo-migration-2026-11-12 | `eaac3a4`（PR #1） |
 | review/poetry-classification-phase2 | `c5f7f55`（PR #4） |
 | review/hugo-deployment-readiness-phase2 | `92d4686`（PR #5） |
+| review/author-review-materials | `044341b`（PR #6） |
+| site/hugo-poetry-site-foundation | （本阶段推送后更新） |
 
 > 上表 SHA 以 `git ls-remote` / GitHub 远程为准（2026-11-12 核验）。
 
@@ -123,3 +129,5 @@
 | #3 | migration/hugo-poetry-foundation | 任务 A：Hugo 框架 |
 | #4 | review/poetry-classification-phase2 | Phase 2：分类规则复核 |
 | #5 | review/hugo-deployment-readiness-phase2 | Phase 2：Hugo/Vercel + 排版保护 |
+| #6 | review/author-review-materials | 阶段A：作者审阅材料 |
+| #7 | site/hugo-poetry-site-foundation | 阶段B：Hugo 完整网站框架 |

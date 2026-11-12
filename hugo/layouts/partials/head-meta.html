@@ -1,1 +1,63 @@
-{{/* 预留：集中式 SEO/元数据 partial（当前 baseof.html 内联实现）。 */}}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} · {{ .Site.Title }}{{ end }}</title>
+
+{{- $desc := "" }}
+{{- with .Description }}{{ $desc = . }}{{ else }}{{ with .Summary }}{{ $desc = . }}{{ else }}{{ $desc = .Site.Params.description }}{{ end }}{{ end }}
+<meta name="description" content="{{ $desc | plainify | truncate 160 }}">
+
+{{- /* 预览/正式域名隔离：仅当 baseURL 为正式域名时才输出 canonical 与 robots=index */}}
+{{- $isProduction := eq (urls.Parse .Site.BaseURL).Host "poet.ismaelan.com" }}
+{{- if $isProduction }}
+<link rel="canonical" href="{{ .Permalink }}">
+<meta name="robots" content="index,follow">
+{{- else }}
+{{- /* 预览域名：不输出 canonical，禁止收录，避免污染正式站 */}}
+<meta name="robots" content="noindex,nofollow">
+{{- end }}
+
+{{- with .Site.Params.author }}<meta name="author" content="{{ . }}">{{ end }}
+
+{{- /* Open Graph */}}
+<meta property="og:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}{{ end }}">
+<meta property="og:description" content="{{ $desc | plainify | truncate 200 }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:site_name" content="{{ .Site.Title }}">
+{{- with .Site.Params.coverImage }}<meta property="og:image" content="{{ . | absURL }}">{{ end }}
+<meta name="twitter:card" content="summary">
+
+{{- /* RSS 自动发现 */}}
+{{- range .AlternativeOutputFormats }}
+<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink | safeURL }}" title="{{ $.Site.Title }}">
+{{- end }}
+
+{{- /* JSON-LD（诗歌页） */}}
+{{- if .IsPage }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  "name": {{ .Title }},
+  "inLanguage": {{ .Site.Language.Locale }},
+  "url": {{ .Permalink }}{{ with .Params.author }},
+  "author": { "@type": "Person", "name": {{ . }} }{{ end }}{{ if not .Date.IsZero }},
+  "datePublished": {{ .Date.Format "2006-01-02" }}{{ end }}
+}
+</script>
+{{- end }}
+
+<link rel="icon" href="{{ "favicon.ico" | relURL }}" type="image/x-icon">
+
+{{- /* 样式：Hugo Pipes 处理 CSS */}}
+{{- $css := resources.Get "css/style.css" }}
+{{- if $css }}
+<link rel="stylesheet" href="{{ ($css | minify | fingerprint).RelPermalink }}">
+{{- else }}
+<link rel="stylesheet" href="{{ "style.css" | relURL }}">
+{{- end }}
+
+{{- /* 站内搜索（纯前端，仅首页索引页加载） */}}
+{{- if and .Site.Params.enableSearch (eq .Layout "search") }}
+<script defer src="{{ "js/search.js" | relURL }}"></script>
+{{- end }}

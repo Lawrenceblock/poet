@@ -1,16 +1,52 @@
 {{ define "main" }}
+{{- $poems := where .Site.RegularPages "Section" "posts" }}
 <section class="cover">
   {{ with .Site.Params.coverImage }}
-  <img src="{{ . | relURL }}" alt="封面">
+  <img src="{{ . | relURL }}" alt="安然诗歌档案封面">
   {{ end }}
   <h1 class="title">{{ .Site.Title }}</h1>
-  {{ with .Site.Params.description }}<p class="sub">{{ . }}</p>{{ end }}
-  <p class="note">
-    <a href="{{ "/archive/" | relURL }}">卷目</a>
-    <span class="nav-sep">·</span>
-    <a href="{{ "/preface/" | relURL }}">题记</a>
-    <span class="nav-sep">·</span>
-    <a href="{{ "/shi-ren-xiao-zhuan/" | relURL }}">小传</a>
+  {{ with .Site.Params.tagline }}<p class="sub">{{ . }}</p>{{ end }}
+  {{ with .Site.Params.description }}<p class="note">{{ . }}</p>{{ end }}
+</section>
+
+<section class="home-block">
+  <h2 class="block-title">最新作品</h2>
+  <ul class="poem-list">
+    {{ range first 5 ($poems.ByDate.Reverse) }}
+    <li class="poem-item">
+      <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+      {{ if not .Date.IsZero }}<time class="date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time>{{ end }}
+    </li>
+    {{ else }}
+    <li class="poem-item empty">尚无作品。</li>
+    {{ end }}
+  </ul>
+</section>
+
+<section class="home-block">
+  <h2 class="block-title">按年份浏览</h2>
+  <ul class="year-chips">
+    {{ range ($poems.GroupByDate "2006") }}
+    <li><a href="{{ ("/years/" | relURL) }}#year-{{ .Key }}">{{ .Key }}<span class="count">{{ len .Pages }}</span></a></li>
+    {{ end }}
+  </ul>
+</section>
+
+<section class="home-block">
+  <h2 class="block-title">入口</h2>
+  <ul class="poem-list">
+    <li class="poem-item"><a href="{{ "/archive/" | relURL }}">卷目</a> — 全部作品列表</li>
+    <li class="poem-item"><a href="{{ "/preface/" | relURL }}">题记</a></li>
+    <li class="poem-item"><a href="{{ "/shi-ren-xiao-zhuan/" | relURL }}">诗人小传</a></li>
+    <li class="poem-item"><a href="{{ "/about/" | relURL }}">档案说明</a> — 作品整理原则</li>
+  </ul>
+</section>
+
+<section class="home-block">
+  <h2 class="block-title">说明</h2>
+  <p class="home-disclaimer">
+    本站为<strong>迁移中的新框架</strong>，当前页面均为明确标注的<strong>合成测试文本</strong>，
+    不是作者的真实作品。真实作品将在获得作者逐篇确认后迁入。
   </p>
 </section>
 {{ end }}

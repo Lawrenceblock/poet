@@ -3,16 +3,17 @@
   <header class="poem-header">
     <h1 class="poem-title">{{ .Title }}</h1>
   </header>
-  <div class="poem-content">
+  <div class="poem-content list-content">
     {{ .Content }}
     <ul class="archive">
-      {{ range .Pages.ByDate.Reverse }}
+      {{ range .Paginator.Pages.ByDate.Reverse }}
       <li class="archive-item">
         <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-        {{ if not .Date.IsZero }}<span class="date">{{ .Date.Format "2006.01" }}</span>{{ end }}
+        {{ if not .Date.IsZero }}<time class="date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time>{{ end }}
       </li>
       {{ end }}
     </ul>
+    {{ partial "pagination.html" . }}
   </div>
 </article>
 {{ end }}
