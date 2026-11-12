@@ -18,12 +18,20 @@ Safety
 ------
   * Writes go only through store.save(), which whitelists candidate_id and
     enum values and never touches poem text, the feed or the candidate CSV.
+  * ?test=1 (or a body field "test": true) routes a save to the isolated test
+    journal; the query flag alone is enough, so a test link can never write to
+    the author's real records.
+  * If REVIEW_ACCESS_TOKEN is set, every /review/ page and /api/ request must
+    present it (via ?token=, X-Review-Token header, or the review_token cookie
+    set on first use). Without it the preview is open to anyone who has the URL,
+    so set it whenever the preview host is reachable by others.
   * REVIEW_FORCE_SAVE_ERROR=1 makes every save fail (used to test the UI's
     failure feedback; it must never report success).
 """
 import argparse
 import json
 import os
+import secrets
 import socketserver
 import sys
 import http.server
@@ -34,14 +42,64 @@ import store  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 PUBLIC = os.path.join(ROOT, "hugo", "public")
+ACCESS_TOKEN = os.environ.get("REVIEW_ACCESS_TOKEN") or ""
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=PUBLIC, **kw)
 
-    def log_message(self, *a):
-        pass
+    def log_message(self, fmt, *a):
+        # Keep the console quiet for normal hits, but always record non-2xx
+        # responses (e.g. a 404 for a poem page) so a fault leaves a trace.
+        try:
+            code = a[1] if len(a) > 1 else ""
+            if str(code).startswith("2"):
+                return
+            sys.stderr.write(f"[review] {self.address_string()} "
+                             f"{self.command} {self.path} -> {code}\n")
+            sys.stderr.flush()
+        except Exception:
+            pass
+
+    # ---------- access control ----------
+    def _presented_token(self):
+        if "?" in self.path:
+            for pair in self.path.split("?", 1)[1].split("&"):
+                if pair.startswith("token="):
+                    return pair[len("token="):]
+        if self.headers.get("X-Review-Token"):
+            return self.headers.get("X-Review-Token")
+        for c in (self.headers.get("Cookie") or "").split(";"):
+            k, _, v = c.strip().partition("=")
+            if k == "review_token":
+                return v
+        return None
+
+    def _authorized(self):
+        if not ACCESS_TOKEN:
+            return True
+        return secrets.compare_digest(self._presented_token() or "", ACCESS_TOKEN)
+
+    def _deny(self):
+        body = json.dumps({"ok": False, "error": "需要访问令牌（?token=…）"},
+                          ensure_ascii=False).encode("utf-8")
+        self.send_response(401)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("WWW-Authenticate", 'Bearer realm="author-review"')
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _maybe_set_cookie(self):
+        tok = self._presented_token()
+        if ACCESS_TOKEN and tok and secrets.compare_digest(tok, ACCESS_TOKEN):
+            self.send_header("Set-Cookie",
+                             f"review_token={tok}; Path=/; HttpOnly; SameSite=Lax")
+
+    def end_headers(self):
+        self._maybe_set_cookie()
+        super().end_headers()
 
     # ---------- helpers ----------
     def _json(self, code, obj):
@@ -82,6 +140,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     # ---------- GET ----------
     def do_GET(self):
+        if not self._authorized():
+            return self._deny()
         path = self._apipath()
         if path is not None:
             return self._api_get(path)
@@ -109,6 +169,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     # ---------- POST ----------
     def do_POST(self):
+        if not self._authorized():
+            return self._deny()
         path = self._apipath()
         if path is None:
             return super().do_POST()
@@ -123,6 +185,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             payload = json.loads(raw.decode("utf-8") or "{}")
         except (UnicodeDecodeError, json.JSONDecodeError):
             return self._json(400, {"ok": False, "error": "请求体不是合法 JSON"})
+
+        # ?test=1 must be enough on its own to keep test writes out of the
+        # author's real journal, so force the flag when the query asks for it.
+        if self._is_test():
+            payload["test"] = True
 
         if os.environ.get("REVIEW_FORCE_SAVE_ERROR") == "1":
             return self._json(500, {"ok": False, "error": "服务端模拟写入失败（测试用）"})

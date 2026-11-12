@@ -43,10 +43,34 @@ def main():
                    check=True, cwd=HUGO,
                    env={**os.environ, "HUGO_PARAMS_ENABLEREVIEW": "true"})
 
+    # Sync the review pages into the preview tree WITHOUT ever removing the
+    # live directory. A plain rmtree+copytree leaves a window in which every
+    # /review/ URL 404s; copying file-by-file via a temp file + atomic replace
+    # means a served page is always either the old or the new copy, never
+    # missing. Stale files are pruned only after the new ones are in place.
     dst = os.path.join(PUBLIC, "review")
-    if os.path.exists(dst):
-        shutil.rmtree(dst)
-    shutil.copytree(REVIEW_SRC, dst)
+    os.makedirs(dst, exist_ok=True)
+    wanted = set()
+    for root, _dirs, files in os.walk(REVIEW_SRC):
+        rel = os.path.relpath(root, REVIEW_SRC)
+        outdir = dst if rel == "." else os.path.join(dst, rel)
+        os.makedirs(outdir, exist_ok=True)
+        for name in files:
+            src = os.path.join(root, name)
+            tgt = os.path.join(outdir, name)
+            wanted.add(os.path.relpath(tgt, dst))
+            tmp = tgt + ".tmp"
+            shutil.copy2(src, tmp)
+            os.replace(tmp, tgt)
+    for root, dirs, files in os.walk(dst, topdown=False):
+        for name in files:
+            full = os.path.join(root, name)
+            if os.path.relpath(full, dst) not in wanted:
+                os.unlink(full)
+        for name in dirs:
+            full = os.path.join(root, name)
+            if not os.listdir(full):
+                os.rmdir(full)
 
     n = len(os.listdir(os.path.join(dst, "poem")))
     print(f"preview built at {PUBLIC}")

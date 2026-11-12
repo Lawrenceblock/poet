@@ -74,6 +74,12 @@ def blog_version_of_qingchun():
 
 def main():
     os.makedirs(OUT, exist_ok=True)
+    # 题记 的旧站原文里含字面量 <link rel="stylesheet" href="style.css">；
+    # 为让该链接可解析，把旧站样式表复制到本目录（不修改任何正文）。
+    src_css = os.path.join(ROOT, "style.css")
+    if os.path.exists(src_css):
+        import shutil
+        shutil.copy2(src_css, os.path.join(OUT, "style.css"))
     links = []
     for fn, rel, title, date, oldpath in SRC_PAGES:
         body_html = read_body(rel)

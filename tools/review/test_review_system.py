@@ -185,6 +185,61 @@ def main():
     check("no journal-test.jsonl leaked to real dir", "journal-test.jsonl" not in after)
     check("real dir unchanged", before == after, f"{before} -> {after}")
 
+    print("14. ?test=1 query flag alone isolates a POST from real records")
+    # This is the regression for the batch-2 investigation: the query flag must
+    # be sufficient on its own, without relying on the request body.
+    tmp2 = tempfile.mkdtemp(prefix="review-test-iso-")
+    srv3 = start_server({"REVIEW_RECORDS_DIR": tmp2})
+    try:
+        if wait_port(PORT):
+            post("/review/api/review", {"candidate_id": "C0010", "status": "keep"})
+            real_j = os.path.join(tmp2, "journal.jsonl")
+            n_before = len(open(real_j, encoding="utf-8").read().strip().splitlines())
+            post("/review/api/review?test=1",
+                 {"candidate_id": "C0003", "status": "exclude", "comment": "隔离回归"})
+            n_after = len(open(real_j, encoding="utf-8").read().strip().splitlines())
+            test_j = os.path.join(tmp2, "journal-test.jsonl")
+            check("real journal line count unchanged",
+                  n_before == n_after, f"{n_before} -> {n_after}")
+            check("test journal received the record", os.path.exists(test_j))
+            if os.path.exists(test_j):
+                rec = json.loads(open(test_j, encoding="utf-8").read().strip().splitlines()[-1])
+                check("record marked test=true", rec.get("test") is True, str(rec))
+    finally:
+        srv3.terminate()
+        try:
+            srv3.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            srv3.kill()
+        shutil.rmtree(tmp2, ignore_errors=True)
+
+    print("15. access token gate (REVIEW_ACCESS_TOKEN) blocks unauthenticated access")
+    tmp3 = tempfile.mkdtemp(prefix="review-test-token-")
+    srv4 = start_server({"REVIEW_RECORDS_DIR": tmp3, "REVIEW_ACCESS_TOKEN": "s3cret"})
+    try:
+        if wait_port(PORT):
+            def try_get(path, headers=None):
+                req = urllib.request.Request(f"http://127.0.0.1:{PORT}{path}", headers=headers or {})
+                try:
+                    with urllib.request.urlopen(req, timeout=10) as r:
+                        return r.status
+                except urllib.error.HTTPError as e:
+                    return e.code
+            check("no token -> /api/reviews 401", try_get("/api/reviews") == 401)
+            check("no token -> /review/ 401", try_get("/review/") == 401)
+            check("with header token -> 200",
+                  try_get("/api/reviews", {"X-Review-Token": "s3cret"}) == 200)
+            check("with ?token= -> 200", try_get("/api/reviews?token=s3cret") == 200)
+            check("wrong token -> 401",
+                  try_get("/api/reviews", {"X-Review-Token": "nope"}) == 401)
+    finally:
+        srv4.terminate()
+        try:
+            srv4.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            srv4.kill()
+        shutil.rmtree(tmp3, ignore_errors=True)
+
     print()
     if fails:
         print(f"FAILURES: {len(fails)} -> {fails}")
