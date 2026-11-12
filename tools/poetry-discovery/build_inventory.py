@@ -16,9 +16,22 @@ OUT = "docs/poetry-discovery"
 
 # ---------- feed loading ----------
 def load_entries():
+    """Load all work/feed-full-*.json pages (produced by fetch_feed.py).
+
+    Auto-discovers pages instead of hardcoding start-index 1/151/301, so the
+    pipeline still works if Blogger changes its page size.
+    """
+    import glob
     entries = []
-    for s in [1, 151, 301]:
-        with open(f'work/feed-full-{s}.json') as f:
+    paths = sorted(glob.glob('work/feed-full-*.json'),
+                   key=lambda p: int(re.search(r'-(\d+)\.json$', p).group(1)))
+    if not paths:
+        raise SystemExit(
+            "No work/feed-full-*.json found. Run first:\n"
+            "  python3 tools/poetry-discovery/fetch_feed.py\n"
+            "(raw feed is not stored in git; see tools/poetry-discovery/README.md)")
+    for p in paths:
+        with open(p) as f:
             d = json.load(f)
         entries += d['feed'].get('entry', [])
     seen = OrderedDict()
