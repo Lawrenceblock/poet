@@ -1,0 +1,5 @@
+# Raw Blogger feed / sitemap (fetched on demand; contains full poem HTML; not committed)
+/work/
+# Python
+__pycache__/
+*.pyc
