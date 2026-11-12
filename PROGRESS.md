@@ -14,8 +14,8 @@
 | `research/poetry-discovery` | 任务 B：旧博客诗歌普查 | ✅ 已推送 |
 | `migration/hugo-poetry-foundation` | 任务 A：Hugo 框架 | ✅ 已推送 |
 | `audit/pre-hugo-migration-2026-11-12` | 前序只读审计（PR #1） | ✅ **保留不动** |
-| `review/poetry-classification-phase2` | Phase 2：分类规则复核（PR #4） | ✅ 已推送 |
-| `review/hugo-deployment-readiness-phase2` | Phase 2：Hugo/Vercel + 排版保护（PR #5） | ✅ 已推送 |
+| `review/poetry-classification-phase2` | Phase 2/3：分类规则复核（PR #4） | ✅ 已推送 |
+| `review/hugo-deployment-readiness-phase2` | Phase 2/3：Hugo/Vercel + 排版保护（PR #5） | ✅ 已推送 |
 
 ## 已完成的阶段
 
@@ -27,6 +27,8 @@
 | P2-1 | 署名规则复核 + 可复现性工具（Task 1/3） | review/poetry-classification-phase2 | `0d2a8fd` |
 | P2-2 | 候选 vs 独立作品数据模型（Task 2） | review/poetry-classification-phase2 | `5149f35` |
 | P2-3 | Hugo/Vercel 部署审计 + 排版保护测试（Task 4/5） | review/hugo-deployment-readiness-phase2 | `9796cea` |
+| P3-1 | 分类规则修正（A 类须署名）+ 字段语义 + README + 复现验证 | review/poetry-classification-phase2 | `4ec62f7` |
+| P3-2 | 关闭 typographer + 短代码矩阵 + Jekyll 隔离 + Vercel 预览修正 | review/hugo-deployment-readiness-phase2 | `22e3907` |
 
 ## 已推送的重要文件
 
@@ -67,20 +69,24 @@
 ## 尚未完成的工作
 
 - 真实诗歌正文迁移（**需作者授权**，本阶段不做）。
-- 29 篇 B 类候选人工复核。
+- 31 篇 B 类候选人工复核。
 - 多首诗文章拆分。
-- Phase 2 建议的 Hugo 修正（关闭 typographer、统一短代码、锁定 HUGO_VERSION）**尚未应用**（仅建议）。
+- Phase 3 已**应用** typographer 关闭；其余建议（Jekyll `exclude`、`HUGO_VERSION` 锁定、`/style.css` 兼容、favicon）**尚未应用**（仅建议）。
+- 当前 v2 分类：**A=104, B=31, C=1, D=1**（合计 137）。
 
 ## 尚未解决的问题
 
-- 29 篇 B 类候选待人工复核；E 类可能被低估。
+- 31 篇 B 类候选待人工复核（含 Phase 3 降级的 2 条）；E 类可能被低估。
 - 多首诗文章（7 篇标题标记 + 若干无标记）待拆分。
 - 《那拉提（未赴）》《诗人小传》未见于博客，来源待确认。
 - 《青春的物语》博客版 vs 站点版差异待作者裁定。
 - Vercel 上 `HUGO_VERSION=0.168.0` 的实际构建待验证（**未部署**）。
-- **【Phase 2 新】Goldmark typographer 默认开启，会改写引号/省略号/破折号**（违反逐字保护），修正未应用。
-- **【Phase 2 新】** `hardWraps` 正文会把 `*x*`/`_x_` 渲染为斜体；需统一用 `poem` 短代码。
-- **【Phase 2 新】** `hugo.toml` 不被 Vercel 官方预设识别；`HUGO_VERSION` 未锁定。
+- **【Phase 3 已解决】** ~~Goldmark typographer 默认开启~~ → **已在 `hugo/hugo.toml` 关闭**（`typographer = false`）。
+- **【Phase 3 已解决】** ~~`hugo.toml` 不被 Vercel 官方预设识别~~ → **建议显式 `"framework": "hugo"` + 锁定 `HUGO_VERSION`**（文档已写明，配置未应用）。
+- **【Phase 3 新】** Jekyll 会构建 `hugo/`、`docs/`（`hugo/` 不以 `_` 开头）；`main` 无这些目录故线上暂不受影响，合并前需加 `exclude`。
+- **【Phase 3 新】** 短代码为**纯文本**（转义 HTML）；含内联 HTML 的诗需专门处理。
+- **【Phase 3 新】** 旧站 `/style.css` 在新 Hugo 站为指纹路径 `/css/style.min.<hash>.css`，旧链接会 404。
+- **【Phase 3 新】** `baseof.html` 引用 `/favicon.ico` 但无该文件。
 
 ## 下一步计划
 
@@ -102,8 +108,8 @@
 | research/poetry-discovery | `e25f6f3`（PR #2） |
 | migration/hugo-poetry-foundation | `a9644ac`（PR #3） |
 | audit/pre-hugo-migration-2026-11-12 | `eaac3a4`（PR #1） |
-| review/poetry-classification-phase2 | `5149f35`（PR #4） |
-| review/hugo-deployment-readiness-phase2 | `9796cea`（PR #5） |
+| review/poetry-classification-phase2 | `4ec62f7`（PR #4） |
+| review/hugo-deployment-readiness-phase2 | `22e3907`（PR #5） |
 
 ## 已创建的 PR（**均未合并**）
 
