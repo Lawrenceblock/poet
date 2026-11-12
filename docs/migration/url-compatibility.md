@@ -1,4 +1,4 @@
-# 旧 URL 兼容方案（Jekyll → Hugo + Vercel）
+# Phase 1/3 · 旧 URL 兼容方案（Jekyll → Hugo + Vercel）（阶段标识：Phase 1 主报告 + Phase 3 补充）
 
 > 本文件说明 Hugo 迁移中如何保持旧站 URL 不失效。
 > 依据：`docs/audit/2026-11-12-pre-hugo-migration-audit.md` 的实测结果。

@@ -1,4 +1,4 @@
-# Phase 2 · 诗歌正文保护测试报告
+# Phase 2/3 · 诗歌正文保护测试报告（阶段标识：Phase 2 主报告 + Phase 3 补充）
 
 > 日期：**2026-11-12**
 > 测试对象：`hugo/layouts/shortcodes/poem.html`、`hugo/hugo.toml`（`[markup.goldmark.renderer]`）
@@ -72,10 +72,13 @@
 
 ### 3.1 【高】typographer 改变引号/省略号/破折号
 
+> **【Phase 3 状态更新】** 本问题**已在 `hugo/hugo.toml` 修复**（`typographer = false`）。
+> 下方“建议（未应用）”为 **Phase 2 当时**的记录；**Phase 3 已应用**，见 §7。
+
 - **现象**：`'` → `‘’`，`"` → `“”`，`...` → `…`，`--` → `–`。
 - **影响**：诗歌正文中的直引号、省略号、破折号会被**静默改写**，违反逐字保护。
 - **根因**：`hugo.toml` **未设置** `[markup.goldmark.extensions] typographer = false`；Goldmark 默认开启 typographer。
-- **建议（未应用）**：
+- **建议（Phase 2 记录；**Phase 3 已应用**）**：
   ```toml
   [markup.goldmark.extensions]
     typographer = false
@@ -124,29 +127,30 @@
 | Markdown 标记不变 | ❌ 变斜体 | ✅ 原样 | 用短代码 |
 | 原始 HTML 保留 | ✅ | ❌ 被转义 | 用 `hardWraps`+`unsafe` |
 
-> **【推断】** 即便关闭 typographer，短代码内引号是否仍被改写需**再验证**（Goldmark 扩展作用于渲染阶段）。**【待验证】**
+> **【Phase 3 更新】** 该推断**已实测取代**：关闭 typographer 后，短代码内 `'`、`...`、`--`、中文标点**均原样保留**（见 §7.3）。**【已验证事实】**
 
 ---
 
-## 5. 建议的修正清单（**本阶段未应用**，待授权）
+## 5. 建议的修正清单（**Phase 2 记录**；修正 1 已在 Phase 3 应用）
 
-| # | 修正 | 文件 | 优先级 |
-| --- | --- | --- | --- |
-| 1 | 关闭 typographer | `hugo/hugo.toml` | 高 |
-| 2 | 迁移规范：诗歌正文一律用 `{{< poem >}}` | `docs/migration/url-compatibility.md` 或新规范 | 高 |
-| 3 | 统一诗节间距（短代码按空行分段） | `hugo/layouts/shortcodes/poem.html` + CSS | 中 |
-| 4 | 明确短代码是否支持内联 HTML | `hugo/layouts/shortcodes/poem.html` | 中 |
-| 5 | 真机/浏览器像素级验证 | —（需环境） | 中 |
+| # | 修正 | 文件 | 优先级 | 状态 |
+| --- | --- | --- | --- | --- |
+| 1 | 关闭 typographer | `hugo/hugo.toml` | 高 | ✅ **Phase 3 已应用** |
+| 2 | 迁移规范：诗歌正文一律用 `{{< poem >}}` | 迁移规范 | 高 | 建议（未应用） |
+| 3 | 统一诗节间距（短代码按空行分段） | `poem.html` + CSS | 中 | 建议（未应用） |
+| 4 | 明确短代码是否支持内联 HTML | `poem.html` | 中 | ✅ 已澄清：**纯文本**（§7.5） |
+| 5 | 真机/浏览器像素级验证 | —（需环境） | 中 | 待环境 |
 
-> **【建议】** 修正 1–4 应在**迁移分支**（非 `main`）实施，并附**逐字比对**测试（合成文本 + 迁移后真实文本的 SHA256 比对）。
+> **【建议】** 未应用项应在**迁移分支**（非 `main`）实施，并附**逐字比对**测试（合成文本 + 迁移后真实文本的 SHA256 比对）。
 
 ---
 
-## 6. 本阶段边界声明
+## 6. 本阶段边界声明（Phase 2 当时）
 
 - 测试**仅使用自编合成文本**，**未**把任何真实诗歌正文复制进框架；
-- **未**修改 `hugo/hugo.toml` 或 `poem.html`（仅提出建议）；
+- **Phase 2 当时未**修改 `hugo/hugo.toml` 或 `poem.html`（仅提出建议）；
 - 构建产物在 `/tmp`，**未**入库。
+- **【Phase 3 更新】** Phase 3 **已**在 `hugo/hugo.toml` 应用 `typographer = false`（**未**改动 `poem.html`，**未**迁移真实诗歌）。
 
 ---
 

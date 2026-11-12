@@ -1,4 +1,4 @@
-# Phase 2 · Hugo 子目录 + Vercel 部署准备审计
+# Phase 2/3 · Hugo 子目录 + Vercel 部署准备审计（阶段标识：Phase 2 主报告 + Phase 3 补充）
 
 > 日期：**2026-11-12**
 > 审计对象：`hugo/hugo.toml`、`hugo/vercel.json`、`hugo/README-HUGO.md`、`docs/migration/hugo-build-verification.md`

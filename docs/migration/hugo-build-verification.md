@@ -1,4 +1,4 @@
-# Hugo 框架 · 本地构建验证记录
+# Phase 1 · Hugo 框架本地构建验证记录（阶段标识：Phase 1 基础框架）
 
 > 验证日期：**2026-11-12**
 > 验证环境：`hugo v0.168.0-e27a6760c5547237f87d353aebe0580feadb20f4+extended linux/amd64`（Hugo **Extended**）

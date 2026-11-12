@@ -29,6 +29,7 @@
 | P2-3 | Hugo/Vercel 部署审计 + 排版保护测试（Task 4/5） | review/hugo-deployment-readiness-phase2 | `9796cea` |
 | P3-1 | 分类规则修正（A 类须署名）+ 字段语义 + README + 复现验证 | review/poetry-classification-phase2 | `4ec62f7` |
 | P3-2 | 关闭 typographer + 短代码矩阵 + Jekyll 隔离 + Vercel 预览修正 | review/hugo-deployment-readiness-phase2 | `22e3907` |
+| P3-3 | Phase 3.1 文档收尾：作品数量表述修正 + 阶段标识统一 | review/poetry-classification-phase2 | `c5f7f55` |
 
 ## 已推送的重要文件
 
@@ -108,8 +109,10 @@
 | research/poetry-discovery | `e25f6f3`（PR #2） |
 | migration/hugo-poetry-foundation | `a9644ac`（PR #3） |
 | audit/pre-hugo-migration-2026-11-12 | `eaac3a4`（PR #1） |
-| review/poetry-classification-phase2 | `4ec62f7`（PR #4） |
-| review/hugo-deployment-readiness-phase2 | `22e3907`（PR #5） |
+| review/poetry-classification-phase2 | `c5f7f55`（PR #4） |
+| review/hugo-deployment-readiness-phase2 | `92d4686`（PR #5） |
+
+> 上表 SHA 以 `git ls-remote` / GitHub 远程为准（2026-11-12 核验）。
 
 ## 已创建的 PR（**均未合并**）
 
