@@ -13,15 +13,64 @@
 # 1) 抓取公开 Feed（写入 work/，不提交 git）
 python3 tools/poetry-discovery/fetch_feed.py
 
-# 2) 生成清单与候选 CSV（写入 docs/poetry-discovery/）
+# 2) 生成 v1 冻结基线 CSV（写入 docs/poetry-discovery/）
 python3 tools/poetry-discovery/build_inventory.py
 
-# 3) （可选）与现有站点对照
+# 3) 生成 v2 分类结果 + v1↔v2 差异表（不覆盖 v1）
+python3 tools/poetry-discovery/build_inventory_v2.py
+
+# （可选）与现有站点对照
 python3 tools/poetry-discovery/build_comparison.py
 ```
 
 > 第 1 步会打印 `feed entries == totalResults == sitemap <loc>` 的交叉校验结果。
 > 第 2 步应输出：`posts total: 305`、`with poetry: 137`、`categories: {A:106, B:29, C:1, D:1}`。
+> 第 3 步应输出：`v2 categories: {A:104, B:31, C:1, D:1}`，`changed rows: 4`。
+
+### 1.1 重建 **v1 冻结基线**（**不可覆盖**）
+
+```bash
+python3 tools/poetry-discovery/fetch_feed.py          # 需先有 work/
+python3 tools/poetry-discovery/build_inventory.py
+```
+
+产出（**仓库内为冻结基线，勿覆盖**）：
+
+- `docs/poetry-discovery/blog-post-inventory.csv`（305 篇）
+- `docs/poetry-discovery/poetry-candidates.csv`（137 条候选）
+
+校验：**重新生成的结果应与仓库中的 v1 CSV 逐字节一致**（`cmp` 无差异）。
+
+### 1.2 重建 **v2 分类结果**
+
+```bash
+python3 tools/poetry-discovery/build_inventory_v2.py
+```
+
+产出（**新文件，不覆盖 v1**）：
+
+- `docs/poetry-discovery/blog-post-inventory.v2.csv`
+- `docs/poetry-discovery/poetry-candidates.v2.csv`
+- `docs/poetry-discovery/classification-diff-v1-v2.csv`
+
+v2 的 A 类**必须有结构性署名证据**；仅“标签+标题”命中的记录归 **B**（待作者审核）。
+
+### 1.3 检查 **v1 ↔ v2 差异**
+
+```bash
+# 差异表：每一行是一条分类发生变化的记录（post_title + category_v1 -> category_v2）
+column -s, -t docs/poetry-discovery/classification-diff-v1-v2.csv   # 或直接打开
+
+# 或直接比较两份候选 CSV 的分类列
+diff <(cut -d, -f1,7 docs/poetry-discovery/poetry-candidates.csv) \
+     <(cut -d, -f1,7 docs/poetry-discovery/poetry-candidates.v2.csv)
+```
+
+期望：`classification-diff-v1-v2.csv` 含 **4 行**变化（2 条 Phase 2 + 2 条 Phase 3）。
+
+### 1.4 获取原始 Feed
+
+原始 Feed 由 `fetch_feed.py` 从**公开** Blogger 端点抓取（见 §2），写入 `work/`，**不入库**（见 §3）。
 
 ---
 
@@ -90,3 +139,16 @@ python3 tools/poetry-discovery/fetch_feed.py 2>&1 | tee work/fetch-log.txt
 - 脚本**只读取公开页面**，不登录、不写入旧博客。
 - CSV 中 `note` 字段仅含**用于识别的截断摘录**，**不含完整诗歌正文**。
 - 重新抓取的原始 Feed 含正文，仅存于本地 `work/`，**不入库**。
+
+---
+
+## 7. 重要：候选记录 ≠ 已确认独立作品（**【已验证事实】**）
+
+- `poetry-candidates.csv` 中的每一行是**文章级候选记录（article-level candidate record）**，
+  **不是**一首“已确认的独立诗歌作品”。
+- 一篇文章可能包含：**多首诗**、**诗 + AI 诗评 + 英译**、或**入选喜讯/公告**等复合内容。
+- 因此 **137 = 候选记录数**，而**独立作品数 ≥ 137，且尚未确认**。
+- `work_count_estimate` 字段表达的是**作品数**估计，不是文章数：
+  - `>=2`：标题有明确多首标记；
+  - `unknown`：无标记，作品数**无法**从元数据证明（**不得**假定为 1）。
+- 在作者人工确认前，**禁止**使用“137 首已发现诗歌”这类确定性表述。

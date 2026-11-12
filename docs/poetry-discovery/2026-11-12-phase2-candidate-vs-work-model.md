@@ -101,8 +101,8 @@ source_post (305)  ──1:N──▶  candidate_work (137)  ──1:N──▶ 
 | `source_url`、`source_post_title` | 保留 | 便于回溯 |
 | `candidate_title` | **改名**（原 `work_title`） | 默认=文章标题，**非**确认诗题 |
 | `title_source` | **新增** | `article_title` / `inner_byline` / `none` |
-| `boundary_status` | **替换** `position_in_post` | `entire_post` / `unknown` / `needs_split` |
-| `work_count_estimate` | **新增** | `1` 或 `>=2`（据多首标记；无标记亦可能 >1） |
+| `boundary_status` | **替换** `position_in_post` | `entire_post_or_unknown` / `needs_split` |
+| `work_count_estimate` | **新增** | `>=2`（有明确多首标记）或 `unknown`（无标记，**不**填 1） |
 | `category`、`confidence`、`authorship_evidence`、`labels`、`note` | 保留 | 现有证据字段 |
 
 ### 3.3 `confirmed_work`（已确认的独立作品，本阶段**为空**）
@@ -130,6 +130,23 @@ source_post (305)  ──1:N──▶  candidate_work (137)  ──1:N──▶ 
 5. **不拆分**多首诗文章；仅在 `boundary_status=needs_split`、`work_count_estimate>=2` 中**标注待人工拆分**。
 
 > 本阶段**未**改动 v1 CSV；上表为**方案**，待审阅后再实施。
+
+---
+
+## 4bis. `work_count_estimate` 字段语义（Phase 3 修正 · **【已验证事实】**）
+
+**Phase 3 依据 ChatGPT 审阅，修正了该字段语义**：
+
+- v2（Phase 2）实现时曾对“无多首标记”的文章统一填 `'1'`。这**把文章数量当成了作品数量**，是**错误**的——一篇文章**没有**多首标记，**并不证明**它只有一首诗（可能含多首而无标记，或含“诗+评论+译”等复合结构）。
+- Phase 3 改为：
+
+| 取值 | 含义 |
+| --- | --- |
+| `>=2` | 标题有**明确多首标记**（如「组诗」「外一首」），作品数 **≥ 2** |
+| `unknown` | **无**多首标记；作品数**无法**从元数据证明，**不得**假定为 1 |
+
+- **重新统计（v2 · Phase 3）**：`>=2` = **7** 条，`unknown` = **130** 条，合计 137。**【已验证事实】**
+- 原则：**文章数 ≠ 作品数**。仅当作者人工确认后，才可把 `unknown` 收敛为具体数字。
 
 ---
 

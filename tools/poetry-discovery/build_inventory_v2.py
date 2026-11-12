@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
-"""Phase 2: stricter authorship/translation rules (v2).
+"""Phase 2/3: stricter authorship rules (v2).
 
 Does NOT overwrite the original CSVs. Writes NEW files:
   docs/poetry-discovery/blog-post-inventory.v2.csv
   docs/poetry-discovery/poetry-candidates.v2.csv
   docs/poetry-discovery/classification-diff-v1-v2.csv
 
-v1 remains the frozen baseline (PR #2). See the Phase 2 review report.
+v1 remains the frozen baseline (PR #2). See the Phase 2/3 review reports.
+
+Key v2 rules
+------------
+* category 'A' (安然 original) REQUIRES explicit structural byline evidence
+  (文/安然, 安然/文, ◎安然, "by An Ran" with word boundaries).
+  Label + title keyword WITHOUT a byline is 'B' (needs author review), never 'A'.
+* work_count_estimate describes WORK count, not article count:
+    '>=2'     -> explicit multi-poem marker in the title
+    'unknown' -> no marker; number of works is NOT provable from metadata
+  (v1's constant '1' wrongly equated article count with work count.)
 """
 import re, csv, os
 from collections import Counter, OrderedDict
@@ -84,9 +94,12 @@ def classify_v2(title, labels, text):
         conf = 0.9 if (has_label or title_hit) else 0.85
         return 'A', conf, r
 
-    # A: poetry label + poetry title keyword (no byline) — kept, but flagged
+    # B: poetry label + poetry title keyword, but NO structural byline.
+    # A-class REQUIRES explicit authorship evidence; label+title alone is not
+    # sufficient (e.g. news/announcement posts with a poetry label). Demoted
+    # from v1's 'A' to 'B' pending human review.
     if has_label and title_hit:
-        return 'A', 0.7, ['poetry label + poetry title keyword (NO byline)']
+        return 'B', 0.55, ['poetry label + poetry title keyword (NO byline); needs author review']
 
     # B: everything else with a poetry signal
     if has_label and vs >= 0.5:
@@ -134,6 +147,9 @@ def main():
                 note = 'MULTI-POEM post (title marker) - needs manual split. ' + note
             if cat2 == 'A' and 'NO byline' in ' '.join(r2):
                 note = 'NO BYLINE: attributed by label+title only. ' + note
+            if 'NO byline' in ' '.join(r2):
+                note = ('DEMOTED v1 A->B: no structural byline; label+title only, '
+                        'needs author review. ') + note
             # title_source: article_title (title has poetry kw) | inner_byline | none
             inner_byline = bool(re.search(r'[^\n]{2,30}?[ \t]*[/|｜][ \t]*安然', plain))
             if bi.POETRY_TITLE_RE.search(title):
@@ -142,7 +158,10 @@ def main():
                 title_source = 'inner_byline'
             else:
                 title_source = 'none'
-            work_count = '>=2' if multi == 'yes' else '1'
+            # work_count_estimate: article count != work count.
+            #   '>=2'     -> explicit multi-poem marker in title
+            #   'unknown' -> no marker; number of works NOT provable from metadata
+            work_count = '>=2' if multi == 'yes' else 'unknown'
             candidates.append(OrderedDict([
                 ('candidate_id', f'C{cid:04d}'),
                 ('source_post_id', e['id']['$t'].split('post-')[-1]),
