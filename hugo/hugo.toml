@@ -1,0 +1,64 @@
+# 安然诗客栈 · Hugo 站点配置
+# 目标：安静、简洁、以诗歌阅读为中心。
+# 关键：permalink 必须保持旧站扁平结构 /:slug/，确保旧链接不失效。
+baseURL = "https://poet.ismaelan.com/"
+defaultContentLanguage = "zh"
+title = "安然诗客栈"
+
+# 语言设置（Hugo v0.158+ 用 locale/label 取代 languageCode/languageName）
+[languages]
+  [languages.zh]
+    locale = "zh-CN"
+    label = "中文"
+    weight = 1
+
+# 分类法：本站以“卷目”为唯一索引，默认关闭 tags/categories，
+# 避免生成空分类页（如需启用，取消注释并在内容中加 tags）。
+[taxonomies]
+#  tag = "tags"
+#  category = "categories"
+
+# 站点级 SEO
+[params]
+  author = "安然"
+  description = "未赴之境 · 安然诗集"
+  # 用于 RSS / 元数据
+  tagline = "一个安静读诗的地方"
+  # 首页封面图（与旧站路径一致：/assets/img/cover.png）
+  coverImage = "/assets/img/cover.png"
+
+# 保持旧站 permalink：/:title/ → /:slug/
+[permalinks]
+  posts = "/:slug/"
+
+# 输出：HTML + RSS + sitemap + robots（Hugo 内置）
+[outputs]
+  home = ["HTML", "RSS", "robots"]
+  section = ["HTML", "RSS"]
+
+[outputFormats.robots]
+  mediaType = "text/plain"
+  baseName = "robots"
+  isPlainText = true
+  notAlternative = true
+
+# 分页（当前 3 篇，未触发；保留以备扩展）
+[pagination]
+  pagerSize = 10
+
+# Markdown 处理：诗歌依赖换行，务必开启 hardWraps 以保留行尾换行
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      # 允许诗歌正文内嵌原始 HTML（旧站诗歌为手工 HTML）
+      unsafe = true
+      # 行尾换行渲染为 <br>，保护诗歌分行
+      hardWraps = true
+  [markup.highlight]
+    noClasses = false
+
+# Sitemap
+[sitemap]
+  changefreq = "monthly"
+  priority = 0.5
+  filename = "sitemap.xml"

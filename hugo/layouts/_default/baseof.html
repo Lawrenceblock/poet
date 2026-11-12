@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Locale | default "zh-CN" }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} · {{ .Site.Title }}{{ end }}</title>
+  <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+  <link rel="canonical" href="{{ .Permalink }}">
+  {{ with .Site.Params.author }}<meta name="author" content="{{ . }}">{{ end }}
+
+  {{/* Open Graph */}}
+  <meta property="og:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}{{ end }}">
+  <meta property="og:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+  <meta property="og:url" content="{{ .Permalink }}">
+  <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+  <meta property="og:site_name" content="{{ .Site.Title }}">
+  {{ with .Site.Params.coverImage }}<meta property="og:image" content="{{ . | absURL }}">{{ end }}
+
+  {{/* RSS 自动发现 */}}
+  {{ range .AlternativeOutputFormats -}}
+  <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink | safeURL }}" title="{{ $.Site.Title }}">
+  {{ end -}}
+
+  <link rel="icon" href="{{ "favicon.ico" | relURL }}" type="image/x-icon">
+
+  {{/* 样式：优先使用 Hugo Pipes 处理的 CSS，回退到 /style.css */}}
+  {{ $css := resources.Get "css/style.css" }}
+  {{ if $css }}
+    <link rel="stylesheet" href="{{ ($css | minify | fingerprint).RelPermalink }}">
+  {{ else }}
+    <link rel="stylesheet" href="{{ "style.css" | relURL }}">
+  {{ end }}
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <header class="site-header">
+    <a class="site-name" href="{{ "/" | relURL }}">{{ .Site.Title }}</a>
+    {{ with .Site.Params.description }}<span class="site-sub">{{ . }}</span>{{ end }}
+    <nav class="site-nav" aria-label="主导航">
+      <a href="{{ "/archive/" | relURL }}">卷目</a>
+      <span class="nav-sep">·</span>
+      <a href="{{ "/preface/" | relURL }}">题记</a>
+      <span class="nav-sep">·</span>
+      <a href="{{ "/shi-ren-xiao-zhuan/" | relURL }}">小传</a>
+    </nav>
+  </header>
+
+  <main id="main" class="site-main">
+    {{ block "main" . }}{{ end }}
+  </main>
+
+  <footer class="site-footer">
+    <p class="copy">© {{ now.Format "2006" }} {{ .Site.Params.author | default .Site.Title }}</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,176 @@
+/* 安然诗客栈 · 样式
+   取向：安静、简洁、以诗歌阅读为中心。
+   基于旧站视觉语言（宋体衬线、柔和灰蓝、居中），补齐旧站缺失的类，
+   并修复移动端缺少 viewport 导致的缩放问题（见 baseof.html 的 viewport）。 */
+
+:root {
+  --bg: #dceef2;
+  --ink: #2c3338;
+  --muted: #5f6b70;
+  --faint: #8a959a;
+  --rule: #b8c8cc;
+  --link: #3a6b7a;
+  --serif: "Songti SC", "SimSun", "Noto Serif CJK SC", "Source Han Serif SC", Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem 1.2rem;
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus {
+  position: static;
+  left: 0;
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: .4rem .8rem;
+  background: #fff;
+  border: 1px solid var(--rule);
+}
+
+/* ---------- 页头 / 页脚 ---------- */
+.site-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  max-width: 560px;
+  width: 100%;
+}
+.site-name {
+  font-size: 1.5rem;
+  letter-spacing: .32em;
+  color: var(--ink);
+}
+.site-sub {
+  display: block;
+  margin-top: .4rem;
+  font-size: .82rem;
+  color: var(--faint);
+  letter-spacing: .1em;
+}
+.site-nav {
+  margin-top: 1rem;
+  font-size: .9rem;
+  color: var(--muted);
+}
+.site-nav a { color: var(--muted); }
+.nav-sep { margin: 0 .5em; color: var(--faint); }
+
+.site-main { width: 100%; max-width: 560px; }
+
+.site-footer {
+  margin-top: 3rem;
+  text-align: center;
+  font-size: .76rem;
+  color: var(--faint);
+  max-width: 560px;
+  width: 100%;
+}
+.copy { margin: 0; }
+
+/* ---------- 首页 ---------- */
+.cover { text-align: center; }
+.cover img {
+  max-width: min(360px, 80vw);
+  max-height: 52vh;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 1.5rem;
+}
+.title {
+  font-size: 1.6rem;
+  letter-spacing: .3em;
+  font-weight: normal;
+  margin: 0 0 .6rem;
+}
+.sub { color: var(--muted); font-size: .95rem; margin: .3rem 0; }
+.note { margin-top: 1.6rem; font-size: .95rem; color: var(--muted); }
+.note a { color: var(--muted); }
+
+/* ---------- 诗歌页 ---------- */
+.poem-page { width: 100%; }
+.poem-header { text-align: center; margin-bottom: 2rem; }
+.poem-title {
+  font-size: 1.35rem;
+  font-weight: normal;
+  letter-spacing: .18em;
+  margin: 0 0 .5rem;
+}
+.poem-date { color: var(--faint); font-size: .8rem; margin: 0; }
+.poem-author { color: var(--muted); font-size: .85rem; margin: .3rem 0 0; }
+
+/* 诗歌正文：保留换行，舒适行距；不使用首行缩进（诗歌不适用） */
+.poem-content {
+  line-height: 2.4;
+  text-align: center;
+  word-break: break-word;
+}
+.poem-content p { margin: 0 0 1.4em; text-indent: 0; }
+.poem-content br { line-height: 2.4; }
+
+/* 英文诗行在移动端过长时左对齐更易读 */
+.poem-content:lang(en), .poem-content .en { text-align: left; }
+
+.poem-note {
+  margin-top: 2.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: .85rem;
+  color: var(--muted);
+  text-align: left;
+  line-height: 1.9;
+}
+
+.poem-footer { margin-top: 2.5rem; text-align: center; }
+.poem-back { font-size: .9rem; color: var(--muted); }
+
+/* ---------- 卷目 / 列表 ---------- */
+.archive { list-style: none; margin: 2rem 0 0; padding: 0; }
+.archive-item {
+  display: flex;
+  align-items: baseline;
+  gap: .6em;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+.archive-item a { flex: 1; }
+.archive-item .date { color: var(--faint); font-size: .8rem; }
+
+/* ---------- 题记 ---------- */
+.preface { text-align: left; line-height: 2; }
+.preface p { margin: 0 0 1.2em; }
+.sign { text-align: right; color: var(--muted); margin-top: 1.5em; }
+
+/* ---------- 移动端 ---------- */
+@media (max-width: 480px) {
+  body { font-size: 16px; padding: 1.5rem 1rem; }
+  .poem-content { line-height: 2.2; }
+  .site-name { letter-spacing: .22em; }
+  .title { letter-spacing: .2em; }
+  .cover img { max-width: 70vw; }
+}
+
+@media print {
+  body { background: #fff; }
+  .site-nav, .poem-footer, .skip-link { display: none; }
+}

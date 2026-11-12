@@ -1,0 +1,15 @@
+{{/* 诗歌短代码：保留逐行换行与空行。
+     用法：
+     {{< poem >}}
+     第一行
+     第二行
+
+     第二节第一行
+     {{< /poem >}}
+     行尾换行被保留为 <br>；空行保留为诗节间隔。 */}}
+<div class="poem-verse">
+{{- $inner := trim .Inner "\n" -}}
+{{- range (split $inner "\n") -}}
+{{ . }}<br>
+{{- end -}}
+</div>

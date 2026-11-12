@@ -1,0 +1,19 @@
+{{ define "main" }}
+<article class="poem-page">
+  <header class="poem-header">
+    <h1 class="poem-title">{{ .Title }}</h1>
+    {{ if not .Date.IsZero }}<p class="poem-date">{{ .Date.Format "2006.01.02" }}</p>{{ end }}
+    {{ with .Params.author }}<p class="poem-author">{{ . }}</p>{{ end }}
+  </header>
+
+  <div class="poem-content">
+    {{ .Content }}
+  </div>
+
+  {{ with .Params.note }}<aside class="poem-note">{{ . | markdownify }}</aside>{{ end }}
+
+  <footer class="poem-footer">
+    <a class="poem-back" href="{{ "/archive/" | relURL }}">← 卷目</a>
+  </footer>
+</article>
+{{ end }}

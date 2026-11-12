@@ -1,0 +1,16 @@
+{{ define "main" }}
+<section class="cover">
+  {{ with .Site.Params.coverImage }}
+  <img src="{{ . | relURL }}" alt="封面">
+  {{ end }}
+  <h1 class="title">{{ .Site.Title }}</h1>
+  {{ with .Site.Params.description }}<p class="sub">{{ . }}</p>{{ end }}
+  <p class="note">
+    <a href="{{ "/archive/" | relURL }}">卷目</a>
+    <span class="nav-sep">·</span>
+    <a href="{{ "/preface/" | relURL }}">题记</a>
+    <span class="nav-sep">·</span>
+    <a href="{{ "/shi-ren-xiao-zhuan/" | relURL }}">小传</a>
+  </p>
+</section>
+{{ end }}
