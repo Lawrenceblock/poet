@@ -5,23 +5,36 @@
 
 <section class="hero">
   <div class="hero-inner">
+
+    <div class="hero-portrait">
+      {{ with .Site.Params.coverImage }}
+      <img
+        src="{{ . | relURL }}"
+        alt="安然肖像"
+        loading="eager"
+        decoding="async">
+      {{ end }}
+    </div>
+
     <div class="hero-text">
-      <p class="hero-kicker">{{ with .Site.Params.author }}{{ . }}{{ end }} · 诗歌档案</p>
+      <p class="hero-kicker">
+        {{ with .Site.Params.author }}{{ . }}{{ end }} · 诗歌档案
+      </p>
+
       <h1 class="hero-title">
         {{ .Site.Title }}
-        <span class="hero-title-en">Anran · Poetry Archive</span>
+        <span class="hero-title-en">
+          Anran · Poetry Archive
+        </span>
       </h1>
+
       <p class="hero-lead">
         {{ with .Site.Params.tagline }}{{ . }}。<br>{{ end }}
         {{ with .Site.Params.description }}{{ . }}。{{ end }}
         收录诗作、创作年代与档案资料。
       </p>
     </div>
-    <p class="hero-meta">
-      <span class="hero-meta-item">收录 <b>{{ len $poems }}</b> 首</span>
-      <span class="hero-meta-item"><b>{{ len $years }}</b> 个年份</span>
-      {{ with index $latest 0 }}<span class="hero-meta-item">最近更新 <b>{{ .Date.Format "2006.01" }}</b></span>{{ end }}
-    </p>
+
   </div>
 </section>
 

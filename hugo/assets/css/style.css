@@ -157,7 +157,7 @@ img { max-width: 100%; }
 }
 
 /* ============================================================
-   首页主视觉：一块有边界的黑（非满屏），左重右轻
+   首页主视觉：黑白几何分割与作者肖像
    ============================================================ */
 .hero {
   background: var(--black);
@@ -168,10 +168,43 @@ img { max-width: 100%; }
   width: 100%;
   max-width: var(--frame);
   margin: 0 auto;
-  padding: clamp(2.8rem, 6.5vw, 5rem) var(--pad) clamp(2.6rem, 6vw, 4.2rem);
+  padding: clamp(2rem, 5vw, 3.5rem) var(--pad);
   display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(1.6rem, 4vw, 2.6rem);
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  align-items: stretch;
+  gap: 0;
+  min-height: clamp(360px, 42vw, 500px);
+}
+
+/* 左侧肖像：独立暖白几何区域 */
+.hero-portrait {
+  background: #F2F0EA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  min-width: 0;
+  overflow: hidden;
+}
+.hero-portrait img {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  max-height: 420px;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* 右侧：纯黑文字区域 */
+.hero-text {
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(1.5rem, 4vw, 4rem);
+  min-width: 0;
 }
 .hero-kicker {
   font-family: var(--sans);
@@ -180,12 +213,11 @@ img { max-width: 100%; }
   text-transform: uppercase;
   color: var(--accent-on-black);
   margin: 0 0 1.4rem;
-  padding-left: .1em;
 }
 .hero-title {
-  font-size: clamp(2.3rem, 6.6vw, 4.2rem);
+  font-size: clamp(2.3rem, 6vw, 4.2rem);
   font-weight: normal;
-  line-height: 1.08;
+  line-height: 1.15;
   letter-spacing: .06em;
   margin: 0 0 1.4rem;
   color: var(--on-black);
@@ -202,33 +234,51 @@ img { max-width: 100%; }
   margin-top: 1.15rem;
 }
 .hero-lead {
-  font-size: clamp(.98rem, 1.5vw, 1.1rem);
+  font-size: clamp(.95rem, 1.5vw, 1.1rem);
   line-height: 2;
   color: #D7D5D2;
   margin: 0;
   max-width: 34rem;
 }
-.hero-lead a { color: var(--accent-on-black); }
-
-/* 主视觉底部一行「档案数据」，右对齐，制造非对称 */
-.hero-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem 2rem;
-  border-top: 1px solid var(--rule-on-black);
-  padding-top: 1rem;
-  font-family: var(--sans);
-  font-size: .72rem;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--on-black-3);
+.hero-lead a {
+  color: var(--accent-on-black);
 }
-.hero-meta b { color: var(--on-black); font-weight: normal; }
-.hero-meta-item { display: inline-flex; gap: .5em; align-items: baseline; }
 
-@media (min-width: 860px) {
-  .hero-meta { justify-content: flex-end; }
-  .hero-text { max-width: 46rem; }
+/* 移动端仍然保持左白右黑，不改成上下排列 */
+@media (max-width: 600px) {
+  .hero-inner {
+    grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr);
+    min-height: 260px;
+    padding: 1rem var(--pad);
+  }
+  .hero-portrait {
+    padding: .5rem;
+  }
+  .hero-portrait img {
+    max-height: 300px;
+  }
+  .hero-text {
+    padding: 1.1rem;
+  }
+  .hero-kicker {
+    font-size: .55rem;
+    letter-spacing: .16em;
+    margin-bottom: .9rem;
+  }
+  .hero-title {
+    font-size: clamp(1.55rem, 6vw, 2.3rem);
+    letter-spacing: .03em;
+    margin-bottom: .9rem;
+  }
+  .hero-title .hero-title-en {
+    font-size: .58rem;
+    letter-spacing: .13em;
+    margin-top: .8rem;
+  }
+  .hero-lead {
+    font-size: .82rem;
+    line-height: 1.8;
+  }
 }
 
 /* ============================================================
@@ -703,8 +753,6 @@ img { max-width: 100%; }
     min-height: 44px;
     padding: .5rem 0;
   }
-  .hero-title { letter-spacing: .04em; }
-  .hero-meta { font-size: .66rem; gap: .4rem 1.2rem; }
   .poem-content { line-height: 2.25; }
   .poem-content br { line-height: 2.25; }
   .archive-item .idx { min-width: 1.8em; }
