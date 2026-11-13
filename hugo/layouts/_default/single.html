@@ -1,14 +1,17 @@
 {{ define "main" }}
 <article class="poem-page">
   <header class="poem-head">
-    <h1 class="poem-title">{{ .Title }}</h1>
-    <p class="poem-meta">
-      {{ with .Params.author }}<span>{{ . }}</span>{{ end }}
-      {{ if not .Date.IsZero }}<span class="muted">创作于 <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time></span>{{ end }}
-      {{ with .Params.lang }}<span class="muted">{{ if eq . "en" }}EN{{ else }}中文{{ end }}</span>{{ end }}
-    </p>
+    <div class="poem-head-inner">
+      <p class="poem-kicker">{{ with .Params.author }}{{ . }}{{ end }} · 作品</p>
+      <h1 class="poem-title">{{ .Title }}</h1>
+      <p class="poem-meta">
+        {{ with .Params.author }}<span>{{ . }}</span>{{ end }}
+        {{ if not .Date.IsZero }}<span class="muted">创作于 <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time></span>{{ end }}
+        {{ with .Params.lang }}<span class="muted">{{ if eq . "en" }}EN{{ else }}中文{{ end }}</span>{{ end }}
+      </p>
+    </div>
   </header>
-  <div class="wrap">
+  <div class="poem-body">
     <div class="poem-content"{{ with .Params.lang }} lang="{{ . }}"{{ end }}>
       {{ .Content }}
     </div>
