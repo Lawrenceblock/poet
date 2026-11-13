@@ -182,6 +182,7 @@
 | feat/author-review-system | `5b423d8`（PR #10） |
 | plan/final-implementation-2026-11-12 | `c9272d0`（PR #11） |
 | impl/phase1-candidate-2026-11-12 | `87a1f1a`（PR #12） |
+| design/phase1-visual-refinement-2026-11-13 | `06e2fa4`（PR #13） |
 
 > 上表 SHA 以 `git ls-remote` / GitHub 远程为准（2026-11-12 核验）。
 
@@ -201,3 +202,39 @@
 | #10 | feat/author-review-system | 作者审阅系统（draft） |
 | #11 | plan/final-implementation-2026-11-12 | 最终建设总策划（draft） |
 | #12 | impl/phase1-candidate-2026-11-12 | **第一阶段实施：候选站 + 作者审阅交付**（draft） |
+| #13 | design/phase1-visual-refinement-2026-11-13 | **视觉优化候选 · 方案 C（白底/墨黑/暗红）**（draft，base=impl 分支） |
+
+
+## 视觉优化候选（POET-VISUAL-REFINEMENT-01）· 2026-11-13
+
+基线 `impl/phase1-candidate-2026-11-12` @ `5573f5c`；分支
+`design/phase1-visual-refinement-2026-11-13` @ `06e2fa4`（PR #13，draft，base=impl 分支）。
+
+### 已完成
+
+- 全站视觉改为**方案 C**：白底 `#FFFFFF` / 墨黑 `#242424` / 暗红 `#762B35` /
+  中灰 `#777777` / 浅灰线 `#E2E0DE` / 极浅暖灰 `#F7F6F4`。
+- 移除旧淡蓝 `#dceef2`、蓝绿链接、半透明浮层与全部渐变；系统衬线字体栈，无外部依赖。
+- 诗歌正文行高 2.35、阅读宽度 42rem、方角年份标签、细分隔线列表。
+- 作者审阅页沿用同一配色（仅样式）；表单、字段、数据与 API 未改。
+- 隔离预览（端口 12001 / work-2），作者原有预览（端口 12000 / work-1）未受影响。
+
+### 验证
+
+- 137/137 诗逐字一致；`hugo/content/**`、`hugo.toml`、`hugo/static/**` 未改动。
+- 154 个审阅 HTML「剥离 `<style>` 后内容」与基线 **0 处差异**。
+- 22 条路由全部 200；`/review/` 无令牌（含 HEAD）→ 401；`?token=` → 303。
+- 令牌未出现在预览产物、访问日志或任何截图；审阅记录 SHA 未变。
+- 像素采样：背景 `#DCEEF2` → `#FFFFFF`，蓝色系像素 0。
+
+### 报告与截图
+
+- `docs/phase1/visual/README.md`、`design-notes.md`、`changes-and-risks.md`、
+  `tests-content-functional-security.md`
+- `docs/phase1/visual/screenshots/{before,after,compare}/`（各 22 张）
+
+### 待办（需授权）
+
+- 作者与审查方查看预览与截图后决定是否采纳方案 C。
+- 可选：辅助灰 `#777777`（4.48:1）是否微调为 `#757575`（4.61:1）以达 WCAG AA。
+- 不自行合并 PR #13，不部署正式站。
