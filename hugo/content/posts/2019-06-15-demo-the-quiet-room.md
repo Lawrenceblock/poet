@@ -5,6 +5,7 @@ slug: "demo-the-quiet-room"
 author: "安然"
 lang: "en"
 note: "本页为**合成测试文本**（英文），仅用于验证中英混排与诗歌排版，不是真实作品。"
+draft: true
 ---
 
 {{< poem >}}
