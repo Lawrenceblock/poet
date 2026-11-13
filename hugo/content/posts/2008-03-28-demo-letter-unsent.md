@@ -5,6 +5,7 @@ slug: "demo-letter-unsent"
 author: "安然"
 lang: "zh"
 note: "本页为**合成测试文本**，仅用于验证诗歌排版与站点结构，不是真实作品。"
+draft: true
 ---
 
 {{< poem >}}
