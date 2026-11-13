@@ -52,12 +52,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, fmt, *a):
         # Keep the console quiet for normal hits, but always record non-2xx
         # responses (e.g. a 404 for a poem page) so a fault leaves a trace.
+        # The query string is stripped so an access token passed as ?token=
+        # is never written to the log.
         try:
             code = a[1] if len(a) > 1 else ""
             if str(code).startswith("2"):
                 return
+            safe = self.path.split("?", 1)[0]
             sys.stderr.write(f"[review] {self.address_string()} "
-                             f"{self.command} {self.path} -> {code}\n")
+                             f"{self.command} {safe} -> {code}\n")
             sys.stderr.flush()
         except Exception:
             pass
@@ -80,6 +83,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not ACCESS_TOKEN:
             return True
         return secrets.compare_digest(self._presented_token() or "", ACCESS_TOKEN)
+
+    def _needs_auth(self):
+        # Only the review area and its API are private. The reading pages stay
+        # open so the author can browse them without a token; the review pages
+        # and every /api/ endpoint require it.
+        if not ACCESS_TOKEN:
+            return False
+        path = self.path.split("?", 1)[0]
+        return path == "/review" or path.startswith("/review/") \
+            or path == "/api" or path.startswith("/api/")
 
     def _deny(self):
         body = json.dumps({"ok": False, "error": "需要访问令牌（?token=…）"},
@@ -140,8 +153,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     # ---------- GET ----------
     def do_GET(self):
-        if not self._authorized():
+        if self._needs_auth() and not self._authorized():
             return self._deny()
+        # A token supplied in the URL is accepted once, then stripped: redirect
+        # to the same path without it so it does not linger in history, logs or
+        # shared links. The cookie set by end_headers() keeps the session valid.
+        if "?" in self.path and "token=" in self.path.split("?", 1)[1]:
+            path = self.path.split("?", 1)[0]
+            self.send_response(303)
+            self.send_header("Location", path)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
         path = self._apipath()
         if path is not None:
             return self._api_get(path)
@@ -202,6 +225,28 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._json(500, {"ok": False, "error": f"保存失败：{e}"})
         return self._json(200, {"ok": True, "record": rec,
                                 "progress": store.progress()})
+
+    # ---------- HEAD / OPTIONS ----------
+    def _deny_head(self):
+        self.send_response(401)
+        self.send_header("WWW-Authenticate", 'Bearer realm="author-review"')
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
+    def do_HEAD(self):
+        # SimpleHTTPRequestHandler answers HEAD without going through do_GET, so
+        # it needs its own gate; otherwise a HEAD leaks whether a page exists.
+        if self._needs_auth() and not self._authorized():
+            return self._deny_head()
+        return super().do_HEAD()
+
+    def do_OPTIONS(self):
+        if self._needs_auth() and not self._authorized():
+            return self._deny_head()
+        self.send_response(204)
+        self.send_header("Allow", "GET, HEAD, POST, OPTIONS")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
 
 class ThreadingServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
