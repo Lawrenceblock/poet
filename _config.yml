@@ -34,6 +34,12 @@ defaults:
 # ── 排除文件（不参加构建） ───────────────
 exclude:
   - README.md
+  - PROGRESS.md
+  - AGENTS.md
+  - docs
+  - hugo
+  - tools
+  - screenshots
   - "元宝代码"
   - vendor
   - Gemfile
