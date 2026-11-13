@@ -1,4 +1,4 @@
-# 安然诗歌档案 · Hugo 站点（Phase B 完整框架）
+# 安然诗歌档案 · Hugo 正式站点
 
 > 本目录是 **Hugo 新站**，与仓库根目录的现有 Jekyll 站点**并存**。
 > 现有线上站点（GitHub Pages，`main` 分支根目录）**不受本目录影响**。
@@ -30,11 +30,11 @@ hugo/
 ├─ content/
 │  ├─ archive.md             # url: /archive/  （卷目，按年份）
 │  ├─ years.md               # url: /years/    （年份归档）
-│  ├─ preface.md             # url: /preface/  （题记，占位）
-│  ├─ shi-ren-xiao-zhuan.md  # url: /shi-ren-xiao-zhuan/（小传，占位）
+│  ├─ preface.md             # url: /preface/  （旧站题记原文）
+│  ├─ shi-ren-xiao-zhuan.md  # url: /shi-ren-xiao-zhuan/（旧站小传原文）
 │  ├─ about.md               # url: /about/    （档案说明）
 │  ├─ search.md              # url: /search/   （站内搜索）
-│  ├─ posts/                 # 诗歌（每篇显式 slug）；含 _index.md
+│  ├─ posts/                 # 正式诗作 + draft 演示样例；含 _index.md
 │  └─ tests/                 # 排版测试（draft + build.render=never，不进正式构建）
 ├─ layouts/
 │  ├─ _default/{baseof,single,list,archive,years,preface,about,search,rss.xml}
@@ -58,5 +58,8 @@ hugo/
    `{{< poem >}}` 为**纯文本**（转义 HTML，不解释 `*`/`_`）；`.poem-verse{white-space:pre-wrap}` 保留行首/行尾空格。
 4. **预览隔离**：仅当 `baseURL` 主机为 `poet.ismaelan.com` 时输出 canonical + `index,follow`；
    否则 `noindex,nofollow` 且 robots.txt `Disallow: /`。
-5. **站内搜索**：纯前端读取 `/index.json`，无第三方依赖（当前仅覆盖合成样例）。
-6. **本阶段不迁移正文**：`content/posts/` 仅含**明确标注的合成样例**（不是真实作品）。
+5. **站内搜索**：纯前端读取 `/index.json`，无第三方依赖；仅收录非草稿的正式页面。
+6. **正式内容**：旧诗站《青春的物语》《那拉提（未赴）》已迁入，原文正文保持不变；旧站题记与诗人小传已迁入。
+7. **演示样例**：`content/posts/` 中文件名含 `demo` 的样例全部设为 `draft: true`，不进入正式构建。
+8. **旧站归档**：`static/legacy/` 保存旧版六个 HTML 页面、样式与封面资源；新站页脚提供 `/legacy/` 入口。仓库根目录的 Jekyll 源文件继续保留，作为可回退备份。
+9. **作者审阅区**：137 篇候选、11 个批次及逐篇页面保存在 `docs/author-review/`；保存审阅意见的 Python API 只在受控本地服务中运行，不部署到公开主站。
