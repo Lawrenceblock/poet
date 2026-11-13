@@ -1,6 +1,7 @@
 {{ define "main" }}
 {{- $poems := where .Site.RegularPages "Section" "posts" }}
 {{- $latest := first 5 ($poems.ByDate.Reverse) }}
+{{- $years := $poems.GroupByDate "2006" }}
 
 <section class="hero">
   <div class="hero-inner">
@@ -16,11 +17,11 @@
         收录诗作、创作年代与档案资料。
       </p>
     </div>
-    {{ with .Site.Params.coverImage }}
-    <div class="hero-media">
-      <img class="hero-cover" src="{{ . | relURL }}" alt="安然诗歌档案封面">
-    </div>
-    {{ end }}
+    <p class="hero-meta">
+      <span class="hero-meta-item">收录 <b>{{ len $poems }}</b> 首</span>
+      <span class="hero-meta-item"><b>{{ len $years }}</b> 个年份</span>
+      {{ with index $latest 0 }}<span class="hero-meta-item">最近更新 <b>{{ .Date.Format "2006.01" }}</b></span>{{ end }}
+    </p>
   </div>
 </section>
 

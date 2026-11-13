@@ -84,22 +84,23 @@ def esc(s):
 PAGE_CSS = """
 /* 作者审阅材料 · 视觉与公开阅读页统一：纸白底、墨黑正文、暗红点缀（Phase 3 编辑设计）。
    仅调整外观（配色与字族）；不改动任何审阅数据、字段、HTML 结构或 API 行为。 */
-:root{--black:#0E0E0E;--ink:#141414;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
+:root{--black:#0E0E0E;--ink:#141414;--ink-2:#4A4A4A;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
  --bg:#FAF9F7;--bg-soft:#F2F1EE;--accent:#7A2A34;--accent-soft:#F3E9EA;
  --on-black:#F2F1EE;--on-black-muted:#A8A6A2;--on-black-accent:#C98A92;--on-black-rule:#2A2A2A}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
  font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
-.rv-head{background:var(--black);color:var(--on-black);border-bottom:2px solid var(--on-black-accent)}
+/* 页眉与公开站一致：纸白 + 细线（刊物页眉），不再使用黑色标题条。 */
+.rv-head{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ink)}
 .rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
  align-items:baseline;justify-content:space-between;gap:6px 16px}
-.rv-head .brand{color:var(--on-black);letter-spacing:.18em;font-size:1.05rem}
-.rv-head .brand-en{display:block;color:var(--on-black-muted);font-size:.58rem;
+.rv-head .brand{color:var(--ink);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--muted);font-size:.58rem;
  letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
 .rv-head nav{font-size:.85rem}
-.rv-head nav a{color:#e6e4e1;margin-left:14px}
-.rv-head nav a:hover{color:#fff}
-.rv-head nav a.cur{color:var(--on-black-accent)}
+.rv-head nav a{color:var(--ink-2);margin-left:14px}
+.rv-head nav a:hover{color:var(--accent)}
+.rv-head nav a.cur{color:var(--accent)}
 .wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
 .rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
 .rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
