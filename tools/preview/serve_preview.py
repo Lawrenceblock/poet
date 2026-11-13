@@ -14,8 +14,8 @@ PUBLIC = os.path.join(ROOT, "hugo", "public")
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *a, **kw):
-        super().__init__(*a, directory=PUBLIC, **kw)
+    def __init__(self, *a, directory=None, **kw):
+        super().__init__(*a, directory=directory or PUBLIC, **kw)
 
     def log_message(self, *a):  # keep the console quiet
         pass
@@ -24,9 +24,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=12000)
+    # Serve a specific directory (e.g. an isolated visual-refinement preview
+    # built with build_preview.py --outdir). Defaults to hugo/public.
+    ap.add_argument("--dir", default=PUBLIC)
     args = ap.parse_args()
-    with socketserver.TCPServer(("0.0.0.0", args.port), Handler) as httpd:
-        print(f"serving {PUBLIC} on 0.0.0.0:{args.port}")
+    root = os.path.abspath(args.dir)
+
+    def handler(*a, **kw):
+        return Handler(*a, directory=root, **kw)
+
+    with socketserver.TCPServer(("0.0.0.0", args.port), handler) as httpd:
+        print(f"serving {root} on 0.0.0.0:{args.port}")
         httpd.serve_forever()
 
 

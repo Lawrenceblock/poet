@@ -255,9 +255,14 @@ class ThreadingServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
 
 
 def main():
+    global PUBLIC
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=12000)
+    # Serve a specific preview tree (e.g. an isolated visual-refinement
+    # candidate). Access control, /api/* and token handling are unchanged.
+    ap.add_argument("--dir", default=PUBLIC)
     args = ap.parse_args()
+    PUBLIC = os.path.abspath(args.dir)
     if not os.path.isdir(PUBLIC):
         print(f"ERROR: {PUBLIC} not found; run tools/preview/build_preview.py first")
         sys.exit(1)
