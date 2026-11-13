@@ -62,7 +62,7 @@ def start_server(extra_env):
     env = {**os.environ, **extra_env}
     return subprocess.Popen([sys.executable, os.path.join(HERE, "serve_review.py"),
                              "--port", str(PORT)], env=env,
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
 
 def main():
@@ -218,27 +218,75 @@ def main():
     srv4 = start_server({"REVIEW_RECORDS_DIR": tmp3, "REVIEW_ACCESS_TOKEN": "s3cret"})
     try:
         if wait_port(PORT):
-            def try_get(path, headers=None):
-                req = urllib.request.Request(f"http://127.0.0.1:{PORT}{path}", headers=headers or {})
+            class NoRedirect(urllib.request.HTTPRedirectHandler):
+                def redirect_request(self, *a, **kw):
+                    return None
+
+            opener = urllib.request.build_opener(NoRedirect)
+
+            def call(method, path, headers=None):
+                req = urllib.request.Request(f"http://127.0.0.1:{PORT}{path}",
+                                             headers=headers or {}, method=method)
                 try:
-                    with urllib.request.urlopen(req, timeout=10) as r:
+                    with opener.open(req, timeout=10) as r:
                         return r.status
                 except urllib.error.HTTPError as e:
                     return e.code
-            check("no token -> /api/reviews 401", try_get("/api/reviews") == 401)
-            check("no token -> /review/ 401", try_get("/review/") == 401)
+
+            check("no token -> /api/reviews 401", call("GET", "/api/reviews") == 401)
+            check("no token -> /review/ 401", call("GET", "/review/") == 401)
             check("with header token -> 200",
-                  try_get("/api/reviews", {"X-Review-Token": "s3cret"}) == 200)
-            check("with ?token= -> 200", try_get("/api/reviews?token=s3cret") == 200)
+                  call("GET", "/api/reviews", {"X-Review-Token": "s3cret"}) == 200)
             check("wrong token -> 401",
-                  try_get("/api/reviews", {"X-Review-Token": "nope"}) == 401)
+                  call("GET", "/api/reviews", {"X-Review-Token": "nope"}) == 401)
+            check("no token -> cookie -> 200",
+                  call("GET", "/api/reviews", {"Cookie": "review_token=s3cret"}) == 200)
+            # A token in the URL must not linger: it redirects to the clean path.
+            check("?token= -> 303 (stripped from URL)",
+                  call("GET", "/api/reviews?token=s3cret") == 303)
+            # HEAD/OPTIONS used to bypass the gate; both must now be gated.
+            check("HEAD without token -> 401", call("HEAD", "/review/") == 401)
+            check("HEAD with token -> 200",
+                  call("HEAD", "/review/", {"X-Review-Token": "s3cret"}) == 200)
+            check("OPTIONS without token -> 401", call("OPTIONS", "/api/reviews") == 401)
     finally:
         srv4.terminate()
         try:
             srv4.wait(timeout=5)
         except subprocess.TimeoutExpired:
             srv4.kill()
+        err = (srv4.stderr.read() or b"").decode("utf-8", "replace")
         shutil.rmtree(tmp3, ignore_errors=True)
+
+    print("16. access log never contains the token")
+    check("token absent from server log", "s3cret" not in err)
+    # The gate test above generated non-2xx lines (401/303); confirm logging
+    # still happened, so redaction is not just silence.
+    check("non-2xx still logged", "-> 401" in err)
+
+    print("17. reading pages stay open while /review/ is gated")
+    tmp4 = tempfile.mkdtemp(prefix="review-test-scope-")
+    srv5 = start_server({"REVIEW_RECORDS_DIR": tmp4, "REVIEW_ACCESS_TOKEN": "s3cret"})
+    try:
+        if wait_port(PORT):
+            def code_of(method, path):
+                req = urllib.request.Request(f"http://127.0.0.1:{PORT}{path}", method=method)
+                try:
+                    with urllib.request.urlopen(req, timeout=10) as r:
+                        return r.status
+                except urllib.error.HTTPError as e:
+                    return e.code
+            check("no token -> / (home) 200", code_of("GET", "/") == 200)
+            check("no token -> /archive/ 200", code_of("GET", "/archive/") == 200)
+            check("no token -> /search/ 200", code_of("GET", "/search/") == 200)
+            check("no token -> /review/ still 401", code_of("GET", "/review/") == 401)
+    finally:
+        srv5.terminate()
+        try:
+            srv5.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            srv5.kill()
+        shutil.rmtree(tmp4, ignore_errors=True)
 
     print()
     if fails:
