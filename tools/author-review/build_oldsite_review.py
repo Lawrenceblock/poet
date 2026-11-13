@@ -109,7 +109,7 @@ def main():
         body.append("<h2>旧站原文（逐字）</h2>")
         body.append(f"<div class=\"poem\">{body_html}</div>")
         with open(os.path.join(OUT, fn), "w", encoding="utf-8") as fh:
-            fh.write(page(f"{title} · 旧站原文", "\n".join(body)))
+            fh.write(page(f"{title} · 旧站原文", "\n".join(body), depth=1))
         links.append((fn, title, oldpath))
 
     idx = ["<p class=\"batchnav\"><a href=\"../index.html\">← 审阅总目录</a></p>",
@@ -125,7 +125,7 @@ def main():
                "在新站已保留为兼容页（不会 404），但其<b>正文是否搬入新版正式页面</b>，"
                "须由作者确认。确认前，新版对应页面只显示指向历史存档的说明。</div>")
     with open(os.path.join(OUT, "index.html"), "w", encoding="utf-8") as fh:
-        fh.write(page("旧站现有页面", "\n".join(idx)))
+        fh.write(page("旧站现有页面", "\n".join(idx), depth=1))
 
     print(f"oldsite review pages: {len(links)} + index -> {os.path.relpath(OUT, ROOT)}")
 

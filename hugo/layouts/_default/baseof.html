@@ -7,16 +7,20 @@
   <a class="skip-link" href="#main">跳到正文</a>
 
   <header class="site-header">
-    <a class="site-name" href="{{ "/" | relURL }}">{{ .Site.Title }}</a>
-    {{ with .Site.Params.tagline }}<span class="site-sub">{{ . }}</span>{{ end }}
-    <nav class="site-nav" aria-label="主导航">
-      {{- $first := true }}
-      {{- range .Site.Menus.main }}
-      {{- if not $first }}<span class="nav-sep" aria-hidden="true">·</span>{{ end }}
-      {{- $first = false }}
-      <a href="{{ .URL | relURL }}"{{ if or (eq $.RelPermalink (.URL | relURL)) (and (ne .URL "/") (hasPrefix $.RelPermalink (.URL | relURL))) }} aria-current="page"{{ end }}>{{ .Name }}</a>
-      {{- end }}
-    </nav>
+    <div class="site-header-inner">
+      <a class="site-name" href="{{ "/" | relURL }}">
+        <span class="site-name-zh">{{ .Site.Title }}</span>
+        <span class="site-name-en">Anran Poetry Archive</span>
+      </a>
+      <nav class="site-nav" aria-label="主导航">
+        {{- $first := true }}
+        {{- range .Site.Menus.main }}
+        {{- if not $first }}<span class="nav-sep" aria-hidden="true">·</span>{{ end }}
+        {{- $first = false }}
+        <a href="{{ .URL | relURL }}"{{ if or (eq $.RelPermalink (.URL | relURL)) (and (ne .URL "/") (hasPrefix $.RelPermalink (.URL | relURL))) }} aria-current="page"{{ end }}>{{ .Name }}</a>
+        {{- end }}
+      </nav>
+    </div>
   </header>
 
   <main id="main" class="site-main">
@@ -24,11 +28,34 @@
   </main>
 
   <footer class="site-footer">
-    <p class="copy">© {{ now.Format "2006" }} {{ .Site.Params.author | default .Site.Title }}</p>
-    <p class="copy-note">
-      <a href="{{ "/about/" | relURL }}">档案说明</a> ·
-      <a href="{{ "/legacy/" | relURL }}">旧版网站 · 历史存档</a>
-    </p>
+    <div class="site-footer-inner">
+      <p class="footer-brand">{{ .Site.Title }}</p>
+      <p class="footer-en">Anran Poetry Archive</p>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h3>栏目</h3>
+          <ul>
+            <li><a href="{{ "/archive/" | relURL }}">卷目</a></li>
+            <li><a href="{{ "/years/" | relURL }}">年份</a></li>
+            <li><a href="{{ "/preface/" | relURL }}">题记</a></li>
+            <li><a href="{{ "/shi-ren-xiao-zhuan/" | relURL }}">诗人小传</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>档案</h3>
+          <ul>
+            <li><a href="{{ "/about/" | relURL }}">档案说明</a></li>
+            <li><a href="{{ "/search/" | relURL }}">搜索</a></li>
+            <li><a href="{{ "/legacy/" | relURL }}">旧版网站 · 历史存档</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">
+        © {{ now.Format "2006" }} {{ .Site.Params.author | default .Site.Title }} ·
+        {{ with .Site.Params.description }}{{ . }} · {{ end }}
+        本站为迁移中的新框架，页面内容均为标注的合成测试文本，真实作品待作者逐篇确认后迁入。
+      </p>
+    </div>
   </footer>
 </body>
 </html>

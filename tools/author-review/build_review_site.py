@@ -84,12 +84,27 @@ def esc(s):
 PAGE_CSS = """
 /* 作者审阅材料 · 视觉与公开阅读页统一：白底、墨黑正文、暗红点缀（方案 C）。
    仅调整外观；不改动任何审阅数据、字段或 API 行为。 */
-:root{--ink:#242424;--muted:#777;--line:#e2e0de;--line-strong:#cfccc8;
- --bg:#fff;--bg-soft:#f7f6f4;--accent:#762b35;--accent-soft:#f3e9ea;}
+:root{--black:#171717;--ink:#242424;--muted:#757575;--line:#e2e0de;--line-strong:#cfccc8;
+ --bg:#fff;--bg-soft:#f7f6f4;--accent:#762b35;--accent-soft:#f3e9ea;
+ --on-black:#fff;--on-black-muted:#a0a0a0;--on-black-accent:#cb6e77;--on-black-rule:#333}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
  font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
-.wrap{max-width:760px;margin:0 auto;padding:28px 20px 120px}
+.rv-head{background:var(--black);color:var(--on-black);border-bottom:2px solid var(--on-black-accent)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--on-black);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--on-black-muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:#e6e4e1;margin-left:14px}
+.rv-head nav a:hover{color:#fff}
+.rv-head nav a.cur{color:var(--on-black-accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
 a{color:var(--accent)}
 h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
 h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
@@ -159,17 +174,30 @@ th{background:var(--bg-soft);font-weight:600}
 """
 
 
-def page(title, body, extra_head=""):
+def page(title, body, extra_head="", depth=0):
+    """depth = directory levels below the review root (poem/ and oldsite/ = 1)."""
+    up = "../" * depth
+    header = (
+        "<header class=\"rv-head\"><div class=\"rv-head-inner\">"
+        f"<a class=\"brand\" href=\"{up}\">安然诗歌档案"
+        "<span class=\"brand-en\">Author Review</span></a>"
+        f"<nav><a href=\"{up}\">总目录</a>"
+        f"<a href=\"{up}index.html\">批次索引</a></nav>"
+        "</div></header>")
+    footer = (
+        "<footer class=\"rv-foot\"><div class=\"rv-foot-inner\">"
+        "安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。"
+        "原文版权归作者所有。</div></footer>")
     return ("<!doctype html>\n<html lang=\"zh-CN\">\n<head>\n"
             "<meta charset=\"utf-8\">\n"
             "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n"
             "<meta name=\"robots\" content=\"noindex,nofollow\">\n"
             f"<title>{esc(title)}</title>\n"
             f"<style>{PAGE_CSS}</style>\n{extra_head}"
-            "</head>\n<body><div class=\"wrap\">\n" + body +
+            "</head>\n<body>" + header + "<div class=\"wrap\">\n" + body +
             "\n<div class=\"foot\">安然诗歌档案 · 作者审阅材料 · "
             "本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>\n"
-            "</div></body></html>\n")
+            "</div>" + footer + "</body></html>\n")
 
 
 # Options shown in the author-review form (value -> Chinese label).
@@ -458,7 +486,7 @@ def build():
         body.append(REVIEW_JS)  # at end of body so the DOM already exists
 
         with open(os.path.join(OUT, "poem", f"{cid}.html"), "w", encoding="utf-8") as fh:
-            fh.write(page(f"{cid} · {title}", "\n".join(body)))
+            fh.write(page(f"{cid} · {title}", "\n".join(body), depth=1))
 
         key = "A" if cat == "A" else "B" if cat == "B" else "CD"
         by_cat[key].append(meta)

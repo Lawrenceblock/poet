@@ -1,54 +1,67 @@
 {{ define "main" }}
 {{- $poems := where .Site.RegularPages "Section" "posts" }}
-<section class="cover">
-  {{ with .Site.Params.coverImage }}
-  <img src="{{ . | relURL }}" alt="安然诗歌档案封面">
-  {{ end }}
-  <h1 class="title">{{ .Site.Title }}</h1>
-  {{ with .Site.Params.tagline }}<p class="sub">{{ . }}</p>{{ end }}
-  {{ with .Site.Params.description }}<p class="note">{{ . }}</p>{{ end }}
-</section>
 
-<section class="home-block">
-  <h2 class="block-title">最新作品</h2>
-  <ul class="poem-list">
-    {{ range first 5 ($poems.ByDate.Reverse) }}
-    <li class="poem-item">
-      <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-      {{ if not .Date.IsZero }}<time class="date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time>{{ end }}
-    </li>
-    {{ else }}
-    <li class="poem-item empty">尚无作品。</li>
+<section class="hero">
+  <div class="hero-inner">
+    {{ with .Site.Params.coverImage }}
+    <img class="hero-cover" src="{{ . | relURL }}" alt="安然诗歌档案封面">
     {{ end }}
-  </ul>
+    <div class="hero-text">
+      <h1 class="hero-title">{{ .Site.Title }}</h1>
+      <p class="hero-en">Anran Poetry Archive</p>
+      <p class="hero-lead">
+        {{ with .Site.Params.author }}作者 · {{ . }}{{ end }}
+        {{ with .Site.Params.tagline }}　{{ . }}{{ end }}
+        <br>
+        {{ with .Site.Params.description }}{{ . }}。{{ end }}
+        一个安静读诗的地方，收录诗作、创作年代与档案资料。
+      </p>
+    </div>
+  </div>
 </section>
 
-<section class="home-block">
-  <h2 class="block-title">按年份浏览</h2>
-  <ul class="year-chips">
-    {{ range ($poems.GroupByDate "2006") }}
-    <li><a href="{{ ("/years/" | relURL) }}#year-{{ .Key }}">{{ .Key }}<span class="count">{{ len .Pages }}</span></a></li>
-    {{ end }}
-  </ul>
-</section>
+<div class="wrap">
+  <section class="home-block">
+    <h2 class="block-title">最新作品</h2>
+    <ul class="poem-list">
+      {{ range first 5 ($poems.ByDate.Reverse) }}
+      <li class="poem-item">
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        {{ if not .Date.IsZero }}<time class="date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time>{{ end }}
+      </li>
+      {{ else }}
+      <li class="poem-item empty">尚无作品。</li>
+      {{ end }}
+    </ul>
+  </section>
 
-<section class="home-block">
-  <h2 class="block-title">入口</h2>
-  <ul class="poem-list">
-    <li class="poem-item"><a href="{{ "/archive/" | relURL }}">卷目</a><span class="hint">全部作品列表</span></li>
-    <li class="poem-item"><a href="{{ "/preface/" | relURL }}">题记</a></li>
-    <li class="poem-item"><a href="{{ "/shi-ren-xiao-zhuan/" | relURL }}">诗人小传</a></li>
-    <li class="poem-item"><a href="{{ "/about/" | relURL }}">档案说明</a><span class="hint">作品整理原则</span></li>
-    {{ if .Site.Params.enableReview }}<li class="poem-item"><a href="{{ "/review/" | relURL }}">作者审阅材料</a><span class="hint">137 篇候选全文（预览专用）</span></li>{{ end }}
-    <li class="poem-item"><a href="{{ "/legacy/" | relURL }}">旧版网站 · 历史存档</a><span class="hint">原诗客栈只读快照</span></li>
-  </ul>
-</section>
+  <section class="home-block">
+    <h2 class="block-title">按年份浏览</h2>
+    <ul class="year-chips">
+      {{ range ($poems.GroupByDate "2006") }}
+      <li><a href="{{ ("/years/" | relURL) }}#year-{{ .Key }}">{{ .Key }}<span class="count">{{ len .Pages }}</span></a></li>
+      {{ end }}
+    </ul>
+  </section>
 
-<section class="home-block">
-  <h2 class="block-title">说明</h2>
-  <p class="home-disclaimer">
-    本站为<strong>迁移中的新框架</strong>，当前页面均为明确标注的<strong>合成测试文本</strong>，
-    不是作者的真实作品。真实作品将在获得作者逐篇确认后迁入。
-  </p>
-</section>
+  <section class="home-block">
+    <h2 class="block-title">栏目入口</h2>
+    <ul class="poem-list">
+      <li class="poem-item"><a href="{{ "/archive/" | relURL }}">卷目</a><span class="hint">全部作品列表</span></li>
+      <li class="poem-item"><a href="{{ "/preface/" | relURL }}">题记</a></li>
+      <li class="poem-item"><a href="{{ "/shi-ren-xiao-zhuan/" | relURL }}">诗人小传</a></li>
+      <li class="poem-item"><a href="{{ "/about/" | relURL }}">档案说明</a><span class="hint">作品整理原则</span></li>
+      {{ if .Site.Params.enableReview }}<li class="poem-item"><a href="{{ "/review/" | relURL }}">作者审阅材料</a><span class="hint">137 篇候选全文（预览专用）</span></li>{{ end }}
+      <li class="poem-item"><a href="{{ "/legacy/" | relURL }}">旧版网站 · 历史存档</a><span class="hint">原诗客栈只读快照</span></li>
+    </ul>
+  </section>
+
+  <section class="home-block">
+    <h2 class="block-title">说明</h2>
+    <p class="home-disclaimer">
+      本站为<strong>迁移中的新框架</strong>，当前页面均为明确标注的<strong>合成测试文本</strong>，
+      不是作者的真实作品。真实作品将在获得作者逐篇确认后迁入。
+    </p>
+  </section>
+</div>
 {{ end }}
