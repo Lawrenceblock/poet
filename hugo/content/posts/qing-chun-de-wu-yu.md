@@ -5,7 +5,6 @@ author: "安然"
 url: "/qing-chun-de-wu-yu/"
 layout: "single"
 lang: "zh+en"
-draft: true
 ---
 
 <div class="poem">
