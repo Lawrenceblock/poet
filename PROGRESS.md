@@ -19,6 +19,35 @@
 | `review/author-review-materials` | 阶段A：作者审阅材料（PR #6） | ✅ 已推送 |
 | `site/hugo-poetry-site-foundation` | 阶段B：Hugo 完整网站框架（PR #7） | ✅ 已推送 |
 | `site/poetry-site-v1-2026-11-12` | 阶段C：整合 + 作者审阅全文站 + 旧站存档（PR #9） | ✅ 已推送 |
+| `feat/author-review-system` | 作者审阅系统（PR #10） | ✅ 已推送 |
+| `plan/final-implementation-2026-11-12` | 最终建设总策划（PR #11） | ✅ 已推送 |
+| `impl/phase1-candidate-2026-11-12` | **第一阶段实施：候选站 + 作者审阅交付（PR #12）** | ✅ 已推送 |
+
+---
+
+## 第一阶段实施（POET-PHASE1-IMPLEMENTATION-01）· 2026-11-12
+
+**分支**：`impl/phase1-candidate-2026-11-12`（基线 `feat/author-review-system@5b423d8`，PR #12，draft）
+**目标**：建成完整、稳定、可独立链接访问的候选站，供作者浏览/审阅/提交意见。**非正式发布。**
+
+### 已完成（P1-A … P1-H）
+
+- **P1-A 构建环境**：Hugo Extended `0.168.0`；全量构建成功（预览 176 页 / 正式 22 页）。
+- **P1-B 内容保真**：`verify_verbatim` **137/137 逐字一致**；公开清单 `candidate-list.md` + `to-confirm.md`。
+- **P1-C 界面评估**：逐页实测（桌面/移动）；发现 1 处标题实体转义瑕疵（C0013，正文未受影响）。
+- **P1-D 安全加固**：令牌门禁覆盖 GET/HEAD/OPTIONS；日志脱敏；`?token=` 一次性后重定向剥离；授权范围收敛到 `/review/` + `/api/`。
+- **P1-E 备份可恢复**：跨文件系统独立备份 + 还原演练**通过**（逐字节一致）。
+- **P1-F 稳定性**：并发重建 204 次请求 **0 瞬时 404**；新增生产产物守门（Hugo `--cleanDestinationDir` 在本版本为 no-op）。
+- **P1-G URL 兼容**：8 个扁平旧页全部保持；305 篇博客映射 **305/305，0 遗漏、0 冲突**；站内链接预览 795 / 正式 209，**0 断链**。
+- **P1-H 交付**：候选站外网可达；审阅系统可用；CSV/JSON 导出。
+
+### 报告
+
+`docs/phase1/`（索引 `README.md` + 8 份任务报告）。
+
+### 待办（需授权）
+
+- 作者逐篇确认 137 候选；标题实体转义瑕疵修正；异地/云端持久备份；旧博客 301（须旧主机下发）。
 
 ---
 
@@ -150,6 +179,9 @@
 | review/author-review-materials | `044341b`（PR #6） |
 | site/hugo-poetry-site-foundation | `f4f28c1`（PR #7） |
 | site/poetry-site-v1-2026-11-12 | `07e23b2`（PR #9） |
+| feat/author-review-system | `5b423d8`（PR #10） |
+| plan/final-implementation-2026-11-12 | `c9272d0`（PR #11） |
+| impl/phase1-candidate-2026-11-12 | `87a1f1a`（PR #12） |
 
 > 上表 SHA 以 `git ls-remote` / GitHub 远程为准（2026-11-12 核验）。
 
@@ -166,3 +198,6 @@
 | #7 | site/hugo-poetry-site-foundation | 阶段B：Hugo 完整网站框架 |
 | #8 | audit/phase-c-production-readiness-2026-11-12 | Phase C 审计（只读） |
 | #9 | site/poetry-site-v1-2026-11-12 | **阶段C：Hugo v1 + 作者审阅全文站 + 旧站存档**（draft） |
+| #10 | feat/author-review-system | 作者审阅系统（draft） |
+| #11 | plan/final-implementation-2026-11-12 | 最终建设总策划（draft） |
+| #12 | impl/phase1-candidate-2026-11-12 | **第一阶段实施：候选站 + 作者审阅交付**（draft） |
