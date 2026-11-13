@@ -13,3 +13,5 @@ __pycache__/
 /docs/author-review/review-records/export-review-records.json
 /docs/author-review/review-records/inbox/
 /docs/author-review/review-records/backups/
+# Phase-1 private list (quotes the author's own review decisions)
+/docs/author-review/private/

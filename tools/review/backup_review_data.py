@@ -33,7 +33,12 @@ TZ = timezone(timedelta(hours=8))
 # Files that make up the authoritative + derived record set.
 DATA_FILES = ["journal.jsonl", "snapshot.json",
               "export-review-records.csv", "export-review-records.json"]
-DEFAULT_TO = "/workspace/backups/author-review"
+# Default backup destination. It MUST sit on a different filesystem from the
+# records (which live under /workspace), otherwise a recycled workspace would
+# take the source and its only backup down together. /home/openhands is a
+# separate mount here; override with REVIEW_BACKUP_DIR if that changes.
+DEFAULT_TO = os.environ.get("REVIEW_BACKUP_DIR",
+                            "/home/openhands/poet-review-backups/author-review")
 
 
 def _sha256(path):
@@ -67,8 +72,24 @@ def cmd_backup(args):
     if not os.path.exists(os.path.join(src, "journal.jsonl")):
         print(f"no journal at {src}/journal.jsonl — nothing to back up")
         return 1
+    dest_root = os.path.abspath(args.to)
+    # Enforce an independent backup: refuse to treat a copy on the same
+    # filesystem as the source as a real backup (a recycled workspace would
+    # lose both). --allow-same-fs overrides for throwaway/local use.
+    try:
+        src_dev = os.stat(src).st_dev
+        probe = dest_root if os.path.exists(dest_root) else os.path.dirname(dest_root)
+        dst_dev = os.stat(probe).st_dev
+        if src_dev == dst_dev and not args.allow_same_fs:
+            print(f"REFUSING: destination {dest_root} is on the same filesystem "
+                  f"as the source ({src}).\n"
+                  f"A backup there would be lost together with the source. "
+                  f"Choose a different filesystem, or pass --allow-same-fs.")
+            return 1
+    except OSError:
+        pass
     stamp = datetime.now(TZ).strftime("%Y%m%d-%H%M%S")
-    dest = os.path.join(args.to, stamp)
+    dest = os.path.join(dest_root, stamp)
     os.makedirs(dest, exist_ok=True)
     copied = []
     for name in DATA_FILES:
@@ -146,8 +167,7 @@ def cmd_restore(args):
         return 0
     # Safety: snapshot current records before overwriting.
     if os.path.exists(os.path.join(store.RECORDS, "journal.jsonl")):
-        args.to = DEFAULT_TO
-        cmd_backup(argparse.Namespace(to=DEFAULT_TO))
+        cmd_backup(argparse.Namespace(to=DEFAULT_TO, allow_same_fs=False))
     os.makedirs(store.RECORDS, exist_ok=True)
     for name in DATA_FILES:
         src = os.path.join(d, name)
@@ -164,6 +184,9 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     b = sub.add_parser("backup")
     b.add_argument("--to", default=DEFAULT_TO)
+    b.add_argument("--allow-same-fs", action="store_true",
+                   help="allow a destination on the same filesystem as the "
+                        "source (not a real independent backup)")
     b.set_defaults(func=cmd_backup)
     v = sub.add_parser("verify")
     v.add_argument("dir")
