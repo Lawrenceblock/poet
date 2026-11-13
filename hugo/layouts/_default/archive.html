@@ -1,24 +1,24 @@
 {{ define "main" }}
 <article class="poem-page">
-  <header class="poem-header">
-    <h1 class="poem-title">{{ .Title }}</h1>
-  </header>
-  <div class="poem-content list-content">
-    {{ .Content }}
-    {{- $poems := where .Site.RegularPages "Section" "posts" }}
-    {{- range ($poems.GroupByDate "2006").Reverse }}
-    <section class="year-group" id="year-{{ .Key }}">
-      <h2 class="year-heading">{{ .Key }}<span class="count">{{ len .Pages }}</span></h2>
-      <ul class="archive">
-        {{ range .Pages.ByDate.Reverse }}
-        <li class="archive-item">
-          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-          {{ if not .Date.IsZero }}<time class="date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time>{{ end }}
-        </li>
-        {{ end }}
-      </ul>
-    </section>
-    {{ end }}
+  <header class="page-title">{{ .Title }}</header>
+  <div class="wrap">
+    <div class="poem-content list-content">
+      {{ .Content }}
+      {{- $poems := where .Site.RegularPages "Section" "posts" }}
+      {{- range ($poems.GroupByDate "2006").Reverse }}
+      <section class="year-group" id="year-{{ .Key }}">
+        <h2 class="year-heading">{{ .Key }}<span class="count">{{ len .Pages }}</span></h2>
+        <ul class="archive">
+          {{ range .Pages.ByDate.Reverse }}
+          <li class="archive-item">
+            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            {{ if not .Date.IsZero }}<time class="date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time>{{ end }}
+          </li>
+          {{ end }}
+        </ul>
+      </section>
+      {{ end }}
+    </div>
   </div>
 </article>
 {{ end }}

@@ -8,12 +8,27 @@
 <style>
 /* 作者审阅材料 · 视觉与公开阅读页统一：白底、墨黑正文、暗红点缀（方案 C）。
    仅调整外观；不改动任何审阅数据、字段或 API 行为。 */
-:root{--ink:#242424;--muted:#777;--line:#e2e0de;--line-strong:#cfccc8;
- --bg:#fff;--bg-soft:#f7f6f4;--accent:#762b35;--accent-soft:#f3e9ea;}
+:root{--black:#171717;--ink:#242424;--muted:#757575;--line:#e2e0de;--line-strong:#cfccc8;
+ --bg:#fff;--bg-soft:#f7f6f4;--accent:#762b35;--accent-soft:#f3e9ea;
+ --on-black:#fff;--on-black-muted:#a0a0a0;--on-black-accent:#cb6e77;--on-black-rule:#333}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
  font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
-.wrap{max-width:760px;margin:0 auto;padding:28px 20px 120px}
+.rv-head{background:var(--black);color:var(--on-black);border-bottom:2px solid var(--on-black-accent)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--on-black);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--on-black-muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:#e6e4e1;margin-left:14px}
+.rv-head nav a:hover{color:#fff}
+.rv-head nav a.cur{color:var(--on-black-accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
 a{color:var(--accent)}
 h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
 h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
@@ -82,7 +97,7 @@ th{background:var(--bg-soft);font-weight:600}
 .hide{display:none}
 </style>
 </head>
-<body><div class="wrap">
+<body><header class="rv-head"><div class="rv-head-inner"><a class="brand" href="../">安然诗歌档案<span class="brand-en">Author Review</span></a><nav><a href="../">总目录</a><a href="../index.html">批次索引</a></nav></div></header><div class="wrap">
 <p class="batchnav"><a href="../index.html">← 审阅总目录</a> <a href="../batch-A-3.html">本批目录</a></p>
 <h1>老树之死</h1>
 <div class="note"><b>这是审阅副本，不是正式发表版本。</b>页面完整保留原文（含标点、诗行、段落、图片），仅移除脚本等不安全代码；未经作者确认不会用于正式站点。</div>
@@ -176,4 +191,4 @@ th{background:var(--bg-soft);font-weight:600}
 </script>
 
 <div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
-</div></body></html>
+</div><footer class="rv-foot"><div class="rv-foot-inner">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div></footer></body></html>

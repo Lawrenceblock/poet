@@ -1,10 +1,10 @@
 {{ define "main" }}
 <article class="poem-page">
-  <header class="poem-header">
-    <h1 class="poem-title">{{ .Title }}</h1>
-  </header>
-  <div class="poem-content prose">
-    {{ .Content }}
+  <header class="page-title">{{ .Title }}</header>
+  <div class="wrap">
+    <div class="poem-content prose">
+      {{ .Content }}
+    </div>
   </div>
 </article>
 {{ end }}
