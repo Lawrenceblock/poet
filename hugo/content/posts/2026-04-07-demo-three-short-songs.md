@@ -5,6 +5,7 @@ slug: "demo-three-short-songs"
 author: "安然"
 lang: "zh"
 note: "本页为**合成测试文本**，用于验证“一篇文章含多首（组诗）”的显示方式，不是真实作品。"
+draft: true
 ---
 
 {{< poem >}}
