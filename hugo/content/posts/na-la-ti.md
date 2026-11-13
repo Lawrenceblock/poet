@@ -5,7 +5,6 @@ author: "安然"
 url: "/na-la-ti/"
 layout: "single"
 lang: "zh"
-draft: true
 ---
 
 <div class="poem">
