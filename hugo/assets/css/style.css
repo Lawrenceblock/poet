@@ -157,12 +157,13 @@ img { max-width: 100%; }
 }
 
 /* ============================================================
-   首页主视觉：黑白几何分割与作者肖像
+   首页主视觉：纸白编辑版式与作者肖像
    ============================================================ */
 .hero {
-  background: var(--black);
-  color: var(--on-black);
+  background: var(--paper);
+  color: var(--ink);
   width: 100%;
+  border-bottom: 1px solid var(--rule);
 }
 .hero-inner {
   width: 100%;
@@ -176,7 +177,7 @@ img { max-width: 100%; }
   min-height: clamp(360px, 42vw, 500px);
 }
 
-/* 左侧肖像：独立暖白几何区域 */
+/* 左侧肖像：独立暖白区域，保留原图比例，不裁切 */
 .hero-portrait {
   background: #F2F0EA;
   display: flex;
@@ -196,9 +197,9 @@ img { max-width: 100%; }
   object-position: center;
 }
 
-/* 右侧：纯黑文字区域 */
+/* 右侧改为纸白，不再使用整块黑底 */
 .hero-text {
-  background: var(--black);
+  background: var(--paper);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -211,7 +212,7 @@ img { max-width: 100%; }
   font-size: .66rem;
   letter-spacing: .36em;
   text-transform: uppercase;
-  color: var(--accent-on-black);
+  color: var(--accent);
   margin: 0 0 1.4rem;
 }
 .hero-title {
@@ -220,7 +221,7 @@ img { max-width: 100%; }
   line-height: 1.15;
   letter-spacing: .06em;
   margin: 0 0 1.4rem;
-  color: var(--on-black);
+  color: var(--ink);
   overflow-wrap: anywhere;
 }
 .hero-title .hero-title-en {
@@ -230,36 +231,30 @@ img { max-width: 100%; }
   font-weight: normal;
   letter-spacing: .32em;
   text-transform: uppercase;
-  color: var(--on-black-2);
+  color: var(--muted);
   margin-top: 1.15rem;
 }
 .hero-lead {
   font-size: clamp(.95rem, 1.5vw, 1.1rem);
   line-height: 2;
-  color: #D7D5D2;
+  color: var(--ink-2);
   margin: 0;
   max-width: 34rem;
 }
 .hero-lead a {
-  color: var(--accent-on-black);
+  color: var(--accent);
 }
 
-/* 移动端仍然保持左白右黑，不改成上下排列 */
+/* 移动端继续保留肖像与文字左右并置 */
 @media (max-width: 600px) {
   .hero-inner {
     grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr);
     min-height: 260px;
     padding: 1rem var(--pad);
   }
-  .hero-portrait {
-    padding: .5rem;
-  }
-  .hero-portrait img {
-    max-height: 300px;
-  }
-  .hero-text {
-    padding: 1.1rem;
-  }
+  .hero-portrait { padding: .5rem; }
+  .hero-portrait img { max-height: 300px; }
+  .hero-text { padding: 1.1rem; }
   .hero-kicker {
     font-size: .55rem;
     letter-spacing: .16em;
