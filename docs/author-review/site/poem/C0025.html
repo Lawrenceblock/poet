@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>C0025 · 胡女何辜</title>
+<style>
+/* 作者审阅材料 · 视觉与公开阅读页统一：纸白底、墨黑正文、暗红点缀（Phase 3 编辑设计）。
+   仅调整外观（配色与字族）；不改动任何审阅数据、字段、HTML 结构或 API 行为。 */
+:root{--black:#0E0E0E;--ink:#141414;--ink-2:#4A4A4A;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
+ --bg:#FAF9F7;--bg-soft:#F2F1EE;--accent:#7A2A34;--accent-soft:#F3E9EA;
+ --on-black:#F2F1EE;--on-black-muted:#A8A6A2;--on-black-accent:#C98A92;--on-black-rule:#2A2A2A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
+/* 页眉与公开站一致：纸白 + 细线（刊物页眉），不再使用黑色标题条。 */
+.rv-head{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ink)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--ink);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:var(--ink-2);margin-left:14px}
+.rv-head nav a:hover{color:var(--accent)}
+.rv-head nav a.cur{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
+a{color:var(--accent)}
+h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
+h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
+.note{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:12px 14px;color:var(--muted);font-size:.9rem;margin:16px 0}
+.meta{color:var(--muted);font-size:.85rem;line-height:1.75}
+.meta b{color:var(--ink);font-weight:600}
+.tags span{display:inline-block;background:var(--bg-soft);border:1px solid var(--line);
+ padding:1px 10px;margin:2px 4px 2px 0;font-size:.78rem;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);padding:16px 18px;margin:14px 0}
+.card h3{margin:0 0 .3em;font-size:1.02rem;font-weight:600}
+.card h3 a{color:var(--ink)}
+.card h3 a:hover{color:var(--accent)}
+.poem{background:#fff;border:1px solid var(--line);border-top:2px solid var(--accent);
+ padding:22px 24px;margin:18px 0}
+.poem p{margin:0 0 1.05em}
+.poem img{max-width:100%;height:auto}
+.verse{white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg-soft);font-weight:600}
+.status{display:inline-block;border:1px solid var(--line-strong);
+ padding:2px 10px;font-size:.8rem;color:var(--muted);background:var(--bg-soft)}
+.status.s-keep{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.status.s-hold{background:var(--bg-soft);border-color:var(--line-strong);color:#8a6d2f}
+.status.s-exclude{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.status.s-pending{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
+.batchnav a{display:inline-block;margin-right:14px}
+.banner{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:10px 14px;font-size:.85rem;color:var(--muted);margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-top:2px solid var(--accent);background:#fff;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid var(--line-strong);background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:#fff;
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+ border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border:1px solid var(--line);background:var(--bg-soft);color:var(--muted)}
+.save-state.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.save-state.err{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.save-state.busy{background:var(--bg-soft);border-color:var(--line-strong);color:var(--muted)}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pill.todo{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.bar{height:12px;background:var(--bg-soft);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:var(--bg-soft)}
+.hide{display:none}
+</style>
+</head>
+<body><header class="rv-head"><div class="rv-head-inner"><a class="brand" href="../">安然诗歌档案<span class="brand-en">Author Review</span></a><nav><a href="../">总目录</a><a href="../index.html">批次索引</a></nav></div></header><div class="wrap">
+<p class="batchnav"><a href="../index.html">← 审阅总目录</a> <a href="../batch-A-1.html">本批目录</a></p>
+<h1>胡女何辜</h1>
+<div class="note"><b>这是审阅副本，不是正式发表版本。</b>页面完整保留原文（含标点、诗行、段落、图片），仅移除脚本等不安全代码；未经作者确认不会用于正式站点。</div>
+<p class="meta">候选编号 <b>C0025</b>　原始发表日期 <b>2009-12-01</b>　语言 <b>zh</b>　脚本分类 <b>A</b><br>原始来源：<a href="https://www.ismaelan.com/2009/12/blog-post.html" rel="noopener">https://www.ismaelan.com/2009/12/blog-post.html</a></p>
+<p class="tags"><span>China</span><span>Muslim</span><span>Uighur</span></p>
+<h2>为什么列出这篇</h2><ul class="meta"><li>脚本分类：A · 脚本检测到明确署名（文/安然 等）</li><li>署名线索：explicit 安然 byline</li><li>原文标签：China|Muslim|Uighur</li><li>标题来源：inner_byline</li></ul>
+<h2>需要作者确认</h2><ul class="meta"><li>这篇文章是“一首诗 / 多首诗 / 非诗（评论、消息、摄影等）”？</li></ul>
+<div class="rv" id="review" data-candidate="C0025"><h2>作者审阅</h2><p class="hint">只需填写你要填的部分；填写后请点“保存审阅”。未保存前刷新页面不会丢失草稿，但只有“已保存”才算正式记录。</p><label for="f-status">① 审阅结论</label><select id="f-status" name="status"><option value="pending">待审阅</option><option value="keep">保留</option><option value="hold">暂缓</option><option value="exclude">排除</option></select><label for="f-nature">② 作品性质</label><select id="f-nature" name="nature"><option value="unset">（未填写）</option><option value="single_poem">一首诗</option><option value="multi_poem">多首诗</option><option value="non_poem">非诗（评论/消息/摄影等）</option><option value="unsure">尚不确定</option></select><label for="f-comment">③ 作者意见（版本问题、是否需修改、是否需与旧站比较等）</label><textarea id="f-comment" name="comment" placeholder="例如：与旧站版本不同，以本版为准；需要再核对第二段换行……"></textarea><p class="hint">可只填部分字段。意见最多 20000 字。</p><div class="rvbar"><button type="button" class="btn" id="f-save">保存审阅</button><span class="save-state" id="f-state" aria-live="polite">尚未保存</span><span class="last-saved" id="f-last"></span></div></div>
+<h2>原文（逐字保留）</h2>
+<div class="poem"><p>&#160;</p>  <p>文/安然</p>  <p>&#160;</p>  <p>深夜孤寂无眠，找来一本清诗选闲翻。每每于落寞时爱读明末清初的遗民之作，常觉心境相近。那些身遭易代之变的人明知新朝张网以待的政治迫害，还是执着地曲意诉说心中的身世情怀、亡国隐痛。彼所不能释怀者，为汉家故国；今吾铭心刻骨事，乃无忘穆族。</p>  <p>&#160;</p>  <p>一故人自西域来，言及旅车见闻，曰每经一站，皆可见一背琴长者率若干胡女离车而去，卖艺他乡。同是汉地飘零之客，余有凄然之色。故人见之颇有不屑，讽曰：那族性耽歌舞，自古如是，何必为之多余忧怀。余默然。</p>  <p>&#160;</p>  <p>&#160;</p>  <p></p>  <p>&#160;</p>  <p>余闻此自标高格之道德审判多矣。</p>  <p>&#160;</p>  <p>不错，西域歌舞自古就流传中国，公元八世纪白居易写《胡旋女》时，就记录下了这一脉相承、顽强延续至今的以且歌且舞为最大特色的乐种：</p>  <p>&#160;</p>  <p>“</p>  <p>胡旋女，胡旋女，心应弦，手应鼓。</p>  <p>弦鼓一声双袖举，回雪飘飖转蓬舞。</p>  <p>左旋右旋不知疲，千匝万周无已时。</p>  <p>”</p>  <p>&#160;</p>  <p>这段如在目前的生动描写成为今日述及新疆歌舞的渊源传统时必要征引的名句。可我更看重白居易同时代的一位比他的名气小得多的诗人为异族舞女所写的另一首作品——《胡腾儿》，同是写罢那令人惊叹的旋转，诗人对离失故土的胡女一句关情又忘情的发问，让我每当读至，就不由自主地感慨系之：“<strong>胡腾儿，胡腾儿，家乡路断知不知？</strong>（李端《胡腾儿》）”从古至今，有多少无名无姓的胡旋女、胡腾儿将青春抛洒在异乡的繁华里，伊人的红汗交流、热情四射却何曾换来过大漠苍凉的一丝一毫的改变？！达官显贵、巨商富贾从这些下层的可怜人身上获取一时的淫乐，只视她们为可供驱使的玩偶。相形之下，李端的同情超越了他的时代、他的族群，在向以华夏为正朔、斥胡虏为犬羊的语境里十分可贵。</p>  <p>&#160;</p>  <p>灯下蹉跎，时过五更，偶翻出赵翼的一首小诗《赠当筵索诗者》。此诗虽不如他的那首“江山代有才人出，各领风骚数百年”脍炙人口，却另有一份真情动人。诗歌也是从佐宴歌女的美好，写至彼等的无奈与悲辛。录此，惟愿今人可将此恻隐之心突破种族藩篱，成就普世之爱：</p>  <p>&#160;</p>  <p>“</p>  <p>盈盈十五出堂来，妙转歌喉劝客卮。</p>  <p>也是人间生活计，老夫和泪写胭脂。</p>  <p>”</p>  <p>&#160;</p>  <p>其实，我知道这最后的美丽希冀有多苦涩、微弱，可亡族之人更复何言。或许真的像鲁迅所言，文学是生活余裕的产物，表现了一民族的文化。为日益险恶的环境和生计日蹙所迫，自己的文字往往力不从心，有枯竭的痛感。即使有意为民族继续写下去，此时的我也只有更多的落泪、更多的挣扎与疲惫。由此，也更能体谅那些无助的歌女：生命如此地值得珍惜，却又如此卑贱，如此脆弱，完全地无从把握。这种悲凉又真切的感受不再是居高临下的歌吟，而是落于吃人的人间后，在生与死徊徨过后，才有的切肤之痛。</p>  <p>&#160;</p>  <p>愿天涯胡女早归故乡。</p>  <p>愿真主的慈悯、援助早日降临。</p></div>
+<p class="meta">如原页面与本页有任何差异，请以 <a href="https://www.ismaelan.com/2009/12/blog-post.html" rel="noopener">原始来源</a> 为准，并告知差异位置。</p>
+
+<script>
+(function(){
+  var root=document.getElementById('review');
+  if(!root) return;
+  var cid=root.getAttribute('data-candidate');
+  var elStatus=document.getElementById('f-status');
+  var elNature=document.getElementById('f-nature');
+  var elComment=document.getElementById('f-comment');
+  var elSave=document.getElementById('f-save');
+  var elState=document.getElementById('f-state');
+  var elLast=document.getElementById('f-last');
+  var api='/review/api/review/'+encodeURIComponent(cid);
+  var apiSave='/review/api/review';
+  var LS='reviewDraft:'+cid;
+  // ?test=1 routes writes to the isolated test journal so acceptance tests
+  // never touch the author's real review records.
+  var TEST=/[?&]test=1(&|$)/.test(location.search);
+  if(TEST){ api+='?test=1'; LS='reviewDraft-test:'+cid; }
+
+  function setState(kind,text){
+    elState.className='save-state'+(kind?' '+kind:'');
+    elState.textContent=text;
+  }
+  function fmt(ts){ return ts?('上次保存：'+ts.replace('T',' ').slice(0,16)):''; }
+
+  // restore unsaved draft (never treated as a saved record)
+  try{
+    var d=JSON.parse(localStorage.getItem(LS)||'null');
+    if(d){ if(d.status)elStatus.value=d.status; if(d.nature)elNature.value=d.nature;
+           if(d.comment)elComment.value=d.comment; setState('','有未保存的草稿'); }
+  }catch(e){}
+
+  function markDirty(){
+    try{localStorage.setItem(LS,JSON.stringify({status:elStatus.value,
+      nature:elNature.value,comment:elComment.value}));}catch(e){}
+    if(!elState.classList.contains('ok')) setState('','有未保存的修改');
+  }
+  [elStatus,elNature,elComment].forEach(function(el){
+    el.addEventListener('input',markDirty); el.addEventListener('change',markDirty);});
+
+  // load the saved record from the server
+  fetch(api,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.record){
+      if(!localStorage.getItem(LS)){
+        elStatus.value=j.record.status||'pending';
+        elNature.value=j.record.nature||'unset';
+        elComment.value=j.record.comment||'';
+      }
+      elLast.textContent=fmt(j.record.updated_at)+(j.record.rev?('（第 '+j.record.rev+' 版）'):'');
+      setState('ok','已保存');
+    }else{
+      setState('','尚未保存');
+    }
+  }).catch(function(){ setState('err','无法读取历史记录（服务器离线）'); });
+
+  elSave.addEventListener('click',function(){
+    elSave.disabled=true; setState('busy','正在保存…');
+    fetch(apiSave,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({candidate_id:cid,status:elStatus.value,
+        nature:elNature.value,comment:elComment.value,test:TEST})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      elSave.disabled=false;
+      if(res.ok&&res.j&&res.j.ok){
+        try{localStorage.removeItem(LS);}catch(e){}
+        var rec=res.j.record||{};
+        elLast.textContent=fmt(rec.updated_at)+(rec.rev?('（第 '+rec.rev+' 版）'):'');
+        setState('ok','保存成功');
+      }else{
+        var msg=(res.j&&res.j.error)?res.j.error:'保存失败';
+        setState('err','保存失败：'+msg);
+      }
+    }).catch(function(){
+      elSave.disabled=false;
+      setState('err','保存失败：网络错误（未保存）');
+    });
+  });
+})();
+</script>
+
+<div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
+</div><footer class="rv-foot"><div class="rv-foot-inner">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div></footer></body></html>

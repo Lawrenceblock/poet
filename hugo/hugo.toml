@@ -1,0 +1,113 @@
+# 安然诗歌档案 · Hugo 站点配置
+# 目标：安静、简洁、以诗歌阅读为中心。
+# 关键：permalink 必须保持旧站扁平结构 /:slug/，确保旧链接不失效。
+baseURL = "https://poet.ismaelan.com/"
+defaultContentLanguage = "zh"
+title = "安然诗歌档案"
+
+# 语言设置（Hugo v0.158+ 用 locale/label 取代 languageCode/languageName）
+[languages]
+  [languages.zh]
+    locale = "zh-CN"
+    label = "中文"
+    weight = 1
+
+# 分类法：本站以“卷目 / 年份”为唯一索引，默认关闭 tags/categories，
+# 避免生成空分类页（如需启用，取消注释并在内容中加 tags）。
+[taxonomies]
+#  tag = "tags"
+#  category = "categories"
+
+# 站点级 SEO
+[params]
+  author = "安然"
+  description = "一个安静读诗的地方"
+  tagline = "未赴之境 · 安然诗歌档案"
+  # 首页封面图（与旧站路径一致：/assets/img/cover.png）
+  coverImage = "/assets/img/cover.png"
+  # 站内搜索开关（纯前端，无第三方依赖）
+  enableSearch = true
+  # 作者审阅材料入口（/review/）。默认 false：正式构建不发布未经确认的作品全文。
+  # 预览构建时由 tools/preview/build_preview.py 用环境变量 HUGO_PARAMS_ENABLEREVIEW=true 开启。
+  enableReview = false
+
+# 导航菜单
+[menu]
+  [[menu.main]]
+    name = "卷目"
+    url = "/archive/"
+    weight = 10
+  [[menu.main]]
+    name = "年份"
+    url = "/years/"
+    weight = 20
+  [[menu.main]]
+    name = "题记"
+    url = "/preface/"
+    weight = 30
+  [[menu.main]]
+    name = "小传"
+    url = "/shi-ren-xiao-zhuan/"
+    weight = 40
+  [[menu.main]]
+    name = "档案说明"
+    url = "/about/"
+    weight = 50
+  [[menu.main]]
+    name = "搜索"
+    url = "/search/"
+    weight = 60
+
+# URL 方案（Phase C 决策，可回滚）：
+#   旧博客 305 篇 → /:year/:month/:slug/  （实测 305 条路径全部唯一，0 冲突；
+#                   与旧博客路径 /YYYY/MM/slug.html 一一对应，仅去掉 .html）
+#   旧诗站 3 篇 + 小传等 → 使用各文件 front matter 中的显式 url:（保持扁平旧路径）
+# 说明：旧博客域名 www.ismaelan.com 与本站 poet.ismaelan.com 不同，
+#       迁移后用 tools/migration/build_redirect_map.py 生成 301 映射。
+[permalinks]
+  posts = "/:year/:month/:slug/"
+
+# 输出：HTML + RSS + sitemap + robots（Hugo 内置）+ 站内搜索 JSON 索引
+[outputs]
+  home = ["HTML", "RSS", "robots", "SearchIndex"]
+  section = ["HTML", "RSS"]
+
+[outputFormats.robots]
+  mediaType = "text/plain"
+  baseName = "robots"
+  isPlainText = true
+  notAlternative = true
+
+# 站内搜索索引（纯前端使用，不依赖第三方服务；只收录正式发布内容）
+[outputFormats.SearchIndex]
+  mediaType = "application/json"
+  baseName = "index"
+  isPlainText = true
+  notAlternative = true
+
+# 分页：正式目录按发表日期分组；保留分页设置以备作品增加。
+[pagination]
+  pagerSize = 10
+
+# Markdown 处理：诗歌依赖换行，务必开启 hardWraps 以保留行尾换行
+[markup]
+  [markup.goldmark]
+    # typographer MUST stay off: Goldmark's typographer rewrites straight
+    # quotes -> curly, "..." -> ellipsis, "--" -> en dash. That silently
+    # mutates the poem text and breaks verbatim preservation.
+    [markup.goldmark.extensions]
+      typographer = false
+    [markup.goldmark.renderer]
+      # 允许诗歌正文内嵌原始 HTML（旧站诗歌为手工 HTML）
+      unsafe = true
+      # 行尾换行渲染为 <br>，保护诗歌分行
+      hardWraps = true
+  [markup.highlight]
+    noClasses = false
+
+# Sitemap
+[sitemap]
+  changefreq = "monthly"
+  priority = 0.5
+  filename = "sitemap.xml"
+

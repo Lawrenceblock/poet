@@ -1,0 +1,3 @@
+# Raw Blogger feed is fetched on demand, NOT committed (contains full poem HTML).
+../../work/
+__pycache__/

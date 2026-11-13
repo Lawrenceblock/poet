@@ -1,0 +1,105 @@
+body {
+  margin: 0;
+  background: #dceef2;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cover {
+  width: 90%;
+  max-width: 520px;
+  text-align: center;
+}
+
+.cover img {
+  display: block;
+  margin: 0 auto;
+  max-width: 360px;
+  max-height: 52vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.title {
+  margin-top: 1.8em;
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 1.65rem;
+  letter-spacing: 0.32em;
+  color: #1f2a2e;
+  text-indent: 0.32em; /* 用字距补视觉居中，因为中文标题有letter-spacing */
+  text-align: center;
+}
+
+.copy {
+  margin-top: 0.9em;
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 0.8rem;
+  color: #9aa3a6;
+  letter-spacing: 0.24em;
+  text-indent: 0.24em;
+  text-align: center;
+}
+
+.note {
+  margin-top: 0.55em;
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 0.76rem;
+  color: #b8c0c2;
+  letter-spacing: 0.36em;
+  text-indent: 0.36em;
+  text-align: center;
+}
+
+.poem-page {
+  max-width: 560px;
+  margin: 6em auto;
+  padding: 0 1.2em;
+  font-family: "Songti SC", "SimSun", serif;
+  color: #2c3a40;
+}
+
+.poem-title {
+  text-align: center;
+  font-size: 1.4rem;
+  letter-spacing: 0.3em;
+  margin-bottom: 0.5em;
+}
+
+.poem-date {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #9aa3a6;
+  letter-spacing: 0.2em;
+  margin-bottom: 3em;
+}
+
+.poem-content {
+  font-size: 1.05rem;
+  line-height: 2.4;
+  letter-spacing: 0.08em;
+}
+
+.poem-content p {
+  text-indent: 2em;
+  margin: 1em 0;
+}
+
+.poem-back {
+  margin-top: 4em;
+  text-align: center;
+  font-size: 0.82rem;
+  letter-spacing: 0.3em;
+}
+
+.poem-back a {
+  color: #7a8b8f;
+  text-decoration: none;
+}
+
+.poem-back a:hover {
+  color: #2c3a40;
+}
+

@@ -1,0 +1,4 @@
+site_url,site_file,site_title,blog_url,blog_date,duplicate,version_diff,url_mapping,needs_human_review,note
+/qing-chun-de-wu-yu/,_posts/2026-04-07-qing-chun-de-wu-yu.md,青春的物语,https://www.ismaelan.com/2026/04/blog-post_7.html,2026-04-07,yes,DIFFERS (normalized),/qing-chun-de-wu-yu/  <-  https://www.ismaelan.com/2026/04/blog-post_7.html,yes,blog post found; manual version comparison required
+/na-la-ti/,_posts/2026-09-07-na-la-ti.md,那拉提（未赴）,,,no,no matching blog post found,unresolved,yes,post not located in blog by normalized prefix match
+/shi-ren-xiao-zhuan/,_posts/2026-09-11-shi-ren-xiao-zhuan.md,诗人小传,,,no,no matching blog post found,unresolved,yes,post not located in blog by normalized prefix match

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>C0009 · 记住！我是阿拉伯人（سجل، أنا عربي）</title>
+<style>
+/* 作者审阅材料 · 视觉与公开阅读页统一：纸白底、墨黑正文、暗红点缀（Phase 3 编辑设计）。
+   仅调整外观（配色与字族）；不改动任何审阅数据、字段、HTML 结构或 API 行为。 */
+:root{--black:#0E0E0E;--ink:#141414;--ink-2:#4A4A4A;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
+ --bg:#FAF9F7;--bg-soft:#F2F1EE;--accent:#7A2A34;--accent-soft:#F3E9EA;
+ --on-black:#F2F1EE;--on-black-muted:#A8A6A2;--on-black-accent:#C98A92;--on-black-rule:#2A2A2A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
+/* 页眉与公开站一致：纸白 + 细线（刊物页眉），不再使用黑色标题条。 */
+.rv-head{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ink)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--ink);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:var(--ink-2);margin-left:14px}
+.rv-head nav a:hover{color:var(--accent)}
+.rv-head nav a.cur{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
+a{color:var(--accent)}
+h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
+h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
+.note{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:12px 14px;color:var(--muted);font-size:.9rem;margin:16px 0}
+.meta{color:var(--muted);font-size:.85rem;line-height:1.75}
+.meta b{color:var(--ink);font-weight:600}
+.tags span{display:inline-block;background:var(--bg-soft);border:1px solid var(--line);
+ padding:1px 10px;margin:2px 4px 2px 0;font-size:.78rem;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);padding:16px 18px;margin:14px 0}
+.card h3{margin:0 0 .3em;font-size:1.02rem;font-weight:600}
+.card h3 a{color:var(--ink)}
+.card h3 a:hover{color:var(--accent)}
+.poem{background:#fff;border:1px solid var(--line);border-top:2px solid var(--accent);
+ padding:22px 24px;margin:18px 0}
+.poem p{margin:0 0 1.05em}
+.poem img{max-width:100%;height:auto}
+.verse{white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg-soft);font-weight:600}
+.status{display:inline-block;border:1px solid var(--line-strong);
+ padding:2px 10px;font-size:.8rem;color:var(--muted);background:var(--bg-soft)}
+.status.s-keep{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.status.s-hold{background:var(--bg-soft);border-color:var(--line-strong);color:#8a6d2f}
+.status.s-exclude{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.status.s-pending{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
+.batchnav a{display:inline-block;margin-right:14px}
+.banner{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:10px 14px;font-size:.85rem;color:var(--muted);margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-top:2px solid var(--accent);background:#fff;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid var(--line-strong);background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:#fff;
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+ border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border:1px solid var(--line);background:var(--bg-soft);color:var(--muted)}
+.save-state.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.save-state.err{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.save-state.busy{background:var(--bg-soft);border-color:var(--line-strong);color:var(--muted)}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pill.todo{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.bar{height:12px;background:var(--bg-soft);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:var(--bg-soft)}
+.hide{display:none}
+</style>
+</head>
+<body><header class="rv-head"><div class="rv-head-inner"><a class="brand" href="../">安然诗歌档案<span class="brand-en">Author Review</span></a><nav><a href="../">总目录</a><a href="../index.html">批次索引</a></nav></div></header><div class="wrap">
+<p class="batchnav"><a href="../index.html">← 审阅总目录</a> <a href="../batch-A-1.html">本批目录</a></p>
+<h1>记住！我是阿拉伯人（سجل، أنا عربي）</h1>
+<div class="note"><b>这是审阅副本，不是正式发表版本。</b>页面完整保留原文（含标点、诗行、段落、图片），仅移除脚本等不安全代码；未经作者确认不会用于正式站点。</div>
+<p class="meta">候选编号 <b>C0009</b>　原始发表日期 <b>2008-10-17</b>　语言 <b>zh+en</b>　脚本分类 <b>A</b><br>原始来源：<a href="https://www.ismaelan.com/2008/10/blog-post_17.html" rel="noopener">https://www.ismaelan.com/2008/10/blog-post_17.html</a></p>
+<p class="tags"><span>诗歌</span></p>
+<h2>为什么列出这篇</h2><ul class="meta"><li>脚本分类：A · 脚本检测到明确署名（文/安然 等）</li><li>署名线索：explicit 安然 byline; poetry label</li><li>原文标签：诗歌</li><li>标题来源：inner_byline</li><li>检测到中英双语，审阅时请核对两种语言是否为同一作品。</li></ul>
+<h2>需要作者确认</h2><ul class="meta"><li>这篇文章是“一首诗 / 多首诗 / 非诗（评论、消息、摄影等）”？</li><li>中英文是否为同一作品的两种版本？以哪一版为准？</li></ul>
+<div class="rv" id="review" data-candidate="C0009"><h2>作者审阅</h2><p class="hint">只需填写你要填的部分；填写后请点“保存审阅”。未保存前刷新页面不会丢失草稿，但只有“已保存”才算正式记录。</p><label for="f-status">① 审阅结论</label><select id="f-status" name="status"><option value="pending">待审阅</option><option value="keep">保留</option><option value="hold">暂缓</option><option value="exclude">排除</option></select><label for="f-nature">② 作品性质</label><select id="f-nature" name="nature"><option value="unset">（未填写）</option><option value="single_poem">一首诗</option><option value="multi_poem">多首诗</option><option value="non_poem">非诗（评论/消息/摄影等）</option><option value="unsure">尚不确定</option></select><label for="f-comment">③ 作者意见（版本问题、是否需修改、是否需与旧站比较等）</label><textarea id="f-comment" name="comment" placeholder="例如：与旧站版本不同，以本版为准；需要再核对第二段换行……"></textarea><p class="hint">可只填部分字段。意见最多 20000 字。</p><div class="rvbar"><button type="button" class="btn" id="f-save">保存审阅</button><span class="save-state" id="f-state" aria-live="polite">尚未保存</span><span class="last-saved" id="f-last"></span></div></div>
+<h2>原文（逐字保留）</h2>
+<div class="poem"><p> </p>  <p> </p>  <p>——纪念伟大的民族诗人达尔维什（Mahmoud Darwish）</p>  <p> </p>  <p>文/安然</p>  <p>10月5日，全世界在纪念他；10月5日，我们这些穆斯林可曾想起这样一个的名字：穆罕默德·达尔维什（1942——2008），并向他致以敬意？</p>  <p>在柏林国际文学节的呼吁下，2008年10月5日这一天，全球数十个城市用多种语言举办达尔维什的诗歌朗诵会；在中国的一角——香港尖沙咀美丽华中心商务印书馆，《今天》和《字花》诗刊举办了专场朗诵会。这条消息也是我事后从广东诗人黄礼孩的博客上得知，我们都是迟到者……</p>  <p>我第一次听到达尔维什的名字是从萨义德那里：一个陌生的巴勒斯坦流亡诗人的名字，它已像电视上司空见惯的冲突画面无法撼动我疲惫僵直的神经。直到他死去，让他与他的作品有了新闻卖点，我才得以从中了解更多，并决定把他的一首怀乡之作写进自己并未完成的新疆小说里。</p>  <p> </p>  <p> </p>  <p>我看了卡塔尔半岛台关于拉马拉（注：巴陪都）8月13日那场葬礼的新闻短片：国葬、赞美、棺椁上覆盖的旗帜、少女动人的泪痕……尘世一切哀荣此刻集于一身，那是一个真正的民族诗人该得的。之后，他就要住进自己的诗集，寂寞如初……但当我获知这个世界上的作家和诗人们在不同的地方接力般地又一次集体纪念他时，除却一份别样的穆斯林兄弟的感动外，开始极有限地思索达尔维什之于这个世界的意义：他何以重要？</p> ##CONTINUE##   <p>正如美国的巴勒斯坦裔学者爱德华·萨义德所说，在穆罕默德·达尔维什的早期诗作中可以找到巴勒斯坦人在流亡之苦中重新整合民族身份的努力。身份是人的一种记忆，是在不断追问“自己是谁”，并做出回答的过程中建立起来的记忆。达尔维什的名篇《身份证》就是一首通过诗人的个人化写作呈现民族记忆的杰作：</p>  <p><strong></strong></p>  <p><strong></strong></p>  <p><strong>IDENTITY CARD（身份证）</strong></p>  <p><em>Record!记住！</em></p>  <p><em>I am an Arab我是阿拉伯人</em></p>  <p><em>And my identity card is number fifty thousand我的身份证是第5万号</em></p>  <p><em>I have eight children我有8个孩子</em></p>  <p><em>And the ninth is coming after a summer今夏我将迎来第9个宝贝</em></p>  <p><em>Will you be angry?你会生气吗？</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>Record!记住！</em></p>  <p><em>I am an Arab我是阿拉伯人</em></p>  <p><em>Employed with fellow workers at a quarry 在采石场做工的工人</em></p>  <p><em>I have eight children 我有八个孩子需要养育</em></p>  <p><em>I get them bread 他们的面包、衣服、课本</em></p>  <p><em>Garments and books </em></p>  <p><em>from the rocks.. 都开采自岩石</em></p>  <p><em>I do not supplicate charity at your doors 我没有在你的门前乞讨</em></p>  <p><em>Nor do I belittle myself at the footsteps of your chamber 也不会在你的枪口下卑躬屈膝</em></p>  <p><em>So will you be angry? 你会生气吗？</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>Record!记住！</em></p>  <p><em>I am an Arab我是阿拉伯人</em></p>  <p><em>I have a name without a title我有名字却没有名衔</em></p>  <p><em>Patient in a country我是病人</em></p>  <p><em>Where people are enraged在一个群情激愤的国度</em></p>  <p><em>My roots我的根</em></p>  <p><em>Were entrenched before the birth of time深及生命诞生之前</em></p>  <p><em>And before the opening of the eras西元之前</em></p>  <p><em>Before the pines, and the olive trees比松木、橄榄</em></p>  <p><em>And before the grass grew和野草的生长还要早</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>My father.. descends from the family of the plow我的父亲 为这个家而奔波</em></p>  <p><em>Not from a privileged class我们不属于特权阶层</em></p>  <p><em>And my grandfather was a farmer我的祖父就是一名农夫</em></p>  <p><em>Neither well-bred, nor well-born!没有良好的教育，没有高贵的门第！</em></p>  <p><em>Teaches me the pride of the sun这让我在识字之前，就认识了如火的骄阳</em></p>  <p><em>Before teaching me how to read</em></p>  <p><em>And my house is like a watchman's hut我的房子由树枝和藤茎搭成，像守夜人的棚屋</em></p>  <p><em>Made of branches and cane</em></p>  <p><em>Are you satisfied with my status?您对我的回答是否满意？</em></p>  <p><em>I have a name without a title!我有名字却不用加头衔！</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>Record!记住！</em></p>  <p><em>I am an Arab我是阿拉伯人</em></p>  <p><em>You have stolen the orchards of my ancestors你们窃据了我祖先的果园</em></p>  <p><em>And the land which I cultivated我开垦的土地</em></p>  <p><em>Along with my children除了那些岩石，你们什么也没给我和我的孩子留下</em></p>  <p><em>And you left nothing for us </em></p>  <p><em>Except for these rocks..</em></p>  <p><em>So will the State take them当局要拿走它们</em></p>  <p><em>As it has been said?!只因为它已经这样说了？！</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>Therefore! 因此！</em></p>  <p><em>Record on the top of the first page: 请在第一页的最上面记下来</em></p>  <p><em>I do not hate people 我不去恨</em></p>  <p><em>Nor do I encroach 也不想冒犯</em></p>  <p><em>But if I become hungry 但是如果我饥饿</em></p>  <p><em>The usurper's flesh will be my food 逆贼的肉将会成为我的食物</em></p>  <p><em>Beware...谨防……</em></p>  <p><em>Beware...谨防……</em></p>  <p><em>Of my hunger我的饥饿</em></p>  <p><em>And my anger我的愤怒</em></p>  <p><em></em></p>  <p><em></em></p>  <p>诗作出自诗人的亲身经历，以色列检查站的犹太士兵不认识这位日后享誉世界的青年诗人。他是以诗歌为生的歌者，那也是他的抵抗生活。当阿拉法特带着橄榄枝和自由战士的枪在世上战斗时，达尔维什则是怀揣着缪斯金笔一路涂抹一路迁徙的贝都因人，所以他慨叹：“在最后的国境之后，我们应当去往哪里？在最后的天空之后，鸟儿应当飞向何方？”与游击战士肉搏于坦克不同，达尔维什对抗的是民族的失忆、抵抗的是苟且偷生的犬儒式的遗忘，他说诗人不能够逃避“此地”与“当下”，而遁身另一个所在或时代。从青年时代起，这位诗人就投身反对占领的斗争，二十六年远离故乡，但他从未远离他的故国，月色拂照的故国始终珍存在他的诗中。</p>  <p>至于为什么有那么多不同国属、不同族属的人也从那个巴勒斯坦人那里得到了心灵的回应，只能说是因为我们正处在一个前所未有的流亡的时代，包括了真实的流亡与精神的流亡。那些有家难归的诗人们在语言中流浪，怪异、孤傲、怀旧、故意与在物质中狂欢的人们显得不合时宜……</p>  <p>达尔维什85岁的妈妈住在西加利利的贾戴达村，最后赴美手术前，他回家探母。“他告诉我，手术很危险，我就劝他别做了。”儿子死后第二天，达维什的妈妈告诉前来采访的以色列《国土报》的记者，“我跟他讲，咱们应该把自己交托给真主。可他到底还是去动了手术，现在，我失去了我的马哈穆德。”</p>  <p>据说母亲是文盲，却能读懂儿子的诗。我想那是因为他明晰了自己属于那儿，所以他的诗也就带有了故乡风土所具有的品质，那是每一个不能忘记故土的巴勒斯坦人一眼就能辨出的品质。</p>  <p>忘不了他的呼声：记住！我是阿拉伯人。</p>  <p>草于10.6日深夜</p><p><br/></p>  <p> </p>  <p> </p>  <p>附上我能搜集到的几首达尔维什的诗，听说在香港那场纪念朗诵会上散发了诗人们自制的达尔维什诗选，希望大陆上那些幸存在精神孤岛中的人们也能尽快看到这位阿拉伯当代诗人的汉文诗集。</p>  <p><b></b></p>  <p><b>我属于那儿</b></p>  <p><em>我属于那儿，我有许多回忆，我像每个人那样诞生。</em></p>  <p><em>我有母亲，一栋很多窗户的房子，兄弟朋友，和带寒窗的</em></p>  <p><em>牢房！我有海鸥族拥的波浪，一幅我自己的全景画。</em></p>  <p><em>我有丰盈的草地。在我词语深处的地平线，我有一轮月亮，</em></p>  <p><em>一只鸟的粮食，和一棵永远的橄榄树。</em></p>  <p><em>我住在剑把人变成猎物之前的土地上，</em></p>  <p><em>我属于那儿。当天堂衰悼她母亲，我把天堂还给她母亲。</em></p>  <p><em>我哭泣而一朵经过的云会带上我的泪水。</em></p>  <p><em>打破清规戒律，我学会了血的审判所需之词。</em></p>  <p><em>我学会并拆开所有的词得以去从中获取一个</em></p>  <p><em>词:家</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><strong></strong></p>  <p><strong>十四行诗之五</strong><b>   <br/></b><em>我触摸你，如同孤单的小提琴触摸遥远的郊区   <br/>河流耐心地期盼共享细雨    <br/>点点滴滴，那穿过诗的明天接近    <br/>于是我带上那远方的土地，而它带我上路。    <br/>在你美德的牝马上，我的灵魂织出    <br/>你的影子的天然苍穹，每回用一枚蚕茧。    <br/>我是你在世上造就的儿子，我的伤口的儿子    <br/>那伤口点亮你微观花园中的一树石榴花。    <br/>夜的血自茉莉淌成白色。你的香味，    <br/>我的弱点你的秘密，伴随我如蛇伤。你的头发    <br/>是彩色之秋风的帐篷。我沿着言说行走    <br/>直到一个贝都因人向一对鸽子诉说的最后词语。    <br/>我轻抚你，如同小提琴轻抚遥远时光的丝绸    <br/>古老的草地在你我周围破土――重生。</em></p><p><em><br/></em></p>  <p> </p>  <p><strong>巴勒斯坦的情人</strong></p>  <p><em>她的眼睛和手上的花纹是巴勒斯坦的</em></p>  <p><em>她的名字，属于巴勒斯坦</em></p>  <p><em>她的梦和悲伤，属于巴勒斯坦</em></p>  <p><em>她的方头巾，她的双脚和身体，属于巴勒斯坦</em></p>  <p><em>她的语言和沉默，属于巴勒斯坦</em></p>  <p><em>她的声音，属于巴勒斯坦</em></p>  <p><em>她的出生和死亡，属于巴勒斯坦</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><strong>赞美长长的阴影</strong></p>  <p><em>我的国家是个旅行的睡袋</em></p>  <p><em>旅行睡袋则是我的国家</em></p>  <p><em>既无台阶</em></p>  <p><em>复无墙壁</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>我的脚下没有土地，可以选择任何死亡</em></p>  <p><em>没有天空</em></p>  <p><em>围绕我的四周</em></p>  <p><em>让我挖洞穴到先知的营帐</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>我的背靠着墙</em></p>  <p><em>一个倒塌了的墙</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>我的国家是个旅行的睡袋</em></p>  <p><em>而我的睡袋则是流浪的国度</em></p>  <p><em>有人在有歌有人烟的帐幕生活</em></p>  <p><em>而有人则在找一个地方</em></p>  <p><em>但四周皆弹火与大雨飞降</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>我的脸靠着花朵</em></p>  <p><em>一株成了焦炭的花</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>我的国家是个旅行的睡袋</em></p>  <p><em>我伸直如床</em></p>  <p><em>眠于其上</em></p>  <p><em>逐爱其上</em></p>  <p><em>埋葬我的朋友其上</em></p>  <p><em>最后也死于其上</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><em>而你能企求什么？</em></p>  <p><em>你只不过一个梦幻走向另一个梦幻</em></p>  <p><em>要一面旗？</em></p>  <p><em>而旗有何用……？</em></p>  <p><em>它能让城镇遮住炸弹？</em></p>  <p><em>这旅程何其之短</em></p>  <p><em>而我思我想多么大而无边</em></p>  <p><em>这个国又如何的渺茫……</em></p><p><em><br/></em></p>  <p><em></em></p>  <p><em></em></p>  <p><b>他们没有问：死后是什么</b><b></b></p>  <p>他们没有问：死后是什么？他们</p>  <p>背诵着天堂的地图，未理</p>  <p>地上的书，却被另一个问题淹没：</p>  <p>在死之前我们做些什么？接近</p>  <p>生命我们生存却不生活。我们的生命</p>  <p>犹如地产诸神争执的荒地</p>  <p>我们是尘垢往昔的邻居</p>  <p>我们的人生为历史家的夜晚变得沉重：“无论何时</p>  <p>我要埋藏他们，他们就突然涌到我的眼前．．．“</p>  <p>我们的人生是艺术家的包袱：“当我绘画他们</p>  <p>我就变成了他们，雾包围了我。“</p>  <p>我们的生命是众生的包袱：“为什么血</p>  <p>还会从鬼身上流？“而我们的生命</p>  <p>应该如我们所愿。我们想</p>  <p>活出一点，不为什么．．．除了尊严</p>  <p>死后的复活。他们引用</p>  <p>无意地，哲学家的话：“死亡</p>  <p>对我们毫无意义。我们死而它不死。</p>  <p>死亡对我们毫无意义。它有意义而</p>  <p>我们没有。“</p>  <p>因此他们重新编排他们的梦</p>  <p>以另一种方式。站着睡觉！</p>  <p></p>  <p> </p>  <p>从youtube上很意外地找到这首由黎巴嫩歌手George Qirmiz深情演唱的《身份证》url：http://www.youtube.com/watch?v=1ldfefYIs0U</p>  <p></p></div>
+<p class="meta">如原页面与本页有任何差异，请以 <a href="https://www.ismaelan.com/2008/10/blog-post_17.html" rel="noopener">原始来源</a> 为准，并告知差异位置。</p>
+
+<script>
+(function(){
+  var root=document.getElementById('review');
+  if(!root) return;
+  var cid=root.getAttribute('data-candidate');
+  var elStatus=document.getElementById('f-status');
+  var elNature=document.getElementById('f-nature');
+  var elComment=document.getElementById('f-comment');
+  var elSave=document.getElementById('f-save');
+  var elState=document.getElementById('f-state');
+  var elLast=document.getElementById('f-last');
+  var api='/review/api/review/'+encodeURIComponent(cid);
+  var apiSave='/review/api/review';
+  var LS='reviewDraft:'+cid;
+  // ?test=1 routes writes to the isolated test journal so acceptance tests
+  // never touch the author's real review records.
+  var TEST=/[?&]test=1(&|$)/.test(location.search);
+  if(TEST){ api+='?test=1'; LS='reviewDraft-test:'+cid; }
+
+  function setState(kind,text){
+    elState.className='save-state'+(kind?' '+kind:'');
+    elState.textContent=text;
+  }
+  function fmt(ts){ return ts?('上次保存：'+ts.replace('T',' ').slice(0,16)):''; }
+
+  // restore unsaved draft (never treated as a saved record)
+  try{
+    var d=JSON.parse(localStorage.getItem(LS)||'null');
+    if(d){ if(d.status)elStatus.value=d.status; if(d.nature)elNature.value=d.nature;
+           if(d.comment)elComment.value=d.comment; setState('','有未保存的草稿'); }
+  }catch(e){}
+
+  function markDirty(){
+    try{localStorage.setItem(LS,JSON.stringify({status:elStatus.value,
+      nature:elNature.value,comment:elComment.value}));}catch(e){}
+    if(!elState.classList.contains('ok')) setState('','有未保存的修改');
+  }
+  [elStatus,elNature,elComment].forEach(function(el){
+    el.addEventListener('input',markDirty); el.addEventListener('change',markDirty);});
+
+  // load the saved record from the server
+  fetch(api,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.record){
+      if(!localStorage.getItem(LS)){
+        elStatus.value=j.record.status||'pending';
+        elNature.value=j.record.nature||'unset';
+        elComment.value=j.record.comment||'';
+      }
+      elLast.textContent=fmt(j.record.updated_at)+(j.record.rev?('（第 '+j.record.rev+' 版）'):'');
+      setState('ok','已保存');
+    }else{
+      setState('','尚未保存');
+    }
+  }).catch(function(){ setState('err','无法读取历史记录（服务器离线）'); });
+
+  elSave.addEventListener('click',function(){
+    elSave.disabled=true; setState('busy','正在保存…');
+    fetch(apiSave,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({candidate_id:cid,status:elStatus.value,
+        nature:elNature.value,comment:elComment.value,test:TEST})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      elSave.disabled=false;
+      if(res.ok&&res.j&&res.j.ok){
+        try{localStorage.removeItem(LS);}catch(e){}
+        var rec=res.j.record||{};
+        elLast.textContent=fmt(rec.updated_at)+(rec.rev?('（第 '+rec.rev+' 版）'):'');
+        setState('ok','保存成功');
+      }else{
+        var msg=(res.j&&res.j.error)?res.j.error:'保存失败';
+        setState('err','保存失败：'+msg);
+      }
+    }).catch(function(){
+      elSave.disabled=false;
+      setState('err','保存失败：网络错误（未保存）');
+    });
+  });
+})();
+</script>
+
+<div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
+</div><footer class="rv-foot"><div class="rv-foot-inner">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div></footer></body></html>

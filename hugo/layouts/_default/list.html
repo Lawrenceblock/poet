@@ -1,0 +1,23 @@
+{{ define "main" }}
+<article class="poem-page">
+  <header class="page-head">
+    <div class="page-head-inner">
+      <p class="page-kicker">作品 · Works</p>
+      <h1 class="page-title">{{ .Title }}</h1>
+    </div>
+  </header>
+  <div class="wrap">
+    {{ with .Content }}<div class="page-sub">{{ . }}</div>{{ end }}
+    <ul class="archive">
+      {{ range .Paginator.Pages.ByDate.Reverse }}
+      <li class="archive-item">
+        <span class="idx">{{ .Date.Format "01" }}</span>
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        {{ if not .Date.IsZero }}<time class="date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time>{{ end }}
+      </li>
+      {{ end }}
+    </ul>
+    {{ partial "pagination.html" . }}
+  </div>
+</article>
+{{ end }}

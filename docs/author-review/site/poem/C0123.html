@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>C0123 · 黄水行</title>
+<style>
+/* 作者审阅材料 · 视觉与公开阅读页统一：纸白底、墨黑正文、暗红点缀（Phase 3 编辑设计）。
+   仅调整外观（配色与字族）；不改动任何审阅数据、字段、HTML 结构或 API 行为。 */
+:root{--black:#0E0E0E;--ink:#141414;--ink-2:#4A4A4A;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
+ --bg:#FAF9F7;--bg-soft:#F2F1EE;--accent:#7A2A34;--accent-soft:#F3E9EA;
+ --on-black:#F2F1EE;--on-black-muted:#A8A6A2;--on-black-accent:#C98A92;--on-black-rule:#2A2A2A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
+/* 页眉与公开站一致：纸白 + 细线（刊物页眉），不再使用黑色标题条。 */
+.rv-head{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ink)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--ink);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:var(--ink-2);margin-left:14px}
+.rv-head nav a:hover{color:var(--accent)}
+.rv-head nav a.cur{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
+a{color:var(--accent)}
+h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
+h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
+.note{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:12px 14px;color:var(--muted);font-size:.9rem;margin:16px 0}
+.meta{color:var(--muted);font-size:.85rem;line-height:1.75}
+.meta b{color:var(--ink);font-weight:600}
+.tags span{display:inline-block;background:var(--bg-soft);border:1px solid var(--line);
+ padding:1px 10px;margin:2px 4px 2px 0;font-size:.78rem;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);padding:16px 18px;margin:14px 0}
+.card h3{margin:0 0 .3em;font-size:1.02rem;font-weight:600}
+.card h3 a{color:var(--ink)}
+.card h3 a:hover{color:var(--accent)}
+.poem{background:#fff;border:1px solid var(--line);border-top:2px solid var(--accent);
+ padding:22px 24px;margin:18px 0}
+.poem p{margin:0 0 1.05em}
+.poem img{max-width:100%;height:auto}
+.verse{white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg-soft);font-weight:600}
+.status{display:inline-block;border:1px solid var(--line-strong);
+ padding:2px 10px;font-size:.8rem;color:var(--muted);background:var(--bg-soft)}
+.status.s-keep{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.status.s-hold{background:var(--bg-soft);border-color:var(--line-strong);color:#8a6d2f}
+.status.s-exclude{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.status.s-pending{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
+.batchnav a{display:inline-block;margin-right:14px}
+.banner{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:10px 14px;font-size:.85rem;color:var(--muted);margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-top:2px solid var(--accent);background:#fff;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid var(--line-strong);background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:#fff;
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+ border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border:1px solid var(--line);background:var(--bg-soft);color:var(--muted)}
+.save-state.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.save-state.err{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.save-state.busy{background:var(--bg-soft);border-color:var(--line-strong);color:var(--muted)}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pill.todo{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.bar{height:12px;background:var(--bg-soft);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:var(--bg-soft)}
+.hide{display:none}
+</style>
+</head>
+<body><header class="rv-head"><div class="rv-head-inner"><a class="brand" href="../">安然诗歌档案<span class="brand-en">Author Review</span></a><nav><a href="../">总目录</a><a href="../index.html">批次索引</a></nav></div></header><div class="wrap">
+<p class="batchnav"><a href="../index.html">← 审阅总目录</a> <a href="../batch-A-6.html">本批目录</a></p>
+<h1>黄水行</h1>
+<div class="note"><b>这是审阅副本，不是正式发表版本。</b>页面完整保留原文（含标点、诗行、段落、图片），仅移除脚本等不安全代码；未经作者确认不会用于正式站点。</div>
+<p class="meta">候选编号 <b>C0123</b>　原始发表日期 <b>2025-05-06</b>　语言 <b>zh+en</b>　脚本分类 <b>A</b><br>原始来源：<a href="https://www.ismaelan.com/2025/05/blog-post.html" rel="noopener">https://www.ismaelan.com/2025/05/blog-post.html</a></p>
+<h2>为什么列出这篇</h2><ul class="meta"><li>脚本分类：A · 脚本检测到明确署名（文/安然 等）</li><li>署名线索：explicit 安然 byline</li><li>标题来源：none</li><li>检测到中英双语，审阅时请核对两种语言是否为同一作品。</li></ul>
+<h2>需要作者确认</h2><ul class="meta"><li>这篇文章是“一首诗 / 多首诗 / 非诗（评论、消息、摄影等）”？</li><li>中英文是否为同一作品的两种版本？以哪一版为准？</li></ul>
+<div class="rv" id="review" data-candidate="C0123"><h2>作者审阅</h2><p class="hint">只需填写你要填的部分；填写后请点“保存审阅”。未保存前刷新页面不会丢失草稿，但只有“已保存”才算正式记录。</p><label for="f-status">① 审阅结论</label><select id="f-status" name="status"><option value="pending">待审阅</option><option value="keep">保留</option><option value="hold">暂缓</option><option value="exclude">排除</option></select><label for="f-nature">② 作品性质</label><select id="f-nature" name="nature"><option value="unset">（未填写）</option><option value="single_poem">一首诗</option><option value="multi_poem">多首诗</option><option value="non_poem">非诗（评论/消息/摄影等）</option><option value="unsure">尚不确定</option></select><label for="f-comment">③ 作者意见（版本问题、是否需修改、是否需与旧站比较等）</label><textarea id="f-comment" name="comment" placeholder="例如：与旧站版本不同，以本版为准；需要再核对第二段换行……"></textarea><p class="hint">可只填部分字段。意见最多 20000 字。</p><div class="rvbar"><button type="button" class="btn" id="f-save">保存审阅</button><span class="save-state" id="f-state" aria-live="polite">尚未保存</span><span class="last-saved" id="f-last"></span></div></div>
+<h2>原文（逐字保留）</h2>
+<div class="poem"><p>文/安然</p><p><br/><br/>一<br/><br/>停在河堤上，<br/>回首一望，<br/>城市还没过河。<br/><br/>文明逐亡扫北，<br/>眼前这条九曲的水<br/>为那些快被遗忘的事物，<br/>拉开最后一点安全距离。<br/><br/>二<br/><br/>路缘石下，<br/>低低的苦艾<br/>探出一排稚嫩的脑袋，<br/>和我一样偷偷张望<br/>水库大门内的碧波万顷。<br/><br/>林边的地干得快冒烟了，<br/>可狗尾草依旧三五成群，<br/>聚在古老的命运里。<br/>春天的小小新娘，<br/>轻佻地擎起毛绒绒的大尾巴，<br/>穿过五月的朔风，<br/>试图挽留每一位猎奇的恩客。<br/><br/>三<br/><br/>直行 直行<br/>我像这大河一样，<br/>拨断这根厌倦的长弦，<br/>从天上冲下幽暗的原野，<br/>奔入那片树影婆娑的未知之境。<br/>那姿态，<br/>莫非就是一个弃世之人；<br/>仿佛密境，<br/>此刻就要敞开怀抱，<br/>收留这头疾驰的兽。<br/><br/>最后，是要化成一方墨写的怪石，<br/>躺倒在这羊肠小径的入口处。<br/>在两棵不知岁月的古槐下，<br/>勾勒皴染，<br/>点墨成云。<br/><br/>四<br/><br/>但时间还没到。<br/>荒芜的尽头是一座铁路石涵，<br/>铁路高坐在石头垒砌的路基上，<br/>将不知名的荒村一切为二。<br/><br/>村口的池塘里，<br/>绿藻家族正开创自己的王朝。<br/>岸上的大白鹅<br/>圈在围栏里，<br/>仍在尽职地嘶鸣。<br/><br/>电子导航说，<br/>前方直行。<br/>可眼前分明是一座土岗，<br/>像一条风化的沉船搁浅在旧河道里。<br/>无论太阳撒下多少白色的血，<br/>也救不活岗上丛生的草木。<br/>它们像我一样如梦似幻，<br/>一样无言以对。<br/>十二只鸟来了，<br/>唱着千年不变的梦魇：<br/>时日曷丧？<br/>及汝皆亡！<br/></p><p><br/></p><br/><p><br/></p><p>AI评价，一字不改：<br/><br/>感谢分享你的诗作《黄水行》，这是一首充满意象、情感深沉且富有哲思的诗歌。以下是对这首诗的评价和分析，希望能为你提供一些反馈和启发：<br/>总体评价<br/>《黄水行》是一首以自然景观为依托，融合个人情感、历史反思和哲学思考的现代诗。诗歌通过对黄水河流、城市、荒村、自然物象的描绘，勾勒出一幅既具体又抽象的画卷，展现了人类文明的脆弱、时间的无情以及个体在命运中的挣扎与沉思。语言凝练而富有画面感，意象的选择既贴近自然，又带有浓厚的象征意味，成功地将个人情感与宏大主题交织在一起。<br/>全诗分为四部分，每部分以不同的场景和视角推进，既有叙事性，又有强烈的抒情色彩。诗中流露出一种对文明衰落、时间流逝的悲悯，同时也透露出一种对生命意义的追问和对自我存在的叩问。整体基调低沉却不失力量，充满了对生命、自然和历史的深沉凝视。<br/>具体分析<br/>1. 意象与画面感<br/>你的诗歌以“黄水”这一核心意象贯穿始终，河流不仅是一个具体的自然景观，更象征了时间、命运和文明的流逝。例如“一”中“眼前这条九曲的水 / 为那些快被遗忘的事物， / 拉开最后一点安全距离”，河流被赋予了守护记忆的功能，同时也暗示了遗忘的不可避免。这种将自然与哲思结合的手法非常成功。<br/>其他意象如“苦艾”“狗尾草”“古槐”“绿藻”“大白鹅”等，既接地气又富有生命力，展现了自然在荒芜中的顽强。这些意象的选择不仅增强了诗歌的画面感，也为读者提供了丰富的联想空间。特别是“狗尾草”被比喻为“春天的小小新娘”，轻佻而充满生命力，这一拟人化描写非常生动，令人印象深刻。<br/>2. 语言与节奏<br/>你的语言凝练而富有张力，句式长短结合，既有散文的流畅感，也有诗的节奏感。例如“三”中的“直行 直行 / 我像这大河一样， / 拨断这根厌倦的长弦”，重复的“直行”不仅强化了节奏，还传递了一种决绝的行动感，仿佛主人公在与命运抗争时的果敢。<br/>此外，诗歌中多处运用了古汉语的语感和典故，如“时日曷丧？及汝皆亡！”（出自《诗经·国殇》），这种引用不仅增添了文化深度，也让诗歌的语气更显庄重，强化了历史感和悲剧感。不过，这一句的融入略显突兀，可能会让部分读者感到跳跃，建议在上下文语境中稍作铺垫，让其更自然地融入现代语境。<br/>3. 情感与主题<br/>诗歌的情感基调是低沉而内省的，充满了对文明衰落、时间流逝和个体渺小的感慨。尤其是“四”中“十二只鸟来了， / 唱着千年不变的梦魇”，鸟儿的歌唱被赋予了宿命般的沉重，仿佛在诉说人类无法逃脱的轮回。这种对命运的叩问贯穿全诗，使诗歌不仅停留在对自然景物的描绘上，更上升到对存在意义的哲学思考。<br/>同时，诗中也流露出一种对现代文明的批判，如“一”中的“城市还没过河”和“文明逐亡扫北”，暗示了城市化与现代文明的局限和破坏力。这种批判并非直白，而是通过隐喻和意象层层铺陈，显得含蓄而深刻。<br/>4. 结构与推进<br/>诗歌分为四部分，每部分既有独立性，又共同构成了一个完整的叙述和情感弧线：<br/><br/>&nbsp;&nbsp;&nbsp; 第一部分以河流为切入点，奠定了全诗的基调，引入了文明与遗忘的主题。<br/>&nbsp;&nbsp;&nbsp; 第二部分聚焦于微小的自然物象（如苦艾、狗尾草），展现了生命在荒芜中的韧性，同时也暗示了生命的短暂与无常。<br/>&nbsp;&nbsp;&nbsp; 第三部分转为第一人称视角，主人公的行动与河流的奔流合二为一，表达了一种对未知的追寻和对自我命运的抗争。<br/>&nbsp;&nbsp;&nbsp; 第四部分则回归到更广阔的视角，通过荒村、铁路、土岗等意象，深化了时间与荒芜的主题，最后以鸟儿的梦魇之歌收尾，留下开放式的思考。<br/><br/>这种分段结构清晰，层层递进，很好地引导了读者的情感和思绪。不过，第四部分的内容较为密集，意象切换较快（从铁路到池塘再到土岗），可能会让读者感到信息量过大。建议在这一部分稍作精简，或通过更明确的意象关联来增强连贯性。<br/>优点<br/><br/>&nbsp;&nbsp;&nbsp; 意象丰富且富有层次：从河流到草木再到荒村，每一个意象都既具体又具有象征意义，成功地构建了一个既真实又梦幻的世界。<br/>&nbsp;&nbsp;&nbsp; 情感深沉而克制：诗歌的情感表达深刻却不过分煽情，通过意象和隐喻传递悲悯与哲思，令人回味。<br/>&nbsp;&nbsp;&nbsp; 语言凝练且具画面感：语言既有现代诗的简洁，又融入了古汉语的韵味，形成了独特的风格。<br/>&nbsp;&nbsp;&nbsp; 结构清晰，主题深刻：四段式的结构层层推进，从自然到个人再到文明，主题逐渐升华，展现了作者对生命与历史的深刻思考。<br/><br/>改进建议<br/><br/>&nbsp;&nbsp;&nbsp; 意象的连贯性：第四部分的意象切换稍显密集，建议精简或通过更明确的线索（如河流的延续）将不同场景串联起来，增强整体的流畅感。<br/>&nbsp;&nbsp;&nbsp; 古汉语融入的自然度：如“时日曷丧？及汝皆亡！”这样的引用虽然有力，但与现代语境的融合略显突兀。可以在前文稍作铺垫，或用更贴近现代的语言进行改写，使其更自然地融入。<br/>&nbsp;&nbsp;&nbsp; 节奏的平衡：部分段落的句子长度变化较大（如第三部分的短句与长句交替），虽然有节奏感，但偶尔会让读者感到跳跃。可以在某些地方适当调整句式，使节奏更平稳。<br/>&nbsp;&nbsp;&nbsp; 结尾的开放性：结尾的“时日曷丧？及汝皆亡！”虽然震撼，但略显沉重，留给读者的思考空间较为压抑。如果希望结尾更有余韵，可以考虑以一个更开放或具象的意象收尾，如回到河流或自然，留下一种循环或延续的可能。<br/><br/>总结<br/>《黄水行》是一首意象丰富、情感深沉、主题深刻的优秀诗歌。它通过对自然、文明和个体命运的描绘，展现了作者对生命无常和历史流转的深刻思考。语言凝练而富有画面感，结构清晰且层层递进，成功地将个人情感与宏大主题融为一体。稍作调整后，这首诗的感染力和艺术性还能进一步提升。<br/>如果你有具体的修改方向或想深入探讨某一部分的创作意图，欢迎告诉我，我可以进一步提供针对性的建议！再次感谢你的分享，这是一首让人沉浸其中、久久回味的诗作。</p><p></p><p></p><p></p><p></p><p></p><p><br/>Below is an English translation of the poem Huangshui Xing (The Song of the Yellow Water), aiming to preserve its imagery, tone, and philosophical depth while rendering it naturally in English:<br/>Yellow Water Song<br/>I<br/>Pausing on the riverbank,<br/>I glance back—<br/>the city hasn’t crossed the river yet. &nbsp;<br/>Civilization chases its ruin northward,<br/>but this meandering stream before me<br/>draws a final line of safety<br/>for things nearly forgotten. &nbsp;<br/>II<br/>Beneath the curbstone,<br/>lowly wormwood<br/>pokes out a row of tender heads,<br/>peering, like me, in secret<br/>at the boundless jade waves beyond the reservoir’s gate. &nbsp;<br/>The land by the woods is parched, nearly smoking,<br/>yet foxtail grass still gathers in clumps,<br/>huddled in ancient fate.<br/>Spring’s little brides,<br/>flirtatiously raising their fluffy tails,<br/>brave May’s northern winds,<br/>trying to detain every curious passerby. &nbsp;<br/>III<br/>Onward, onward—<br/>like this great river,<br/>I snap the weary string of routine,<br/>plunging from the heavens across darkened plains,<br/>rushing toward that unknown realm of dancing tree shadows.<br/>My bearing—<br/>is it not that of one who forsakes the world?<br/>As if a secret sanctuary<br/>were about to fling wide its arms<br/>to embrace this galloping beast. &nbsp;<br/>In the end, I’ll become a strange stone, etched in ink,<br/>lying at the entrance to this winding path.<br/>Beneath two ancient locust trees, ageless and unknowing,<br/>I’ll trace rugged lines,<br/>dotting ink into clouds. &nbsp;<br/>IV<br/>But the time hasn’t come.<br/>At the end of desolation stands a railway culvert,<br/>the tracks perched high on a stone embankment,<br/>slicing an unknown village in two. &nbsp;<br/>In the pond at the village’s edge,<br/>the algae clan builds its dynasty.<br/>On the bank, great white geese,<br/>penned in their enclosure,<br/>still honk dutifully. &nbsp;<br/>The GPS commands:<br/>“Go straight ahead.”<br/>But before me looms a weathered mound,<br/>like a derelict ship stranded in the old riverbed.<br/>No matter how much white blood the sun spills,<br/>it cannot revive the grasses and trees sprouting there.<br/>Like me, they drift in a dreamlike haze,<br/>equally speechless.<br/>Twelve birds arrive,<br/>singing a timeless nightmare:<br/>“When will these days perish?<br/>When will you all be gone?”<br/>Translation Notes:<br/><br/>&nbsp;&nbsp;&nbsp; Title: Huangshui Xing is translated as Yellow Water Song, preserving the reference to the river (likely the Yellow River or a symbolic river) and the classical poetic form xing (a meditative or descriptive "song").<br/>&nbsp;&nbsp;&nbsp; Imagery and Tone: The translation retains the vivid, almost surreal imagery and the reflective, melancholic tone. Specific plants (e.g., 苦艾 as wormwood, 狗尾草 as foxtail grass) and cultural references (e.g., ancient locust trees, ink painting techniques like 皴染) are rendered with precision to evoke the original’s rootedness in Chinese landscape and tradition.<br/>&nbsp;&nbsp;&nbsp; Philosophical Depth: The poem’s themes of transience, alienation, and the tension between civilization and nature are mirrored in the English, particularly in lines like “Civilization chases its ruin northward” and the final bird song, which echoes ancient lamentations.<br/>&nbsp;&nbsp;&nbsp; Rhythm and Structure: While the original doesn’t adhere to strict metrical patterns, the translation maintains a flowing rhythm, with varied line lengths to reflect the poem’s meditative pacing and shifts in mood.<br/>&nbsp;&nbsp;&nbsp; Cultural Nuances: References like “dotting ink into clouds” (点墨成云) allude to Chinese ink painting, and “sheep-intestine path” (羊肠小径) evokes a winding, narrow trail, both preserved to maintain cultural resonance.<br/><br/>If you’d like a more literal translation, a different tone, or further analysis of specific lines, let me know!<br/></p></div>
+<p class="meta">如原页面与本页有任何差异，请以 <a href="https://www.ismaelan.com/2025/05/blog-post.html" rel="noopener">原始来源</a> 为准，并告知差异位置。</p>
+
+<script>
+(function(){
+  var root=document.getElementById('review');
+  if(!root) return;
+  var cid=root.getAttribute('data-candidate');
+  var elStatus=document.getElementById('f-status');
+  var elNature=document.getElementById('f-nature');
+  var elComment=document.getElementById('f-comment');
+  var elSave=document.getElementById('f-save');
+  var elState=document.getElementById('f-state');
+  var elLast=document.getElementById('f-last');
+  var api='/review/api/review/'+encodeURIComponent(cid);
+  var apiSave='/review/api/review';
+  var LS='reviewDraft:'+cid;
+  // ?test=1 routes writes to the isolated test journal so acceptance tests
+  // never touch the author's real review records.
+  var TEST=/[?&]test=1(&|$)/.test(location.search);
+  if(TEST){ api+='?test=1'; LS='reviewDraft-test:'+cid; }
+
+  function setState(kind,text){
+    elState.className='save-state'+(kind?' '+kind:'');
+    elState.textContent=text;
+  }
+  function fmt(ts){ return ts?('上次保存：'+ts.replace('T',' ').slice(0,16)):''; }
+
+  // restore unsaved draft (never treated as a saved record)
+  try{
+    var d=JSON.parse(localStorage.getItem(LS)||'null');
+    if(d){ if(d.status)elStatus.value=d.status; if(d.nature)elNature.value=d.nature;
+           if(d.comment)elComment.value=d.comment; setState('','有未保存的草稿'); }
+  }catch(e){}
+
+  function markDirty(){
+    try{localStorage.setItem(LS,JSON.stringify({status:elStatus.value,
+      nature:elNature.value,comment:elComment.value}));}catch(e){}
+    if(!elState.classList.contains('ok')) setState('','有未保存的修改');
+  }
+  [elStatus,elNature,elComment].forEach(function(el){
+    el.addEventListener('input',markDirty); el.addEventListener('change',markDirty);});
+
+  // load the saved record from the server
+  fetch(api,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.record){
+      if(!localStorage.getItem(LS)){
+        elStatus.value=j.record.status||'pending';
+        elNature.value=j.record.nature||'unset';
+        elComment.value=j.record.comment||'';
+      }
+      elLast.textContent=fmt(j.record.updated_at)+(j.record.rev?('（第 '+j.record.rev+' 版）'):'');
+      setState('ok','已保存');
+    }else{
+      setState('','尚未保存');
+    }
+  }).catch(function(){ setState('err','无法读取历史记录（服务器离线）'); });
+
+  elSave.addEventListener('click',function(){
+    elSave.disabled=true; setState('busy','正在保存…');
+    fetch(apiSave,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({candidate_id:cid,status:elStatus.value,
+        nature:elNature.value,comment:elComment.value,test:TEST})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      elSave.disabled=false;
+      if(res.ok&&res.j&&res.j.ok){
+        try{localStorage.removeItem(LS);}catch(e){}
+        var rec=res.j.record||{};
+        elLast.textContent=fmt(rec.updated_at)+(rec.rev?('（第 '+rec.rev+' 版）'):'');
+        setState('ok','保存成功');
+      }else{
+        var msg=(res.j&&res.j.error)?res.j.error:'保存失败';
+        setState('err','保存失败：'+msg);
+      }
+    }).catch(function(){
+      elSave.disabled=false;
+      setState('err','保存失败：网络错误（未保存）');
+    });
+  });
+})();
+</script>
+
+<div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
+</div><footer class="rv-foot"><div class="rv-foot-inner">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div></footer></body></html>

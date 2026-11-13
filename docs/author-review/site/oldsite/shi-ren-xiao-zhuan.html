@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>诗人小传 · 旧站原文</title>
+<style>
+/* 作者审阅材料 · 视觉与公开阅读页统一：纸白底、墨黑正文、暗红点缀（Phase 3 编辑设计）。
+   仅调整外观（配色与字族）；不改动任何审阅数据、字段、HTML 结构或 API 行为。 */
+:root{--black:#0E0E0E;--ink:#141414;--ink-2:#4A4A4A;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
+ --bg:#FAF9F7;--bg-soft:#F2F1EE;--accent:#7A2A34;--accent-soft:#F3E9EA;
+ --on-black:#F2F1EE;--on-black-muted:#A8A6A2;--on-black-accent:#C98A92;--on-black-rule:#2A2A2A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
+/* 页眉与公开站一致：纸白 + 细线（刊物页眉），不再使用黑色标题条。 */
+.rv-head{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ink)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--ink);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:var(--ink-2);margin-left:14px}
+.rv-head nav a:hover{color:var(--accent)}
+.rv-head nav a.cur{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
+a{color:var(--accent)}
+h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
+h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
+.note{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:12px 14px;color:var(--muted);font-size:.9rem;margin:16px 0}
+.meta{color:var(--muted);font-size:.85rem;line-height:1.75}
+.meta b{color:var(--ink);font-weight:600}
+.tags span{display:inline-block;background:var(--bg-soft);border:1px solid var(--line);
+ padding:1px 10px;margin:2px 4px 2px 0;font-size:.78rem;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);padding:16px 18px;margin:14px 0}
+.card h3{margin:0 0 .3em;font-size:1.02rem;font-weight:600}
+.card h3 a{color:var(--ink)}
+.card h3 a:hover{color:var(--accent)}
+.poem{background:#fff;border:1px solid var(--line);border-top:2px solid var(--accent);
+ padding:22px 24px;margin:18px 0}
+.poem p{margin:0 0 1.05em}
+.poem img{max-width:100%;height:auto}
+.verse{white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg-soft);font-weight:600}
+.status{display:inline-block;border:1px solid var(--line-strong);
+ padding:2px 10px;font-size:.8rem;color:var(--muted);background:var(--bg-soft)}
+.status.s-keep{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.status.s-hold{background:var(--bg-soft);border-color:var(--line-strong);color:#8a6d2f}
+.status.s-exclude{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.status.s-pending{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
+.batchnav a{display:inline-block;margin-right:14px}
+.banner{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:10px 14px;font-size:.85rem;color:var(--muted);margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-top:2px solid var(--accent);background:#fff;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid var(--line-strong);background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:#fff;
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+ border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border:1px solid var(--line);background:var(--bg-soft);color:var(--muted)}
+.save-state.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.save-state.err{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.save-state.busy{background:var(--bg-soft);border-color:var(--line-strong);color:var(--muted)}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pill.todo{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.bar{height:12px;background:var(--bg-soft);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:var(--bg-soft)}
+.hide{display:none}
+</style>
+</head>
+<body><header class="rv-head"><div class="rv-head-inner"><a class="brand" href="../">安然诗歌档案<span class="brand-en">Author Review</span></a><nav><a href="../">总目录</a><a href="../index.html">批次索引</a></nav></div></header><div class="wrap">
+<p class="batchnav"><a href="../index.html">← 审阅总目录</a> <a href="index.html">旧站页面</a></p>
+<h1>诗人小传</h1>
+<div class="note"><b>本页逐字取自旧站源码（<code>_posts/2026-09-11-shi-ren-xiao-zhuan.md</code>），未作任何改写。</b>旧站该页当前线上地址：<a href="https://poet.ismaelan.com/shi-ren-xiao-zhuan/" rel="noopener">https://poet.ismaelan.com/shi-ren-xiao-zhuan/</a></div>
+<p class="meta">旧站日期 2026.09.11　旧路径 /shi-ren-xiao-zhuan/</p>
+<h2>旧站原文（逐字）</h2>
+<div class="poem"># 诗人小传
+
+# 此生行止
+
+> 我将自己的笔名命名为「安然」。那是安拉的定然。
+> 
+> 《我的诗歌志》
+
+安然，经名伊斯玛义勒，祖父赐名崔浩新。一九七九年二月二十日生于济南西关。回族。诗人、小说作者。
+
+自小浸淫汉文，却始终记得母族的话与寺。城关、清真寺、被遗忘的少数人，构成后来写作的底子。二〇〇七年远走西域，二十八岁，始以「安然」为笔名。诗写西关与喀什噶尔，散文、时评与小说并行，关注面不离伊斯兰世界与中华文化圈。
+
+曾参加第六届全国回族作家笔会、边缘民族现代诗大展。诗作入选《当代先锋诗三十年（一九七九—二〇〇九）谱系与典藏》，亦见中国作协《新时期少数民族文学选》。长篇小说《地藏》曾于博客连载。博客「一个回族人的时代言说」自二〇〇八年写起，至今未辍。
+
+## 年谱
+
+按年编次，记行止，不记毁誉。
+
+1. **1979 己未 · 生**
+   
+   二月二十日，生于山东省济南市。西关人氏。回族。经名伊斯玛义勒。
+
+2. **2004 甲申 · 二十五岁**
+
+   始为回教发声。后七年文字结集为《热血与冷灰——为回教声言的七年》。
+
+3. **2006 丙戌 · 二十七岁**
+
+   小说《城关深处的回族美女》以《西关女子》为题，刊于《回族文学》第二期。
+
+4. **2007 丁亥 · 二十八岁**
+
+   赴新疆参加笔会，漫游西域。作《西域：七个片段》《我的西关》。自此以安然为笔名。受邀住乌鲁木齐南门外回族人家。参加第六届全国回族作家笔会、边缘民族现代诗大展。
+
+5. **2008 戊子 · 二十九岁**
+
+   三月，开设博客「一个回族人的时代言说」。四月，开通 X（时称 Twitter）账号 @ismaelan。六月，作《信》。
+
+6. **2012 壬辰 · 三十三岁**
+
+   诗作三首入选江苏文艺出版社《当代先锋诗三十年（一九七九—二〇〇九）谱系与典藏》。六月，济南历下公安分局科院路派出所因网络言论上门。
+
+7. **2018 戊戌 · 三十九岁**
+
+   三月，遵林莽先生之嘱，作《我的诗歌志》。自述中国作协曾以少数民族文学重点扶持项目资助其长篇小说。四月，赴鲁迅文学院井冈山学习，途中被扣查。八月、十一月，因推文两度被问话。十二月，于博客连载长篇小说《地藏》。诗集上架。
+
+8. **2019 己亥 · 四十岁**
+
+   得悉诗作已入选《当代先锋诗三十年》选本。
+
+9. **2020 庚子 · 四十一岁**
+
+   一月二十四日除夕，济南警方以寻衅滋事刑事拘留。二月二十一日，取保候审。此后数年噤声。
+
+10. **2023 癸卯 · 四十四岁**
+
+    十月二十九日，小区门口取快递时被殴。十一月，博客重开，记其事。
+
+11. **2025 乙巳 · 四十六岁**
+
+    四月，邻里冲突后再发中英文声明。诗文与时评续写。
+
+12. **2026 丙午 · 四十七岁**
+
+    博客持续刊出双语新诗。七月，作诗纪念姥娘左宝英。八月，作《So, You Are Still Here》。</div>
+<div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
+</div><footer class="rv-foot"><div class="rv-foot-inner">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div></footer></body></html>

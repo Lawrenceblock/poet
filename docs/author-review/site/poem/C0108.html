@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>C0108 · 希克梅特在书店陪伴了我一个下午</title>
+<style>
+/* 作者审阅材料 · 视觉与公开阅读页统一：纸白底、墨黑正文、暗红点缀（Phase 3 编辑设计）。
+   仅调整外观（配色与字族）；不改动任何审阅数据、字段、HTML 结构或 API 行为。 */
+:root{--black:#0E0E0E;--ink:#141414;--ink-2:#4A4A4A;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
+ --bg:#FAF9F7;--bg-soft:#F2F1EE;--accent:#7A2A34;--accent-soft:#F3E9EA;
+ --on-black:#F2F1EE;--on-black-muted:#A8A6A2;--on-black-accent:#C98A92;--on-black-rule:#2A2A2A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
+/* 页眉与公开站一致：纸白 + 细线（刊物页眉），不再使用黑色标题条。 */
+.rv-head{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ink)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--ink);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:var(--ink-2);margin-left:14px}
+.rv-head nav a:hover{color:var(--accent)}
+.rv-head nav a.cur{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
+a{color:var(--accent)}
+h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
+h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
+.note{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:12px 14px;color:var(--muted);font-size:.9rem;margin:16px 0}
+.meta{color:var(--muted);font-size:.85rem;line-height:1.75}
+.meta b{color:var(--ink);font-weight:600}
+.tags span{display:inline-block;background:var(--bg-soft);border:1px solid var(--line);
+ padding:1px 10px;margin:2px 4px 2px 0;font-size:.78rem;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);padding:16px 18px;margin:14px 0}
+.card h3{margin:0 0 .3em;font-size:1.02rem;font-weight:600}
+.card h3 a{color:var(--ink)}
+.card h3 a:hover{color:var(--accent)}
+.poem{background:#fff;border:1px solid var(--line);border-top:2px solid var(--accent);
+ padding:22px 24px;margin:18px 0}
+.poem p{margin:0 0 1.05em}
+.poem img{max-width:100%;height:auto}
+.verse{white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg-soft);font-weight:600}
+.status{display:inline-block;border:1px solid var(--line-strong);
+ padding:2px 10px;font-size:.8rem;color:var(--muted);background:var(--bg-soft)}
+.status.s-keep{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.status.s-hold{background:var(--bg-soft);border-color:var(--line-strong);color:#8a6d2f}
+.status.s-exclude{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.status.s-pending{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
+.batchnav a{display:inline-block;margin-right:14px}
+.banner{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:10px 14px;font-size:.85rem;color:var(--muted);margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-top:2px solid var(--accent);background:#fff;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid var(--line-strong);background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:#fff;
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+ border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border:1px solid var(--line);background:var(--bg-soft);color:var(--muted)}
+.save-state.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.save-state.err{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.save-state.busy{background:var(--bg-soft);border-color:var(--line-strong);color:var(--muted)}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pill.todo{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.bar{height:12px;background:var(--bg-soft);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:var(--bg-soft)}
+.hide{display:none}
+</style>
+</head>
+<body><header class="rv-head"><div class="rv-head-inner"><a class="brand" href="../">安然诗歌档案<span class="brand-en">Author Review</span></a><nav><a href="../">总目录</a><a href="../index.html">批次索引</a></nav></div></header><div class="wrap">
+<p class="batchnav"><a href="../index.html">← 审阅总目录</a> <a href="../batch-A-6.html">本批目录</a></p>
+<h1>希克梅特在书店陪伴了我一个下午</h1>
+<div class="note"><b>这是审阅副本，不是正式发表版本。</b>页面完整保留原文（含标点、诗行、段落、图片），仅移除脚本等不安全代码；未经作者确认不会用于正式站点。</div>
+<p class="meta">候选编号 <b>C0108</b>　原始发表日期 <b>2018-12-10</b>　语言 <b>zh+en</b>　脚本分类 <b>A</b><br>原始来源：<a href="https://www.ismaelan.com/2018/12/blog-post.html" rel="noopener">https://www.ismaelan.com/2018/12/blog-post.html</a></p>
+<h2>为什么列出这篇</h2><ul class="meta"><li>脚本分类：A · 脚本检测到明确署名（文/安然 等）</li><li>署名线索：explicit 安然 byline</li><li>标题来源：none</li><li>检测到中英双语，审阅时请核对两种语言是否为同一作品。</li></ul>
+<h2>需要作者确认</h2><ul class="meta"><li>这篇文章是“一首诗 / 多首诗 / 非诗（评论、消息、摄影等）”？</li><li>中英文是否为同一作品的两种版本？以哪一版为准？</li></ul>
+<div class="rv" id="review" data-candidate="C0108"><h2>作者审阅</h2><p class="hint">只需填写你要填的部分；填写后请点“保存审阅”。未保存前刷新页面不会丢失草稿，但只有“已保存”才算正式记录。</p><label for="f-status">① 审阅结论</label><select id="f-status" name="status"><option value="pending">待审阅</option><option value="keep">保留</option><option value="hold">暂缓</option><option value="exclude">排除</option></select><label for="f-nature">② 作品性质</label><select id="f-nature" name="nature"><option value="unset">（未填写）</option><option value="single_poem">一首诗</option><option value="multi_poem">多首诗</option><option value="non_poem">非诗（评论/消息/摄影等）</option><option value="unsure">尚不确定</option></select><label for="f-comment">③ 作者意见（版本问题、是否需修改、是否需与旧站比较等）</label><textarea id="f-comment" name="comment" placeholder="例如：与旧站版本不同，以本版为准；需要再核对第二段换行……"></textarea><p class="hint">可只填部分字段。意见最多 20000 字。</p><div class="rvbar"><button type="button" class="btn" id="f-save">保存审阅</button><span class="save-state" id="f-state" aria-live="polite">尚未保存</span><span class="last-saved" id="f-last"></span></div></div>
+<h2>原文（逐字保留）</h2>
+<div class="poem"><br/>
+
+
+<br/>
+<br/>
+
+Nâzım Hikmet accompanied me in the bookstore for a afternoon
+
+<br/>
+<br/>
+<br/>
+
+<br/>
+
+文/安然<br/>
+<br/>
+
+<br/>
+
+我只认识两位土耳其诗人，一位长眠在科尼亚（Konya）的穹顶下，另一位就是希克梅特（Nâzım Hikmet）。<br/>
+<br/>
+
+对于中国，希克梅特不是一个陌生的名字。在上个世纪五十年代，他就与苏联的马雅可夫斯基、智利的聂鲁达、古巴的纪廉一起受到左派文人的推崇，郭沫若曾为他的中文译本题签，至今在“毛左”的网站上仍能找到《希克梅特诗集》的链接。但他们写不出那样不屈服的文字，安纳托利亚充沛的阳光照彻了那双美丽的绿目：
+
+<br/>
+
+<i>我凝视你的眼睛，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 泥土晒出来的味道冲击我：</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 我在麦田，迷失于庄稼的颗粒。</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </i>
+
+<i>你眼睛是无底的绿色深渊，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 变化从未停止，如永恒之物，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 一直释放着秘密，一个又一个，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 却绝不会</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 　　　　彻头彻尾地屈服……</i>
+
+(《<b>1945</b><b>年</b><b>10</b><b>月</b><b>10</b><b>日</b>》)
+
+<br/>
+
+是的，是希克梅特将自由诗体和共产主义——这两样看似风马牛不相及的新事物引荐到了土耳其，历史也证明了土耳其人民做了怎样正确的选择。但我从来不认为希克梅特就是错的，为那些被贫困糟蹋了的人们写诗，从来就不是一件值得懊悔的事：
+
+<br/>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>伊斯坦布尔的贫困——他们说——难以诉诸语言，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;饥饿——他们说——已经糟践了人民，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 肺结核——他们说——到处蔓延。</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这么高的小女孩——他们说——</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 　　　　　　　在烧毁的建筑里、在电影院……</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 黑新闻从这个离我很远的城市传来，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这里的人诚实、勤劳、贫穷——</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 真实的伊斯坦布尔，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这就是你的家，我的爱人，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 无论我被流放何处，关进哪个监狱，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 　　　我将它放在大袋子里、背在背上，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 　　　我在心里守着这城市，犹如一个孩子丢失的东西，</i>
+
+<i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 　　　犹如你的样子在我眼中……</i>
+
+(《<b>1945</b><b>年</b><b>11</b><b>月</b><b>13</b><b>日</b>》)
+
+<br/>
+
+希克梅特生命的最后几年是在苏联的流亡中渡过的，那是一个压抑的斯大林时代，敏感的诗人显然察觉到了从莫斯科到巴库、从曾经的理想与现实之间存在的差距，他拒绝为那位领袖之父唱赞歌，并在1961年，写下一首《无题》：
+
+<br/>
+
+<i>他是石头青铜石膏和纸无处不在从二厘米到七米高不等</i>
+
+<i>在所有城市广场我们都在他的石头青铜石膏和纸的靴子下</i>
+
+<i>在公园他石头青铜石膏和纸的阴影使树木变暗</i>
+
+<i>他的石头青铜石膏和纸的胡须落进我们餐馆里的汤里</i>
+
+<i>在我们的房间我们都在他的石头青铜石膏和纸的眼睛里</i>
+
+<i>有天早晨他消失了</i>
+
+<i>他的靴子从我们的广场</i>
+
+<i>他的阴影从树林</i>
+
+<i>他的眼睛从我们的房间消失了</i>
+
+<i>成千上万吨的石头青铜石膏和纸的重量从我们的背上终于被移走了</i>
+
+<br/>
+
+(《<b>无题</b>》)
+
+<br/>
+
+毕其一生，希克梅特都是一位自由诗人，他既没有拜倒在凯末尔主义者的军靴下，也没有变成克林姆林宫严冬下的欢唱的金丝雀。而关于这些，长期不为人知，希克梅特“革命诗人”的形象长期停摆在六十年前的那个旧译本上。他渐渐从中国人的视野中淡出，被遗忘在风中，连那份旧译本也从市面上绝迹。<br/>
+<br/>
+
+十年前，我就为无法读到这位土耳其诗人更多的作品而遗憾。当那个零下七摄氏度的下午，我蹲下身子，从书店最底层的架子上寻找值得一读的东西，意外抽出了那本《诗经典——希克梅特诗选》时，欣喜如同老友重逢。<br/>
+<br/>
+
+我匆匆找到一个角落坐下来，如饥似渴地阅读起来。李以亮的这个译本填补了希克梅特后期诗歌在中文出版领域长期阙如的空白，让一个依旧是那么人性，同时，又是一个多侧面的希克梅特重新出现在了中国人面前。我有一种冲动，急切地翻看封底的标价：五十五元！<br/>
+<br/>
+
+我平静下来了，所以，希克梅特在书店陪伴了我一个下午，躲避那场突如其来的严寒。
+<br/></div>
+<p class="meta">如原页面与本页有任何差异，请以 <a href="https://www.ismaelan.com/2018/12/blog-post.html" rel="noopener">原始来源</a> 为准，并告知差异位置。</p>
+
+<script>
+(function(){
+  var root=document.getElementById('review');
+  if(!root) return;
+  var cid=root.getAttribute('data-candidate');
+  var elStatus=document.getElementById('f-status');
+  var elNature=document.getElementById('f-nature');
+  var elComment=document.getElementById('f-comment');
+  var elSave=document.getElementById('f-save');
+  var elState=document.getElementById('f-state');
+  var elLast=document.getElementById('f-last');
+  var api='/review/api/review/'+encodeURIComponent(cid);
+  var apiSave='/review/api/review';
+  var LS='reviewDraft:'+cid;
+  // ?test=1 routes writes to the isolated test journal so acceptance tests
+  // never touch the author's real review records.
+  var TEST=/[?&]test=1(&|$)/.test(location.search);
+  if(TEST){ api+='?test=1'; LS='reviewDraft-test:'+cid; }
+
+  function setState(kind,text){
+    elState.className='save-state'+(kind?' '+kind:'');
+    elState.textContent=text;
+  }
+  function fmt(ts){ return ts?('上次保存：'+ts.replace('T',' ').slice(0,16)):''; }
+
+  // restore unsaved draft (never treated as a saved record)
+  try{
+    var d=JSON.parse(localStorage.getItem(LS)||'null');
+    if(d){ if(d.status)elStatus.value=d.status; if(d.nature)elNature.value=d.nature;
+           if(d.comment)elComment.value=d.comment; setState('','有未保存的草稿'); }
+  }catch(e){}
+
+  function markDirty(){
+    try{localStorage.setItem(LS,JSON.stringify({status:elStatus.value,
+      nature:elNature.value,comment:elComment.value}));}catch(e){}
+    if(!elState.classList.contains('ok')) setState('','有未保存的修改');
+  }
+  [elStatus,elNature,elComment].forEach(function(el){
+    el.addEventListener('input',markDirty); el.addEventListener('change',markDirty);});
+
+  // load the saved record from the server
+  fetch(api,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.record){
+      if(!localStorage.getItem(LS)){
+        elStatus.value=j.record.status||'pending';
+        elNature.value=j.record.nature||'unset';
+        elComment.value=j.record.comment||'';
+      }
+      elLast.textContent=fmt(j.record.updated_at)+(j.record.rev?('（第 '+j.record.rev+' 版）'):'');
+      setState('ok','已保存');
+    }else{
+      setState('','尚未保存');
+    }
+  }).catch(function(){ setState('err','无法读取历史记录（服务器离线）'); });
+
+  elSave.addEventListener('click',function(){
+    elSave.disabled=true; setState('busy','正在保存…');
+    fetch(apiSave,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({candidate_id:cid,status:elStatus.value,
+        nature:elNature.value,comment:elComment.value,test:TEST})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      elSave.disabled=false;
+      if(res.ok&&res.j&&res.j.ok){
+        try{localStorage.removeItem(LS);}catch(e){}
+        var rec=res.j.record||{};
+        elLast.textContent=fmt(rec.updated_at)+(rec.rev?('（第 '+rec.rev+' 版）'):'');
+        setState('ok','保存成功');
+      }else{
+        var msg=(res.j&&res.j.error)?res.j.error:'保存失败';
+        setState('err','保存失败：'+msg);
+      }
+    }).catch(function(){
+      elSave.disabled=false;
+      setState('err','保存失败：网络错误（未保存）');
+    });
+  });
+})();
+</script>
+
+<div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
+</div><footer class="rv-foot"><div class="rv-foot-inner">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div></footer></body></html>

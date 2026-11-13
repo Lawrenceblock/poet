@@ -1,0 +1,15 @@
+{{ define "main" }}
+<article class="poem-page">
+  <header class="page-head">
+    <div class="page-head-inner">
+      <p class="page-kicker">题记 · Preface</p>
+      <h1 class="page-title">{{ .Title }}</h1>
+    </div>
+  </header>
+  <div class="wrap">
+    <div class="poem-content preface">
+      {{ .Content }}
+    </div>
+  </div>
+</article>
+{{ end }}

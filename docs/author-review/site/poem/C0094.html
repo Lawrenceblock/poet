@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>C0094 · 帝国：诗歌的监狱——读李必丰狱中诗作</title>
+<style>
+/* 作者审阅材料 · 视觉与公开阅读页统一：纸白底、墨黑正文、暗红点缀（Phase 3 编辑设计）。
+   仅调整外观（配色与字族）；不改动任何审阅数据、字段、HTML 结构或 API 行为。 */
+:root{--black:#0E0E0E;--ink:#141414;--ink-2:#4A4A4A;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
+ --bg:#FAF9F7;--bg-soft:#F2F1EE;--accent:#7A2A34;--accent-soft:#F3E9EA;
+ --on-black:#F2F1EE;--on-black-muted:#A8A6A2;--on-black-accent:#C98A92;--on-black-rule:#2A2A2A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
+/* 页眉与公开站一致：纸白 + 细线（刊物页眉），不再使用黑色标题条。 */
+.rv-head{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ink)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--ink);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:var(--ink-2);margin-left:14px}
+.rv-head nav a:hover{color:var(--accent)}
+.rv-head nav a.cur{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
+a{color:var(--accent)}
+h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
+h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
+.note{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:12px 14px;color:var(--muted);font-size:.9rem;margin:16px 0}
+.meta{color:var(--muted);font-size:.85rem;line-height:1.75}
+.meta b{color:var(--ink);font-weight:600}
+.tags span{display:inline-block;background:var(--bg-soft);border:1px solid var(--line);
+ padding:1px 10px;margin:2px 4px 2px 0;font-size:.78rem;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);padding:16px 18px;margin:14px 0}
+.card h3{margin:0 0 .3em;font-size:1.02rem;font-weight:600}
+.card h3 a{color:var(--ink)}
+.card h3 a:hover{color:var(--accent)}
+.poem{background:#fff;border:1px solid var(--line);border-top:2px solid var(--accent);
+ padding:22px 24px;margin:18px 0}
+.poem p{margin:0 0 1.05em}
+.poem img{max-width:100%;height:auto}
+.verse{white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg-soft);font-weight:600}
+.status{display:inline-block;border:1px solid var(--line-strong);
+ padding:2px 10px;font-size:.8rem;color:var(--muted);background:var(--bg-soft)}
+.status.s-keep{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.status.s-hold{background:var(--bg-soft);border-color:var(--line-strong);color:#8a6d2f}
+.status.s-exclude{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.status.s-pending{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
+.batchnav a{display:inline-block;margin-right:14px}
+.banner{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:10px 14px;font-size:.85rem;color:var(--muted);margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-top:2px solid var(--accent);background:#fff;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid var(--line-strong);background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:#fff;
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+ border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border:1px solid var(--line);background:var(--bg-soft);color:var(--muted)}
+.save-state.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.save-state.err{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.save-state.busy{background:var(--bg-soft);border-color:var(--line-strong);color:var(--muted)}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pill.todo{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.bar{height:12px;background:var(--bg-soft);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:var(--bg-soft)}
+.hide{display:none}
+</style>
+</head>
+<body><header class="rv-head"><div class="rv-head-inner"><a class="brand" href="../">安然诗歌档案<span class="brand-en">Author Review</span></a><nav><a href="../">总目录</a><a href="../index.html">批次索引</a></nav></div></header><div class="wrap">
+<p class="batchnav"><a href="../index.html">← 审阅总目录</a> <a href="../batch-A-5.html">本批目录</a></p>
+<h1>帝国：诗歌的监狱——读李必丰狱中诗作</h1>
+<div class="note"><b>这是审阅副本，不是正式发表版本。</b>页面完整保留原文（含标点、诗行、段落、图片），仅移除脚本等不安全代码；未经作者确认不会用于正式站点。</div>
+<p class="meta">候选编号 <b>C0094</b>　原始发表日期 <b>2013-05-27</b>　语言 <b>zh</b>　脚本分类 <b>A</b><br>原始来源：<a href="https://www.ismaelan.com/2013/05/blog-post_27.html" rel="noopener">https://www.ismaelan.com/2013/05/blog-post_27.html</a></p>
+<h2>为什么列出这篇</h2><ul class="meta"><li>脚本分类：A · 脚本检测到明确署名（文/安然 等）</li><li>署名线索：explicit 安然 byline</li><li>标题来源：article_title</li></ul>
+<h2>需要作者确认</h2><ul class="meta"><li>这篇文章是“一首诗 / 多首诗 / 非诗（评论、消息、摄影等）”？</li></ul>
+<div class="rv" id="review" data-candidate="C0094"><h2>作者审阅</h2><p class="hint">只需填写你要填的部分；填写后请点“保存审阅”。未保存前刷新页面不会丢失草稿，但只有“已保存”才算正式记录。</p><label for="f-status">① 审阅结论</label><select id="f-status" name="status"><option value="pending">待审阅</option><option value="keep">保留</option><option value="hold">暂缓</option><option value="exclude">排除</option></select><label for="f-nature">② 作品性质</label><select id="f-nature" name="nature"><option value="unset">（未填写）</option><option value="single_poem">一首诗</option><option value="multi_poem">多首诗</option><option value="non_poem">非诗（评论/消息/摄影等）</option><option value="unsure">尚不确定</option></select><label for="f-comment">③ 作者意见（版本问题、是否需修改、是否需与旧站比较等）</label><textarea id="f-comment" name="comment" placeholder="例如：与旧站版本不同，以本版为准；需要再核对第二段换行……"></textarea><p class="hint">可只填部分字段。意见最多 20000 字。</p><div class="rvbar"><button type="button" class="btn" id="f-save">保存审阅</button><span class="save-state" id="f-state" aria-live="polite">尚未保存</span><span class="last-saved" id="f-last"></span></div></div>
+<h2>原文（逐字保留）</h2>
+<div class="poem"><br/>
+<br/>
+
+
+<br/>
+文/安然<br/>
+<br/>
+<br/>
+<br/>
+布罗茨基认为，诗人与帝国是对峙的。<br/>
+<br/>
+帝国视令人窒息的精神控制为正常，诗人却挣扎着试图拥有一块独立的精神净土；帝国建立强大的专制机器以便奴役，诗人却视自由为生命；帝国营造墓地般的肃穆和整齐划一，诗歌却是生命多样性的最有力的证据。只有伪诗歌、伪诗人才会献媚权力、依附帝国，而失去精神自由的“诗句”，只是一行行廉价的华丽铅字而已。<br/>
+<br/>
+因此，帝国并不愿意承认“诗人”的存在，它只承认体制内的“文学工作者”，这样的文学侍从的角色自古有之，成为一种数千年的传统，对那些缺乏精神底色的小文人构成致命诱惑。<br/>
+<br/>
+有人需要被豢养，有人需要被承认。但真正的诗人只是一种精神上的自我指认。当布罗茨基被以“社会寄生虫”罪押上布拉格帝国的法庭时，法官们曾对他自称“诗人”，发出一阵阵粗俗的哄笑。他们问他，是谁承认你的？却未料到布罗茨基以一种诗人在逻辑上的超凡能力回答道：也并没有人承认我为人类啊？！是啊，这是不言自明的。<br/>
+<br/>
+但在帝国眼中，一切都需要许可！服装、语言、思想……一切的一切皆有规定的样式，一旦违背了，便会打上危险、反动、极端、恐怖……种种标签，人们不得不时时处处体现自己的政治正确性，以致化入了他们自觉的潜意识。<br/>
+<br/>
+在北朝鲜，金二世不喜欢女人穿长裤，长裤便成为朝鲜民主主义共和国的女人们的禁忌；在西朝鲜某地，“面纱”则成为女人的原罪，到处树立着骇人的警告牌子——戴面纱者不被允许进入社区、机关、医院等公共场所。<br/>
+<br/>
+1949年后的大陆社会，文化被简单地以“新”与“旧”加以切割，知识分子经历着痛苦的政治改造，无论男女老幼，人人背诵“老三篇”，毛式语言成为社会上竞相模仿的标准。以语言为技艺和表达手段的诗人们，则出现分化，有人陷于难言的沉默，更多人则是努力唱颂歌，不惜放弃文学的标准。冯至便在其1958年出版的诗集《西郊集》的后记中如此表白：“这些诗在质量上也是粗糙的，但是比起我解放前的诗，我是走上了正确的道路……”但即使如此，拿着鞭子在后面督阵的文学官僚还嫌不够，在1956年3月的中国作协会议上，周扬就明确地向艾青这位在解放前写过《大堰河——我的保姆》的前左翼诗人提出了“能不能为社会主义歌唱”的问题。不能歌唱，便只有流放北疆。在流放地长大的艾青的儿子没有因此而变得驯顺，反而更加叛逆，近日以一首《傻伯夷》摇滚开唱，指天骂地，快意恩仇，虽不算阳春白雪，倒和“愤怒出诗人”一语有着精神上的联系。<br/>
+<br/>
+诗人本应在批判现实中出离愤怒，诗人本不应在日益无序和沉沦的社会中将风花雪月、无病呻吟当作自己的卖点。诗歌不是个人游戏，它理应担负人类伟大灵魂对其的需求。<br/>
+<br/>
+古米廖夫、曼德尔施塔姆、阿赫玛托娃、茨维塔耶娃、帕斯捷尔纳克……这一系列苏俄文学史上的诗歌殉道者的名字，至今闪耀着十字的辉光。他们或死于枪杀，或亡于集中营，或陨于自戕，或一生坎坷，但他们以自己的存在与书写铸就的不屈的俄罗斯魂魄，却令一个民族不致在精神上跌倒后，再也无法爬起。<br/>
+<br/>
+所以，李必丰在我视野中的出现，令我于沉痛中，也获得对这个人间的某种的希望：那么多人在意识到现实的荒诞之后，逃避了，麻木了，犬儒了，可还是有人能在至痛中清醒着、倾诉着，为荒诞吞噬，也义无反顾地背负起荒诞加于的不可承受之重！<br/>
+<br/>
+重！抑或痛？<br/>
+<br/>
+当听到那些政治受难者的故事时，我会本能地感到恐惧与绝望。“人类一直被一个法则分成两个物种：那些知道而不说的人；那些说而不知道的人。”（米沃什语）大多数时候，我一直装聋作哑地扮演前一种角色，直到心灵里爆发出怒吼。<br/>
+<br/>
+李必丰的遭遇挑战着人类忍耐的极限，他是诗人，他坚持良知，备受苦难，一次次逃亡、落狱，也不改其志。他的朋友廖亦武说，他曾被缅北的游击队捕获，像球一样被人踢来踢去，以致阴囊受损……<br/>
+<br/>
+“人在被推至其处境的极限之后，再次在书面文字中找到最后堡垒，用来抵抗毁灭的孤独。他的文字，不管是精致或笨拙，有韵律或凌乱，都仅仅是由那种想表达的意志所驱使，以此沟通和传达真相。它们是在最可能恶劣的环境下写的，是由贫乏的丶按理说十分危险的手段传播的。这些文字，与有权有势的集团所捏造和维持的谎言相反，那些集团可以动用庞大的技术，并且受到无节制的暴力的保护。”　<br/>
+<br/>
+李必丰的狱中诗作，为米沃什在《诗的见证》一书中所引用的这段文字，做了最真实的注脚。这段文字本是米沃什从另一部著作——《纳粹占领下被判处死刑者作品（1939——1945）》的摘引，奥斯维辛之后真的不该有诗吗，还是更该有诗的参与与见证？<br/>
+<br/>
+李必丰：我们的眼睛是两口枯井<br/>
+<br/>
+眼睛这两口枯井<br/>
+散乱的目光深处是肥沃的淤泥<br/>
+曾有爱情的禾苗被泪水的火焰烧尽<br/>
+我们住在悲伤的另一端<br/>
+隔着高墙看远处的太阳远处的山<br/>
+夜里梦见远处的人<br/>
+用思念的网打捞零散的往事<br/>
+然后让骨头里长满骨头<br/>
+<br/>
+读李必丰的诗歌让我想起土耳其当年著名的狱中诗人希克梅特，文字如家信——怀念情人，渴望自由，但又信念坚定！1950年，土耳其当局最终在国际文化界人士的共同呼吁下，释放了这位土耳其共产党人。<br/>
+<br/>
+诗人在一个国家中的处境，反映了这个国家内部权力与精神之间的关系。历史无数次地证实，把那些坚持良知者变成受害者，并不能巩固权力的基础，那只会令权力建基于沙滩之上。否定或批判，对任何人或集团都意味着痛苦，但没有否定的痛苦，便没有改变的希望，也就没有未来。通常说来，民主政体是渴望了解民意的；而不是伪造民意——从长远来看，那毫无意义。希望所有人，无论你是有着高贵的家世，还是出身下贱；是手握权柄，还是无权无势，都能在某一刻面对自己的良知，我想这是人类这一物种区别于其它物种的最为重要的特征，良知、同情……这些人类品质把你我相连成一片大陆，而不是一座座相互永不理解的孤岛。<br/>
+<br/>
+不要试图复兴过往的帝国荣耀，而应尝试着建立崭新的人之国。<br/>
+<br/>
+人之国不囚禁诗人，更不囚禁良知。<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/></div>
+<p class="meta">如原页面与本页有任何差异，请以 <a href="https://www.ismaelan.com/2013/05/blog-post_27.html" rel="noopener">原始来源</a> 为准，并告知差异位置。</p>
+
+<script>
+(function(){
+  var root=document.getElementById('review');
+  if(!root) return;
+  var cid=root.getAttribute('data-candidate');
+  var elStatus=document.getElementById('f-status');
+  var elNature=document.getElementById('f-nature');
+  var elComment=document.getElementById('f-comment');
+  var elSave=document.getElementById('f-save');
+  var elState=document.getElementById('f-state');
+  var elLast=document.getElementById('f-last');
+  var api='/review/api/review/'+encodeURIComponent(cid);
+  var apiSave='/review/api/review';
+  var LS='reviewDraft:'+cid;
+  // ?test=1 routes writes to the isolated test journal so acceptance tests
+  // never touch the author's real review records.
+  var TEST=/[?&]test=1(&|$)/.test(location.search);
+  if(TEST){ api+='?test=1'; LS='reviewDraft-test:'+cid; }
+
+  function setState(kind,text){
+    elState.className='save-state'+(kind?' '+kind:'');
+    elState.textContent=text;
+  }
+  function fmt(ts){ return ts?('上次保存：'+ts.replace('T',' ').slice(0,16)):''; }
+
+  // restore unsaved draft (never treated as a saved record)
+  try{
+    var d=JSON.parse(localStorage.getItem(LS)||'null');
+    if(d){ if(d.status)elStatus.value=d.status; if(d.nature)elNature.value=d.nature;
+           if(d.comment)elComment.value=d.comment; setState('','有未保存的草稿'); }
+  }catch(e){}
+
+  function markDirty(){
+    try{localStorage.setItem(LS,JSON.stringify({status:elStatus.value,
+      nature:elNature.value,comment:elComment.value}));}catch(e){}
+    if(!elState.classList.contains('ok')) setState('','有未保存的修改');
+  }
+  [elStatus,elNature,elComment].forEach(function(el){
+    el.addEventListener('input',markDirty); el.addEventListener('change',markDirty);});
+
+  // load the saved record from the server
+  fetch(api,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.record){
+      if(!localStorage.getItem(LS)){
+        elStatus.value=j.record.status||'pending';
+        elNature.value=j.record.nature||'unset';
+        elComment.value=j.record.comment||'';
+      }
+      elLast.textContent=fmt(j.record.updated_at)+(j.record.rev?('（第 '+j.record.rev+' 版）'):'');
+      setState('ok','已保存');
+    }else{
+      setState('','尚未保存');
+    }
+  }).catch(function(){ setState('err','无法读取历史记录（服务器离线）'); });
+
+  elSave.addEventListener('click',function(){
+    elSave.disabled=true; setState('busy','正在保存…');
+    fetch(apiSave,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({candidate_id:cid,status:elStatus.value,
+        nature:elNature.value,comment:elComment.value,test:TEST})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      elSave.disabled=false;
+      if(res.ok&&res.j&&res.j.ok){
+        try{localStorage.removeItem(LS);}catch(e){}
+        var rec=res.j.record||{};
+        elLast.textContent=fmt(rec.updated_at)+(rec.rev?('（第 '+rec.rev+' 版）'):'');
+        setState('ok','保存成功');
+      }else{
+        var msg=(res.j&&res.j.error)?res.j.error:'保存失败';
+        setState('err','保存失败：'+msg);
+      }
+    }).catch(function(){
+      elSave.disabled=false;
+      setState('err','保存失败：网络错误（未保存）');
+    });
+  });
+})();
+</script>
+
+<div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
+</div><footer class="rv-foot"><div class="rv-foot-inner">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div></footer></body></html>

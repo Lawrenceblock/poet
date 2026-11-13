@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>C0105 · 我的诗歌志</title>
+<style>
+/* 作者审阅材料 · 视觉与公开阅读页统一：纸白底、墨黑正文、暗红点缀（Phase 3 编辑设计）。
+   仅调整外观（配色与字族）；不改动任何审阅数据、字段、HTML 结构或 API 行为。 */
+:root{--black:#0E0E0E;--ink:#141414;--ink-2:#4A4A4A;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
+ --bg:#FAF9F7;--bg-soft:#F2F1EE;--accent:#7A2A34;--accent-soft:#F3E9EA;
+ --on-black:#F2F1EE;--on-black-muted:#A8A6A2;--on-black-accent:#C98A92;--on-black-rule:#2A2A2A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
+/* 页眉与公开站一致：纸白 + 细线（刊物页眉），不再使用黑色标题条。 */
+.rv-head{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ink)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--ink);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:var(--ink-2);margin-left:14px}
+.rv-head nav a:hover{color:var(--accent)}
+.rv-head nav a.cur{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
+a{color:var(--accent)}
+h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
+h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
+.note{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:12px 14px;color:var(--muted);font-size:.9rem;margin:16px 0}
+.meta{color:var(--muted);font-size:.85rem;line-height:1.75}
+.meta b{color:var(--ink);font-weight:600}
+.tags span{display:inline-block;background:var(--bg-soft);border:1px solid var(--line);
+ padding:1px 10px;margin:2px 4px 2px 0;font-size:.78rem;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);padding:16px 18px;margin:14px 0}
+.card h3{margin:0 0 .3em;font-size:1.02rem;font-weight:600}
+.card h3 a{color:var(--ink)}
+.card h3 a:hover{color:var(--accent)}
+.poem{background:#fff;border:1px solid var(--line);border-top:2px solid var(--accent);
+ padding:22px 24px;margin:18px 0}
+.poem p{margin:0 0 1.05em}
+.poem img{max-width:100%;height:auto}
+.verse{white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg-soft);font-weight:600}
+.status{display:inline-block;border:1px solid var(--line-strong);
+ padding:2px 10px;font-size:.8rem;color:var(--muted);background:var(--bg-soft)}
+.status.s-keep{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.status.s-hold{background:var(--bg-soft);border-color:var(--line-strong);color:#8a6d2f}
+.status.s-exclude{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.status.s-pending{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
+.batchnav a{display:inline-block;margin-right:14px}
+.banner{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:10px 14px;font-size:.85rem;color:var(--muted);margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-top:2px solid var(--accent);background:#fff;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid var(--line-strong);background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:#fff;
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+ border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border:1px solid var(--line);background:var(--bg-soft);color:var(--muted)}
+.save-state.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.save-state.err{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.save-state.busy{background:var(--bg-soft);border-color:var(--line-strong);color:var(--muted)}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pill.todo{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.bar{height:12px;background:var(--bg-soft);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:var(--bg-soft)}
+.hide{display:none}
+</style>
+</head>
+<body><header class="rv-head"><div class="rv-head-inner"><a class="brand" href="../">安然诗歌档案<span class="brand-en">Author Review</span></a><nav><a href="../">总目录</a><a href="../index.html">批次索引</a></nav></div></header><div class="wrap">
+<p class="batchnav"><a href="../index.html">← 审阅总目录</a> <a href="../batch-B-2.html">本批目录</a></p>
+<h1>我的诗歌志</h1>
+<div class="note"><b>这是审阅副本，不是正式发表版本。</b>页面完整保留原文（含标点、诗行、段落、图片），仅移除脚本等不安全代码；未经作者确认不会用于正式站点。</div>
+<p class="meta">候选编号 <b>C0105</b>　原始发表日期 <b>2018-03-24</b>　语言 <b>zh+en</b>　脚本分类 <b>B</b><br>原始来源：<a href="https://www.ismaelan.com/2018/03/blog-post.html" rel="noopener">https://www.ismaelan.com/2018/03/blog-post.html</a></p>
+<h2>为什么列出这篇</h2><ul class="meta"><li>脚本分类：B · 有诗歌特征但无明确署名</li><li>署名线索：poetry title keyword + verse structure, no explicit byline</li><li>标题来源：article_title</li><li>检测到中英双语，审阅时请核对两种语言是否为同一作品。</li></ul>
+<h2>需要作者确认</h2><ul class="meta"><li>这篇文章是“一首诗 / 多首诗 / 非诗（评论、消息、摄影等）”？</li><li>中英文是否为同一作品的两种版本？以哪一版为准？</li><li>是否确认作者署名/归属？</li></ul>
+<div class="rv" id="review" data-candidate="C0105"><h2>作者审阅</h2><p class="hint">只需填写你要填的部分；填写后请点“保存审阅”。未保存前刷新页面不会丢失草稿，但只有“已保存”才算正式记录。</p><label for="f-status">① 审阅结论</label><select id="f-status" name="status"><option value="pending">待审阅</option><option value="keep">保留</option><option value="hold">暂缓</option><option value="exclude">排除</option></select><label for="f-nature">② 作品性质</label><select id="f-nature" name="nature"><option value="unset">（未填写）</option><option value="single_poem">一首诗</option><option value="multi_poem">多首诗</option><option value="non_poem">非诗（评论/消息/摄影等）</option><option value="unsure">尚不确定</option></select><label for="f-comment">③ 作者意见（版本问题、是否需修改、是否需与旧站比较等）</label><textarea id="f-comment" name="comment" placeholder="例如：与旧站版本不同，以本版为准；需要再核对第二段换行……"></textarea><p class="hint">可只填部分字段。意见最多 20000 字。</p><div class="rvbar"><button type="button" class="btn" id="f-save">保存审阅</button><span class="save-state" id="f-state" aria-live="polite">尚未保存</span><span class="last-saved" id="f-last"></span></div></div>
+<h2>原文（逐字保留）</h2>
+<div class="poem"><br/>
+
+<br/>
+
+<br/>
+
+<b>我的诗歌志</b><b></b>
+
+<b><br/></b>
+<br/>
+
+
+
+——遵林莽先生之嘱而作<b></b>
+<br/>
+
+<br/>
+
+文/崔浩新
+
+<br/>
+
+在讲及我的诗歌之前，先让我讲述一个在我的脑海里日渐清晰的故事：在苍狼白鹿的后裔征服世界的时代，一个生命体被掏出母体，撕裂了那条滴着鲜血的脐带，却连一声痛苦的初啼也不曾发出过！他沉默的方式是如此决绝，如此令人震惊，也如此岁月漫长，像一场淹没了他的面孔几个世纪的大雾，他是最熟悉的陌生人！在漫长的沉默面前，人们忘记了那是金子，是血色点染的赤金，隐忍只换来对哑巴的轻视，蜚短流长将弱者的名字污名化：那个寄意深沉的叠音词被粗暴地呼喊，被著意地歪曲，被卑鄙地嫁祸……反正他是哑巴，他不会有任何的回应！一个词的命运就如此被改变，网上流传着一份新华社的禁用词和慎用词名单，这个古老的叠音词便赫然名列其间。
+
+我的诗歌就是这样一个牙牙学语的儿童，断断续续地回忆着这个命运多舛的生命体的前世今生，这个沉重异常的生命体就是我出身的“回回民族”，我最初的语言几乎托不住他。
+
+那语调拉长
+
+慢慢的
+
+憨憨的
+
+回族话呀 
+
+调调里藏着黄土高原的大风
+
+风中是花儿在简单、真挚地唱
+
+（《西域：七个片段》）
+
+这些诗行写于2007年的新疆，后来成为一个更复杂的系列诗歌的一部分。布罗茨基说，每位诗人都拥有一片独特的内心风景，他意识中的声音或曰无意识中的声音，就冲着这片风景发出。新疆于我，便是这样一片内心的风景。
+
+但新疆并非我的故乡。
+
+我，生长于孔孟之乡，自小便浸淫在汉文化里。尽管，童年是一个百废待兴的八零世代，“破四旧”的喧嚣还未远去，灰头土脸的传统还未重拾国学的地位，但父亲已然开始以白居易的《卖炭翁》为我发蒙，我津津乐道的是秦皇汉武唐宗宋祖，壮怀激烈的是“大江东去，浪淘尽，千古风流人物”，如若不是稚子间时常围绕“回族与猪”的话题爆发面红耳赤的争吵与厮打，我几乎已忘记了自己与他人的区别。那些烙印在肉体或内在的伤痕，养成了我与周围世界的一种古怪、高傲、不合时宜的疏离感，面对这个自认为可以吞噬一切的世界，我恰是那个敢于向风车发起挑战的斗士！于是，即使父亲保持着回族人标志性的沉默，我也在心底存下了自己关于此类问题的朦胧的疑惑：我们到底是谁，我们来自哪里？祖父曾给出过一个简单的答案：西域，我们是西域回回！可西域在哪里，这位私塾出身的旧式秀才又一次语焉不详。即便如此，我仍要应该感谢他，在那些风雨如晦的年代里，他都没曾向自己的儿子吐露过只言片语，愿真主慈悯我的祖父。
+
+古老的历史之树繁衍到我这里，本已花果飘零了，可2007年的那次漫游，像是一场命运的罡风，将28岁的我吹向了那片自古称之为“西域”的土地。这是安拉的定然，凡人无法抗拒！我也没有抗拒，我将自己的笔名命名为“安然”。
+
+新疆，这个难于表达的庞大存在，在我心中投下了永难抹灭的星球般的影迹，这是一块诗与歌的土地，在它之上曾经诞生了维吾尔古典时代的诗人尤素福·哈斯·哈吉甫的长达一万三千多行的叙事诗篇——《福乐智慧》，当我一路向西，终于抵达那座中亚的著名古都“喀什噶尔”时，一刻也没有停留地奔向了那位古代大诗人的陵园，在他覆盖着绿色丝织物的尘土飞扬的墓棺边，捧起双手为他祈祷。
+
+岂知，在我为他祈祷的瞬间，一粒诗歌的种子也在我的心中隐秘地、迅速地萌发、生长！
+
+尤素福·哈斯·哈吉甫的喀什噶尔给我带来的冲击太鲜烈了，我被无可救药地击中，几乎如患热病一样，沉醉在艾提尕尔清真寺附近的那片迷宫般的异域风情里。置身其间，我仿佛又重回了童年时密如蛛网的西关老巷，我不仅重新发现了故乡，还发现了世间存在着的那惊人的文化亲缘性，我在异乡的路途上大步流星地通向了故乡。
+
+这里有被遗落的民族
+
+有被遗忘的秘密
+
+有不轻易开启的门
+
+门里的人安静、温和
+
+内心固执
+
+<br/>
+
+淡忘了阿拉伯
+
+淡忘了波斯
+
+淡忘了突厥
+
+惟有一百一十四章经文
+
+以一种古老的忧伤
+
+永被诉说
+
+那时有内心的风暴
+
+有奔跑在梦中的大宛马
+
+有春天和爱情临近的讯息
+
+（《我的西关》）
+
+这首关于“西关”的组诗写于新疆之行前夕，寄寓了我的不可复原的乡愁，西关的老城旧貌早已消失在九十年代的改造之中，我家那座有着垂花门的祖宅曾为前清知县建造，三位曾祖父白手起家后购置过来，聚族而居近百年，它比后来建造的那些仿古假文物更有价值更真实更有说服力，这是我和其他中国人在很久之后才发觉的真理——我们的城市文明也必须有历经沧桑的建筑群落这样的实物来印证其古老、独特、丰富、多元，人们往往后知后觉，悔之晚矣。
+
+于是，当我在边远的喀什发现了原汁原味的老巷，一下子便被唤起了记忆，触动了乡愁。在那里的古老社区里，我并非异族，我可以安心地倘徉在过街阁楼下，我可以在街巷拐角处的那座精致小巧的雕花清真寺里和一班老人一起并肩做礼拜，我可以收到忽闪着大眼睛的少年塞到手中的维文小广告，只要我不说话，一切止步于语言之门前，这是殊为遗憾的。即使如此，我仍然感到我深深地理解这里、眷恋这里。但当时我并没有为喀什噶尔写下过一个字，我不敢轻易下笔，我生怕自己没有能力把握那个伟大绚烂、复杂深沉的文明，我像一个朝圣的信徒一样小心翼翼地珍藏着记忆里的画面，直到多年后听说那里开启了现代化的“改造”“拆迁”，面对着一张张传来的充满了瓦砾的图片，想到自己已经消失的故乡“西关”，才颤抖着愤然起笔：
+
+从单人牢房
+
+眺望窗外冷白的世界
+
+我仿佛听见地底传出的微弱的呼声
+
+我仿佛看见老坦克改装的推土机在一千零一夜里横行
+
+肩头的天使在急切地催促我
+
+说吧
+
+这灰霭下的真相
+
+哭吧
+
+这雾化的哀伤
+
+梦中的细密画每一幅都铭心刻骨
+
+<br/>
+
+K城 尘烟四起
+
+长袍像幽灵一样在西风里出没
+
+只有蓝鸽子是一群听不懂国语的无知信徒
+
+还在围着千年的拱顶与金色的塔尖
+
+旁若无人地 迷醉地旋转
+
+命途啊 咕咕
+
+<br/>
+
+受伤的巷口丢失了那些披着褐色织衫的贞静少女
+
+哪里的琴弦在播种思念
+
+丰收了 一城瓦砾
+
+（《狱中书简》）
+
+我的每一首诗都像一副自己为自己亲手开下的毒药，但又每每不得不如此书写，不得不如此倾吐，否则，即使我不被杀，也会因良知的自责而选择自杀，了结这段尘世孽缘。写完这首虚构的诗文后，我把它发在了自己的博客“一个回族人的时代言说”上，然后，做好了像《狱中书简》一书的作者迪特里希·朋霍费尔那样“就义”的准备，谁都知道我写的是什么，但什么也没发生。只能说，今天的中国不是昨天的纳粹德国，我安然无恙……
+
+从这一点上说，那种将中国描述为专制恐怖、毫无包容性的报道，似乎也不尽公正与准确。当然，在我的写作生涯中，曾不止一次地陷入绝境，不止一次地面对冰冷的讯问，但任凭风吹浪打，我依然故我。
+
+诗歌对我来说，是一种抵抗，既是抵抗人生的虚无，也是抵抗人世的不公。但它不是一种暴力的抵抗，而是诗意的抵抗；它不唤起暴力，它唤起省思与对话。但反思从来都是艰难的，反智倒很容易，民粹主义浪潮正席卷全球，以宗教或民族为名进行的争斗层出不穷，我也曾经深感绝望。在一个传统已经碎片化的时代，我们应不应该抢救那些文明的碎片？那些独特的建筑艺术、语言文化、宗教思想不只专属于哪一个民族，它们更是属于全人类的文化遗产，不容受到任何名义的伤害！在一个“文明冲突”已经显现的时代，不同文明之间只能相互倾轧而不能相互倾听？！我们的安全感不来自或者说绝不可能来自铁丝网，隔离是一种绝望，绝望中的平静谈不上安全舒适。真正的安全来自于真诚地相互尊重相互倾听相互谅解：渡尽劫波兄弟在，相逢一笑泯恩仇！
+
+新疆之行为我打开了一座回族人的经验世界。相反，对于我急欲探访的古丽斯坦，却因语言的隔膜，而不得不望而兴叹。古丽，在维吾尔语中是花儿的意思，斯坦，则有花园、家园之意，维吾尔的花儿像大马士革的玫瑰，很美，但那份稀世的美丽永远不属于我！别了，古丽斯坦。
+
+牙牙学语的孩子教会他这个怀乡的词：阿娜！
+
+捧着这滴着脐血的语言，
+
+他横过马路，
+
+仿佛在追寻自己的母亲。
+
+母亲去了哪里？
+
+为什么抛下自己丑陋的天堂，
+
+投身欲望的街区？
+
+一路急行，
+
+直到走进完整的黑暗，
+
+满城的霓虹也照不亮一个人内心的黑暗。
+
+浪子，再也没能找见阿娜……
+
+<br/>
+
+路边的KTV里呜咽如歌：
+
+“就让这杯烈酒伴我天涯走
+
+她站在丝绸乡的路上望着天边
+
+日落下”
+
+（《阿娜》）
+
+在维吾尔语中，“阿娜”是母亲的意思。这首诗既是我深深的恋母情结与寻根情结的反映，也是我在雅马里克山的那片维吾尔人的黄泥小屋中间真实目睹的记录，至今回想起那童声的呼唤，仍然痛彻心扉。
+
+一叠童声从身后的山上传来，
+
+将他钉在原地。
+
+“阿娜——”
+
+<br/>
+
+一个车流中漂浮的身影回望她卑微、凌乱的家园，
+
+却未停下朝向城市的脚步。
+
+雅马里克山在乌鲁木齐的门外，乌鲁木齐则是一座现代化的大城市，摩天大楼，触目皆是。除了南门外的一小部分社区，它与内地别无二致，这可能是很多慕名而来的游客所想象不到的。各民族间的文化差异性在逐渐消失，文明同质化现象越来越严重，这里面有经济上的压力，也有其他不可言说的原因。在这种情境下，保持淳朴的人性和坚守好客的传统，就尤为令人感动。我曾受邀住在乌鲁木齐南门外的回族人家里，我们素昧平生，但当朋友介绍我是来新疆开笔会的回族作家时，他们就把我当成了“浪亲戚”的家人，这就是回族人！
+
+新疆的回族大多来自关中，当地人把他们那种带有浓郁陕西风味的方言，称为“回族话”。陕西关中曾是一处较大的回民聚居地，在回族历史上具有重要意义的“经堂教育”即开创于陕西。但在近代帝国崩溃的大格局下，作为一支孤立无依的少数族群，陕西回民成为了国家政治经济失败的替罪羊，遭遇了前所未有的大屠杀，不得不在义军领袖白彦虎的带领下举族西迁，自那以后，这股逆向的移民潮在中国的西部持续了很多年，也把陕甘宁青的文化、饮食、习俗、方言带到了新疆乃至更远的中亚地区，这便是我诗里描绘的那种“调调里藏着黄土高原的大风”的新疆回族话的由来。我把自己第一次听到这种方言的新奇感受写进了诗里，同时，我也不止一次地描写过他们英雄的祖先。
+
+猛回头
+
+站外一支马队若隐若现
+
+我识得那匹高头大白马
+
+我会唱那首陕花儿
+
+“刀刀儿拿来头割下
+
+不死还这个唱法”
+
+可我不唱
+
+（《读艾•辛格小说》）
+
+艾•辛格是一位犹太作家，曾获1978年的诺贝尔文学奖。他出身于古老的东欧犹太人社区，当纳粹迫害濒临他的时候，他逃往了美国，在那里依旧坚持以一种古老的东欧少数民族语言“意第绪语”进行创作，无疑，他的意第绪语读者少之又少，但他的坚持是对那些死于大屠杀的同胞的纪念，也许，那些亡魂还会读他的小说。当我阅读艾•辛格讲述的那些犹太古老村寨的故事、传说时，我发现了文化的共通性、民族遭遇的相似性，我将犹太人和回回人的故事交织在一起，以复调的形式写进了这首诗歌里，这是对两个不幸民族的共同纪念。于是，那列曾经运送犹太囚徒的“废弃已久的铁皮火车”和一支若隐若现的义军马队魔幻般地相遇在了“那个空无一人的荒野小站”。批评家乔治•斯坦纳（George Steiner）认为20世纪西方文学这一整个类型，都是“域外”的，是一种由流亡者写的和关于流亡者的文学，象征着难民时代。痛苦的难民时代并没有随着旧世纪的落幕而终结，这种流亡之苦在新的21世纪里似乎愈演愈烈，成为了一场世人无法回避的危机。在这场危机中，有两个地方尤为引人注目：叙利亚和缅甸。
+
+一万颗炮弹播种在这块土地上
+
+女孩麦尔彦在难民营里似野草般疯长
+
+故乡的日子是坟墓
+
+异国的青春是风之镰
+
+她日复一日地向父亲追问归期
+
+父亲的蓝色深眸每每转向天空
+
+等到黎明幽深了
+
+那时
+
+圣人将落在大马士革的塔楼上
+
+宣布和平
+
+（《圣女麦尔彦》）
+
+在这个资讯发达的时代，对叙利亚危机，我几乎算是一个见证者。我目睹了一场在西方支持下的“阿拉伯之春”，如何由游行、镇压、反抗演变成了一场旷日持久的人道主义的严冬！我目睹了独裁者的残酷、政客的善变、民众的痛苦与无助。
+
+从远方收回的目光
+
+落在那张明信片上
+
+看着胡安•鲁尔福拍摄的原住民
+
+就又看到了那个被忧伤筑了巢的地方，
+
+在那里的风搅动着这种忧伤，
+
+却永远无法把它带走
+
+<br/>
+
+带走的是那些黑暗中的花儿
+
+“娶了我吧，先生
+
+我什么都不要”
+
+难民营外的少女苦苦哀告
+
+天堂的新月
+
+子夜的下水道里有你受伤的影子
+
+那面流水落花的金月亮啊
+
+一个人在诅咒
+
+物质的奴隶
+
+连心灵也被殖民
+
+一个人在祈祷
+
+这腐烂的盛世购买你——华丽的胴体
+
+空空两手
+
+空空鲁哈
+
+（《铁一样的乡愁在心间》）
+
+我不止一次地写到叙利亚难民的窘境，因为我的目光从未远离那里，我知道的太多，不能把它们久埋在心里而装作若无其事。而对于缅甸突然爆发的罗兴亚人危机，则让我感到既陌生又迷惑，我曾长久地注视、观察，直到我完全理解了这场由缅甸的佛教民族主义者一手导演的种族主义闹剧！
+
+南亚蜡白的太阳
+
+如同一个和尚煽动时的冷酷
+
+你的黑肤色
+
+在人类的沉默中巨增
+
+那冒烟的太阳穴
+
+流出瘦骨嶙峋下包裹一生的痛苦
+
+行刑后的哑寂时刻
+
+身下这片不友好的杂草地不再驱赶你
+
+你终于把自己静静地留在了佛国
+
+（《罗兴亚》）
+
+人类似乎从未从历史的诅咒之中摆脱出来，悲剧一再地重复自身。正如《旧约·传道书》中说：“已有的事，后必再有。已行的事，后必再行。日光之下并无新事。岂有一件事人能指着说，这是新的。哪知，在我们以前的世代，早已有了……我见日光之下所作的一切事，都是虚空，都是捕风。”在白皮肤的雅利安人煽动者之后，还会有黄皮肤的佛教民族主义僧侣，美国《时代周刊》将在缅甸鼓吹对伊斯兰教进行坚决抵制以及直接推动缅甸军方与民间迫害穆斯林少数民族的政治僧侣阿欣威拉杜称为“佛教的本·拉登”，从2013年至今，已有80万罗兴亚穆斯林逃离了自己在缅甸的家园，流散世界各地，成为国际难民大家庭中的一员。2018年年初，在另一个佛教国家斯里兰卡又发生了佛教极端分子攻击当地穆斯林少数民族的事件，一再发生的冲突，已不再是偶然现象，它似乎印证了文化冲突最容易发生在文明的断层线上的预言，而少数民族恰恰就位于这条不同文明的断层线上，他们最容易受伤害，最容易成为那些相信“如果没有真正的敌人，也就没有真正的朋友。除非我们憎恨非我族类，我们便不可能爱我族类”的民族主义狂热分子的政治献祭品，看一看中国网络上那些被称为“穆黑”的反穆斯林分子的狰狞丑态，你就会发现“文明冲突”的危险并非远在天边，而是近在眼前。政客们虽然在口头上否认、谴责“文明冲突”的预言，大谈文明的多样性，而实际上在内心深处却已是这些冲突理论的俘虏，充满了对不同文明的恐惧。
+
+阿多诺曾说：“奥斯维辛之后，写诗是野蛮的。”奥斯维辛之后，诗人何为，曾是一个深刻的命题。但面对重复上演的人间惨剧，难道就此不发声，不谴责？甚至露出诡异、冰冷的笑意？这样的世界是否更野蛮？自古以来世界上的灾祸从未止息过，如果连诗人们都不谴责不反击，不为人类的美好情感受伤受辱，而感到颤栗、愤怒；如果忧患之中不再出现诗人的身影，愤怒不再诞生诗人，那么，这个世界该多野蛮多无望啊！
+
+于是，面对野蛮，仍要写诗。
+
+人是有同理心的，是有移情能力的，能由己推人，而同情他人。一个真正的诗人更应是世界的情人，而不应只周旋在三两个女人的石榴裙边，他应该将自己的爱尽可能地放大一些，他不应只爱自己，他不应只沉湎于自己的内心，只在自己的文字里贩售那些鸡零狗碎，只将目光盯在异性的下半身，只写那些没完没了的废话，只写那些故作高深而不知所云的文字垃圾，拉帮结派只为稻粱谋……这都不是真正的诚实的诗人所为！诚然，一个诗人，作为个体是软弱的，即使他被迫屈服于世俗屈服于压力，只能顾到自己，但也不应该进而去指责那些在人类的暗夜时分擎起灯盏的人，那样的调笑与指责，就显得太卑鄙！
+
+铁一样的乡愁在心间
+
+无声林立
+
+向着破碎的蓝琉璃的天穹生长
+
+向着劫运未改的土地扎根
+
+（《铁一样的乡愁在心间》）
+
+我的诗行越来越焦虑，已不适合使用陈旧的语言来表达现实，现实五光十色，迷人心智，诗的语言只能超越现实，才能直达本质，本质都是超现实的。我在本质上则是一个彻头彻尾的悲观主义者，痛苦与孤独沉埋着我，几不能自拔。回首身后那条泥泞蜿蜒的小路，如果路途之上没有那些温暖的相逢，我早已消失在了道边。
+
+远方的朋友，虽然你们的身影已经隐没在了驿路的尽头，可你们永远铭刻我心。
+
+在我的人生之中，有一种帮助不应该讳言，也许说出来人们会大吃一惊，但我仍要坦承：在他们心目中的一位“反体制的诗人”也得到过体制的帮助：回族作家笔会邀请过我，中国作家协会以少数民族文学重点扶持项目的名义资助过我的长篇小说的创作……我与体制之间的纠葛一言难尽，也许在天朝看来，我更像是一位诤言直谏的旧式文人吧？
+
+习近平时代，我已两次受邀来北京的鲁迅文学院学习，这样的殊遇，在以往是不可想象的。君以国士待我，我当以国士报之；君以路人待我，我当以路人报之；君以草芥待我，我必以仇寇报之。孟子的这番话，我还是知道的。
+
+我的内心是复杂的，以致我不知道如何为这篇数千字的长文收场，正在此时的一个清晨，我意外地听到了一首新疆民歌，那沉郁回旋的唱腔令我心颤，即使我不能听懂其中的任何一个词，但两行清泪还是潸然而下。当我得知这首歌谱写自维吾尔当代最著名的诗人穆海麦提的一首诗，并读到歌词的译文时，仿佛一下子找到了心中久觅不得的答案：
+
+花儿各种各样
+
+日子有好有坏
+
+人也各有不同
+
+有好人也有坏人
+
+不要因为谁伤了你的心
+
+就以为所有人都是坏人
+
+<br/>
+
+有人饥饿你要送上珍贵的馕
+
+有人需要生命你就献上鲜血
+
+在你需要的时候
+
+总能出现好人
+
+遇上困难不要因为挫折而伤心失望
+
+世界充满美好我们到处能遇上好人
+
+（《伟大的人们》 穆海麦提）
+
+我还是愿意相信这个新时代的诚意，愿意看到一个“各美其美，美人之美，美美与共，天下大同”的理想社会的实现。
+
+但我仍是我，我将我的诗、我的灵魂交托给了真主！
+<br/>
+<br/>
+<br/>
+
+
+
+<br/>
+
+林莽先生是我在鲁迅文学院的导师，这篇文字是他布置的一篇论文。林莽先生曾任《诗刊》杂志的主编，他是一位老诗人，也是一位体制内的资深编辑，他的身影早在70年代的“白洋淀诗歌群落”时期便已出现，堪称中国新时期诗歌的见证者。
+
+<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+<h3>
+后记：</h3>
+
+<br/>
+
+<b>这篇寄望于“新时代”的作品发表之后所发生的事，令人匪夷所思：</b>
+
+<br/>
+
+
+<blockquote>
+
+【回族诗人安然被“红色教育” 井冈山下遭国保扣查】<br/>
+安然4月9日表示，两名扣查他的便衣警察拒绝告知查扣理由，也没出示相关法律文件。他认为这与他近期发表涉及新疆维吾尔族的作品有关。https://t.co/wLbdk0EcuP
+— 自由亚洲电台新闻 (@RFA_Chinese) 2018年4月9日</blockquote>
+
+
+<br/>
+<br/>
+<br/>
+<b>After this article was published:</b><br/>
+<br/>
+<blockquote>
+
+China Sends Prominent Muslim Poet For Ideological 'Re-education' https://t.co/F0P5YgJOlx
+— Radio Free Asia (@RadioFreeAsia) 2018年4月9日</blockquote></div>
+<p class="meta">如原页面与本页有任何差异，请以 <a href="https://www.ismaelan.com/2018/03/blog-post.html" rel="noopener">原始来源</a> 为准，并告知差异位置。</p>
+
+<script>
+(function(){
+  var root=document.getElementById('review');
+  if(!root) return;
+  var cid=root.getAttribute('data-candidate');
+  var elStatus=document.getElementById('f-status');
+  var elNature=document.getElementById('f-nature');
+  var elComment=document.getElementById('f-comment');
+  var elSave=document.getElementById('f-save');
+  var elState=document.getElementById('f-state');
+  var elLast=document.getElementById('f-last');
+  var api='/review/api/review/'+encodeURIComponent(cid);
+  var apiSave='/review/api/review';
+  var LS='reviewDraft:'+cid;
+  // ?test=1 routes writes to the isolated test journal so acceptance tests
+  // never touch the author's real review records.
+  var TEST=/[?&]test=1(&|$)/.test(location.search);
+  if(TEST){ api+='?test=1'; LS='reviewDraft-test:'+cid; }
+
+  function setState(kind,text){
+    elState.className='save-state'+(kind?' '+kind:'');
+    elState.textContent=text;
+  }
+  function fmt(ts){ return ts?('上次保存：'+ts.replace('T',' ').slice(0,16)):''; }
+
+  // restore unsaved draft (never treated as a saved record)
+  try{
+    var d=JSON.parse(localStorage.getItem(LS)||'null');
+    if(d){ if(d.status)elStatus.value=d.status; if(d.nature)elNature.value=d.nature;
+           if(d.comment)elComment.value=d.comment; setState('','有未保存的草稿'); }
+  }catch(e){}
+
+  function markDirty(){
+    try{localStorage.setItem(LS,JSON.stringify({status:elStatus.value,
+      nature:elNature.value,comment:elComment.value}));}catch(e){}
+    if(!elState.classList.contains('ok')) setState('','有未保存的修改');
+  }
+  [elStatus,elNature,elComment].forEach(function(el){
+    el.addEventListener('input',markDirty); el.addEventListener('change',markDirty);});
+
+  // load the saved record from the server
+  fetch(api,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.record){
+      if(!localStorage.getItem(LS)){
+        elStatus.value=j.record.status||'pending';
+        elNature.value=j.record.nature||'unset';
+        elComment.value=j.record.comment||'';
+      }
+      elLast.textContent=fmt(j.record.updated_at)+(j.record.rev?('（第 '+j.record.rev+' 版）'):'');
+      setState('ok','已保存');
+    }else{
+      setState('','尚未保存');
+    }
+  }).catch(function(){ setState('err','无法读取历史记录（服务器离线）'); });
+
+  elSave.addEventListener('click',function(){
+    elSave.disabled=true; setState('busy','正在保存…');
+    fetch(apiSave,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({candidate_id:cid,status:elStatus.value,
+        nature:elNature.value,comment:elComment.value,test:TEST})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      elSave.disabled=false;
+      if(res.ok&&res.j&&res.j.ok){
+        try{localStorage.removeItem(LS);}catch(e){}
+        var rec=res.j.record||{};
+        elLast.textContent=fmt(rec.updated_at)+(rec.rev?('（第 '+rec.rev+' 版）'):'');
+        setState('ok','保存成功');
+      }else{
+        var msg=(res.j&&res.j.error)?res.j.error:'保存失败';
+        setState('err','保存失败：'+msg);
+      }
+    }).catch(function(){
+      elSave.disabled=false;
+      setState('err','保存失败：网络错误（未保存）');
+    });
+  });
+})();
+</script>
+
+<div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
+</div><footer class="rv-foot"><div class="rv-foot-inner">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div></footer></body></html>

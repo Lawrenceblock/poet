@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>C0015 · 巴勒斯坦，最悲伤的词——一首小诗的创作手记</title>
+<style>
+/* 作者审阅材料 · 视觉与公开阅读页统一：纸白底、墨黑正文、暗红点缀（Phase 3 编辑设计）。
+   仅调整外观（配色与字族）；不改动任何审阅数据、字段、HTML 结构或 API 行为。 */
+:root{--black:#0E0E0E;--ink:#141414;--ink-2:#4A4A4A;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
+ --bg:#FAF9F7;--bg-soft:#F2F1EE;--accent:#7A2A34;--accent-soft:#F3E9EA;
+ --on-black:#F2F1EE;--on-black-muted:#A8A6A2;--on-black-accent:#C98A92;--on-black-rule:#2A2A2A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
+/* 页眉与公开站一致：纸白 + 细线（刊物页眉），不再使用黑色标题条。 */
+.rv-head{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ink)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--ink);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:var(--ink-2);margin-left:14px}
+.rv-head nav a:hover{color:var(--accent)}
+.rv-head nav a.cur{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
+a{color:var(--accent)}
+h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
+h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
+.note{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:12px 14px;color:var(--muted);font-size:.9rem;margin:16px 0}
+.meta{color:var(--muted);font-size:.85rem;line-height:1.75}
+.meta b{color:var(--ink);font-weight:600}
+.tags span{display:inline-block;background:var(--bg-soft);border:1px solid var(--line);
+ padding:1px 10px;margin:2px 4px 2px 0;font-size:.78rem;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);padding:16px 18px;margin:14px 0}
+.card h3{margin:0 0 .3em;font-size:1.02rem;font-weight:600}
+.card h3 a{color:var(--ink)}
+.card h3 a:hover{color:var(--accent)}
+.poem{background:#fff;border:1px solid var(--line);border-top:2px solid var(--accent);
+ padding:22px 24px;margin:18px 0}
+.poem p{margin:0 0 1.05em}
+.poem img{max-width:100%;height:auto}
+.verse{white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg-soft);font-weight:600}
+.status{display:inline-block;border:1px solid var(--line-strong);
+ padding:2px 10px;font-size:.8rem;color:var(--muted);background:var(--bg-soft)}
+.status.s-keep{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.status.s-hold{background:var(--bg-soft);border-color:var(--line-strong);color:#8a6d2f}
+.status.s-exclude{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.status.s-pending{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
+.batchnav a{display:inline-block;margin-right:14px}
+.banner{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:10px 14px;font-size:.85rem;color:var(--muted);margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-top:2px solid var(--accent);background:#fff;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid var(--line-strong);background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:#fff;
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+ border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border:1px solid var(--line);background:var(--bg-soft);color:var(--muted)}
+.save-state.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.save-state.err{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.save-state.busy{background:var(--bg-soft);border-color:var(--line-strong);color:var(--muted)}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pill.todo{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.bar{height:12px;background:var(--bg-soft);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:var(--bg-soft)}
+.hide{display:none}
+</style>
+</head>
+<body><header class="rv-head"><div class="rv-head-inner"><a class="brand" href="../">安然诗歌档案<span class="brand-en">Author Review</span></a><nav><a href="../">总目录</a><a href="../index.html">批次索引</a></nav></div></header><div class="wrap">
+<p class="batchnav"><a href="../index.html">← 审阅总目录</a> <a href="../batch-A-1.html">本批目录</a></p>
+<h1>巴勒斯坦，最悲伤的词——一首小诗的创作手记</h1>
+<div class="note"><b>这是审阅副本，不是正式发表版本。</b>页面完整保留原文（含标点、诗行、段落、图片），仅移除脚本等不安全代码；未经作者确认不会用于正式站点。</div>
+<p class="meta">候选编号 <b>C0015</b>　原始发表日期 <b>2009-01-12</b>　语言 <b>zh</b>　脚本分类 <b>A</b><br>原始来源：<a href="https://www.ismaelan.com/2009/01/blog-post_12.html" rel="noopener">https://www.ismaelan.com/2009/01/blog-post_12.html</a></p>
+<p class="tags"><span>Arab</span><span>Isreal</span><span>Palestine</span><span>Terrorism</span></p>
+<h2>为什么列出这篇</h2><ul class="meta"><li>脚本分类：A · 脚本检测到明确署名（文/安然 等）</li><li>署名线索：explicit 安然 byline</li><li>原文标签：Arab|Isreal|Palestine|Terrorism</li><li>标题来源：article_title</li></ul>
+<h2>需要作者确认</h2><ul class="meta"><li>这篇文章是“一首诗 / 多首诗 / 非诗（评论、消息、摄影等）”？</li></ul>
+<div class="rv" id="review" data-candidate="C0015"><h2>作者审阅</h2><p class="hint">只需填写你要填的部分；填写后请点“保存审阅”。未保存前刷新页面不会丢失草稿，但只有“已保存”才算正式记录。</p><label for="f-status">① 审阅结论</label><select id="f-status" name="status"><option value="pending">待审阅</option><option value="keep">保留</option><option value="hold">暂缓</option><option value="exclude">排除</option></select><label for="f-nature">② 作品性质</label><select id="f-nature" name="nature"><option value="unset">（未填写）</option><option value="single_poem">一首诗</option><option value="multi_poem">多首诗</option><option value="non_poem">非诗（评论/消息/摄影等）</option><option value="unsure">尚不确定</option></select><label for="f-comment">③ 作者意见（版本问题、是否需修改、是否需与旧站比较等）</label><textarea id="f-comment" name="comment" placeholder="例如：与旧站版本不同，以本版为准；需要再核对第二段换行……"></textarea><p class="hint">可只填部分字段。意见最多 20000 字。</p><div class="rvbar"><button type="button" class="btn" id="f-save">保存审阅</button><span class="save-state" id="f-state" aria-live="polite">尚未保存</span><span class="last-saved" id="f-last"></span></div></div>
+<h2>原文（逐字保留）</h2>
+<div class="poem"><p>  </p>  <p>安然/文 </p>  <p>战争开始之初，有人就劝我为巴勒斯坦人写点什么。一夜无眠，没有写出一个词。因为“巴勒斯坦”就是最悲伤的那个词，她哽住了所有的话。 </p>  <p>  ##CONTINUE##<br/></p>  <p>悲伤的巴勒斯坦蒙面人 </p>  <p>  </p>  <p>他们脸上的悲伤， </p>  <p>你们看不见； </p>  <p>他们内心的低泣， </p>  <p>你们听不见。 </p>  <p>在F—16制造的震耳欲聋的“声幕”下 </p>  <p>恐怖的蜚短流长在齐诵强权的公理 </p>  <p>我们这些远东的回回要张开泥土的嘴 </p>  <p>独自为你们发声 </p>  <p>  </p>  <p>我们听到了橄榄树下的悲风—— </p>  <p>“ </p>  <p>我知道我们将死去 </p>  <p>我们没有飞机，没有坦克 </p>  <p>只有自己的身体 </p>  <p>烈火焚烧掉的不只是我的肉体 </p>  <p>还有我的耻辱 </p>  <p>” </p>  <p>当悲伤到了顶点 </p>  <p>当绝望越过尽头 </p>  <p>就只有坚强装扮起巴勒斯坦女郎的冷艳 </p>  <p>  </p>  <p>啊 孤绝无援的巴勒斯坦女郎 </p>  <p>所有情人都起身离去 </p>  <p>往日床头的蜜语甜言 </p>  <p>都化作今日的冷眼旁观 </p>  <p>  </p>  <p>我不知道如何声援巴勒斯坦，所有的声明都变成了支离破碎的词语，在战火中像是在为一位未亡人提前烧纸，那词语的灰烬无情地在空中起舞，更加凸显声明人的虚伪。我沉默，但那怒火在我的体内燃起，让我在梦里也不得安宁。 </p>  <p>  </p>  <p>梦中的巴勒斯坦女郎啊 </p>  <p>我的倾诉是那么贫乏 </p>  <p>说不出你的美 </p>  <p>说不出你的怕 </p>  <p>只把我卑微的爱献给你 </p>  <p>把我软弱的泪水流在这人世的荒漠 </p>  <p>我是你从不知晓的情人 </p>  <p>在龙的脚下长大 </p>  <p>  </p>  <p>那个以上帝选民自诩的民族却干出了连天使也愤怒的暴行。德国人说奥斯维辛之后写诗是野蛮的，诗之不存的世界真的野蛮了。那个在奥斯维辛幸存下来的民族没有学会悲悯却承领了残忍的真谛，将同样的苦难加于另一个无辜民族的身上，只因为他们需要一个自己的家园，就要让另一个民族无辜地失去自己的家园。 </p>  <p>没有人再提起后来成为以色列总理的贝京曾是犹太恐怖组织的领导成员，正是他们在1946年每隔几天就在巴勒斯坦各地制造一起爆炸或枪击事件动摇了二战后身心疲惫的英国人统治这块并不富庶的殖民地的信心，将巴勒斯坦的命运交由美国主导的联合国裁决。这个国际法的维护者却无视自己宪章上规定的“民族自决”原则，无视巴勒斯坦当时大多数居民的意愿，将一个“犹太国”强加在他们的土地上。犹太人当然是聪明的，现状不符合强权制定的那些冠冕堂皇的规则，他们就改变现状——60年来在巴勒斯坦全境的殖民、驱赶、屠杀只有一个目的，就是改变这块土地上的人口比例，这样也就符合了那个“国际法”。所以，犹太人和他们在全世界的代理人有资格教训穆斯林不要搞恐怖主义了，因为犹太人已不再需要用恐怖主义主张自己的权利；所以，犹太人和他们在全世界的代理人有资格教训穆斯林要尊重国际法，遵守他们制定的“放之四海而皆准”的国际规则，做一个虽然屈辱但是被认可为“现代”的文明人。 </p>  <p>弱者在强者设计的游戏中，在强者一边冒充裁判一边充任运动员的情况下，没有获胜的希望。 </p>  <p>1982年，以色列总理贝京在对议会演讲时脱口而出：“巴勒斯坦人是用两条腿走路的牲畜。”轻蔑之情无以复加。 </p>  <p>我承认巴勒斯坦人是弱者，甚至如今所有的穆斯林国家和人民都是国际秩序中的弱者，这样说不单单是为了博取一种廉价的同情或是顾影自怜，更有一种愤怒的鄙夷，一个穆斯林对自己族群萎靡不振的鄙夷！当不久前，我从一个“阿訇”麇集的QQ群中，因为谈论了巴勒斯坦问题而触及了“莫谈国事”的底线被赶出的时候，我就更加认定正是有着这样一批冷酷自私的“大伊玛目、大毛拉、大阿訇”将真主对世人的怜悯、劝诫、博爱、约定——伊斯兰的教义矮化为了束缚穆斯林的种种僵化教条，率领穆斯林向真主的敌人称臣，以伊斯兰的名义阻挠穆斯林的进步，才有今日伊斯兰世界看不到底的衰落。那些窃据清真寺不学无术的“学者们”享受着被收买的优待，因此装聋作哑，而普通穆斯林的命运就这样无人过问了。“可怜者也必有可恨之处”——这句话应作这样解释：可恨者导致可怜者的灾难命运更加深重。 </p>  <p>姐姐 </p>  <p>巴勒斯坦女郎 </p>  <p>我的情人姐姐 </p>  <p>我的命悬一线的姐姐 </p>  <p>我那满腹心事都凝结成了内心的冰川 </p>  <p>它渴盼着一次痛快淋漓的雪崩啊 </p>  <p>纵使将自己埋葬 </p>  <p>也情愿 </p>  <p>我是伊斯兰病人身上的一个细胞 </p>  <p>即使不是癌细胞 </p>  <p>也缺失了所有的活力 </p>  <p>从生到死 </p>  <p>静静地等待老迈命运的嘲弄 </p>  <p><strong>也有一种人，每当穆斯林世界遭遇强敌进犯，只有置之死地才能后生时，他们就志愿地充当起新帝国主义的当代传教士，成群结队地纷至沓来，百般指责穆斯林 “太热衷于暴力”，口如悬河地劝化下自由民主的迷魂汤。从说客的有色眼镜后面看去，坚决的抵抗就是冥顽不化的“缺乏理性”，是对民主世界的排斥。只有投降派的策应言行才能令他们眉开眼笑，得到他们的褒奖，那才是具有了开明的“务实精神”，似乎穆斯林世界除了全面倒向西方之外就别无他途。</strong> </p>  <p>西方有没有民主？有的，我承认那是一种普遍符合人性的普世价值。穆斯林世界要不要民主？要的。但绝不接受刺刀下护送下闯进门来的“民主大礼”。当那些说客和他们的温和派朋友把“普世价值”与狂轰滥炸的“侵略军”混为一谈的时候，他们就会很自觉地将血淋淋的民众生死视而不见，那是理所当然的民主的代价……那样的“民主”早已堕落为西方石油与军工集团无限贪欲的遮羞布，既是穆斯林的不幸，也是民主的不幸。 </p>  <p> </p>  <p>所以我爱那些把未来抓在自己手里的孩子 </p>  <p>投石诉说着不屈 </p>  <p>他击不毁战车 </p>  <p>却击中了所有的良心 </p>  <p>悲伤的巴勒斯坦蒙面人 </p>  <p>你是他的姐姐 </p>  <p>也是我的姐姐</p>  Technorati 标签: 穆斯林</div>
+<p class="meta">如原页面与本页有任何差异，请以 <a href="https://www.ismaelan.com/2009/01/blog-post_12.html" rel="noopener">原始来源</a> 为准，并告知差异位置。</p>
+
+<script>
+(function(){
+  var root=document.getElementById('review');
+  if(!root) return;
+  var cid=root.getAttribute('data-candidate');
+  var elStatus=document.getElementById('f-status');
+  var elNature=document.getElementById('f-nature');
+  var elComment=document.getElementById('f-comment');
+  var elSave=document.getElementById('f-save');
+  var elState=document.getElementById('f-state');
+  var elLast=document.getElementById('f-last');
+  var api='/review/api/review/'+encodeURIComponent(cid);
+  var apiSave='/review/api/review';
+  var LS='reviewDraft:'+cid;
+  // ?test=1 routes writes to the isolated test journal so acceptance tests
+  // never touch the author's real review records.
+  var TEST=/[?&]test=1(&|$)/.test(location.search);
+  if(TEST){ api+='?test=1'; LS='reviewDraft-test:'+cid; }
+
+  function setState(kind,text){
+    elState.className='save-state'+(kind?' '+kind:'');
+    elState.textContent=text;
+  }
+  function fmt(ts){ return ts?('上次保存：'+ts.replace('T',' ').slice(0,16)):''; }
+
+  // restore unsaved draft (never treated as a saved record)
+  try{
+    var d=JSON.parse(localStorage.getItem(LS)||'null');
+    if(d){ if(d.status)elStatus.value=d.status; if(d.nature)elNature.value=d.nature;
+           if(d.comment)elComment.value=d.comment; setState('','有未保存的草稿'); }
+  }catch(e){}
+
+  function markDirty(){
+    try{localStorage.setItem(LS,JSON.stringify({status:elStatus.value,
+      nature:elNature.value,comment:elComment.value}));}catch(e){}
+    if(!elState.classList.contains('ok')) setState('','有未保存的修改');
+  }
+  [elStatus,elNature,elComment].forEach(function(el){
+    el.addEventListener('input',markDirty); el.addEventListener('change',markDirty);});
+
+  // load the saved record from the server
+  fetch(api,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.record){
+      if(!localStorage.getItem(LS)){
+        elStatus.value=j.record.status||'pending';
+        elNature.value=j.record.nature||'unset';
+        elComment.value=j.record.comment||'';
+      }
+      elLast.textContent=fmt(j.record.updated_at)+(j.record.rev?('（第 '+j.record.rev+' 版）'):'');
+      setState('ok','已保存');
+    }else{
+      setState('','尚未保存');
+    }
+  }).catch(function(){ setState('err','无法读取历史记录（服务器离线）'); });
+
+  elSave.addEventListener('click',function(){
+    elSave.disabled=true; setState('busy','正在保存…');
+    fetch(apiSave,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({candidate_id:cid,status:elStatus.value,
+        nature:elNature.value,comment:elComment.value,test:TEST})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      elSave.disabled=false;
+      if(res.ok&&res.j&&res.j.ok){
+        try{localStorage.removeItem(LS);}catch(e){}
+        var rec=res.j.record||{};
+        elLast.textContent=fmt(rec.updated_at)+(rec.rev?('（第 '+rec.rev+' 版）'):'');
+        setState('ok','保存成功');
+      }else{
+        var msg=(res.j&&res.j.error)?res.j.error:'保存失败';
+        setState('err','保存失败：'+msg);
+      }
+    }).catch(function(){
+      elSave.disabled=false;
+      setState('err','保存失败：网络错误（未保存）');
+    });
+  });
+})();
+</script>
+
+<div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
+</div><footer class="rv-foot"><div class="rv-foot-inner">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div></footer></body></html>

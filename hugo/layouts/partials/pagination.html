@@ -1,0 +1,8 @@
+{{- $p := .Paginator }}
+{{- if gt $p.TotalPages 1 }}
+<nav class="pager" aria-label="分页">
+  {{- if $p.HasPrev }}<a class="pager-prev" href="{{ $p.Prev.URL | relURL }}">← 上一页</a>{{ end }}
+  <span class="pager-info">第 {{ $p.PageNumber }} / {{ $p.TotalPages }} 页</span>
+  {{- if $p.HasNext }}<a class="pager-next" href="{{ $p.Next.URL | relURL }}">下一页 →</a>{{ end }}
+</nav>
+{{- end }}

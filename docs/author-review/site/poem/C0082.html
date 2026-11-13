@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>C0082 · 遗忘与记忆的角力：香妃</title>
+<style>
+/* 作者审阅材料 · 视觉与公开阅读页统一：纸白底、墨黑正文、暗红点缀（Phase 3 编辑设计）。
+   仅调整外观（配色与字族）；不改动任何审阅数据、字段、HTML 结构或 API 行为。 */
+:root{--black:#0E0E0E;--ink:#141414;--ink-2:#4A4A4A;--muted:#6B6B6B;--line:#DAD8D4;--line-strong:#C4C1BC;
+ --bg:#FAF9F7;--bg-soft:#F2F1EE;--accent:#7A2A34;--accent-soft:#F3E9EA;
+ --on-black:#F2F1EE;--on-black-muted:#A8A6A2;--on-black-accent:#C98A92;--on-black-rule:#2A2A2A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
+/* 页眉与公开站一致：纸白 + 细线（刊物页眉），不再使用黑色标题条。 */
+.rv-head{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ink)}
+.rv-head-inner{max-width:760px;margin:0 auto;padding:16px 20px;display:flex;flex-wrap:wrap;
+ align-items:baseline;justify-content:space-between;gap:6px 16px}
+.rv-head .brand{color:var(--ink);letter-spacing:.18em;font-size:1.05rem}
+.rv-head .brand-en{display:block;color:var(--muted);font-size:.58rem;
+ letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
+.rv-head nav{font-size:.85rem}
+.rv-head nav a{color:var(--ink-2);margin-left:14px}
+.rv-head nav a:hover{color:var(--accent)}
+.rv-head nav a.cur{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+.rv-foot{background:var(--black);color:var(--on-black-muted);font-size:.8rem;line-height:1.9}
+.rv-foot-inner{max-width:760px;margin:0 auto;padding:22px 20px}
+.rv-foot a{color:#c9c7c4}
+.rv-foot a:hover{color:var(--on-black-accent)}
+a{color:var(--accent)}
+h1{font-size:1.5rem;font-weight:600;margin:.2em 0 .6em;letter-spacing:.04em}
+h2{font-size:1.08rem;margin:1.6em 0 .4em;letter-spacing:.04em}
+.note{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:12px 14px;color:var(--muted);font-size:.9rem;margin:16px 0}
+.meta{color:var(--muted);font-size:.85rem;line-height:1.75}
+.meta b{color:var(--ink);font-weight:600}
+.tags span{display:inline-block;background:var(--bg-soft);border:1px solid var(--line);
+ padding:1px 10px;margin:2px 4px 2px 0;font-size:.78rem;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);padding:16px 18px;margin:14px 0}
+.card h3{margin:0 0 .3em;font-size:1.02rem;font-weight:600}
+.card h3 a{color:var(--ink)}
+.card h3 a:hover{color:var(--accent)}
+.poem{background:#fff;border:1px solid var(--line);border-top:2px solid var(--accent);
+ padding:22px 24px;margin:18px 0}
+.poem p{margin:0 0 1.05em}
+.poem img{max-width:100%;height:auto}
+.verse{white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg-soft);font-weight:600}
+.status{display:inline-block;border:1px solid var(--line-strong);
+ padding:2px 10px;font-size:.8rem;color:var(--muted);background:var(--bg-soft)}
+.status.s-keep{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.status.s-hold{background:var(--bg-soft);border-color:var(--line-strong);color:#8a6d2f}
+.status.s-exclude{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.status.s-pending{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
+.batchnav a{display:inline-block;margin-right:14px}
+.banner{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+ padding:10px 14px;font-size:.85rem;color:var(--muted);margin-bottom:18px}
+/* ---- review form ---- */
+.rv{border:1px solid var(--line);border-top:2px solid var(--accent);background:#fff;padding:16px 16px 8px;margin:18px 0}
+.rv h2{margin-top:.2em}
+.rv label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+.rv select,.rv textarea{width:100%;font:inherit;font-size:16px;padding:12px 12px;
+ border:1px solid var(--line-strong);background:#fff;color:var(--ink)}
+.rv select{min-height:48px}
+.rv textarea{min-height:120px;line-height:1.8;resize:vertical}
+.rv .hint{color:var(--muted);font-size:.8rem;margin:4px 0 0}
+.rvbar{position:sticky;bottom:0;background:#fff;
+ padding:12px 0 4px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+ border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:16px;min-height:48px;padding:10px 22px;
+ border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.save-state{font-size:.9rem;padding:6px 12px;border:1px solid var(--line);background:var(--bg-soft);color:var(--muted)}
+.save-state.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.save-state.err{background:#f4f1f1;border-color:#d9c9c9;color:#8a4a4a}
+.save-state.busy{background:var(--bg-soft);border-color:var(--line-strong);color:var(--muted)}
+.last-saved{color:var(--muted);font-size:.82rem;width:100%}
+.pill{display:inline-block;padding:2px 10px;font-size:.78rem;border:1px solid var(--line)}
+.pill.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pill.todo{background:var(--bg-soft);border-color:var(--line);color:var(--muted)}
+.bar{height:12px;background:var(--bg-soft);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.filters a{display:inline-block;min-height:44px;line-height:44px;padding:0 16px;
+ border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);font-size:.9rem}
+.filters a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.exportbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.exportbar a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;
+ border:1px solid var(--accent);text-decoration:none;font-weight:600}
+.rowdone{background:var(--bg-soft)}
+.hide{display:none}
+</style>
+</head>
+<body><header class="rv-head"><div class="rv-head-inner"><a class="brand" href="../">安然诗歌档案<span class="brand-en">Author Review</span></a><nav><a href="../">总目录</a><a href="../index.html">批次索引</a></nav></div></header><div class="wrap">
+<p class="batchnav"><a href="../index.html">← 审阅总目录</a> <a href="../batch-A-4.html">本批目录</a></p>
+<h1>遗忘与记忆的角力：香妃</h1>
+<div class="note"><b>这是审阅副本，不是正式发表版本。</b>页面完整保留原文（含标点、诗行、段落、图片），仅移除脚本等不安全代码；未经作者确认不会用于正式站点。</div>
+<p class="meta">候选编号 <b>C0082</b>　原始发表日期 <b>2012-05-26</b>　语言 <b>zh</b>　脚本分类 <b>A</b><br>原始来源：<a href="https://www.ismaelan.com/2012/05/blog-post_26.html" rel="noopener">https://www.ismaelan.com/2012/05/blog-post_26.html</a></p>
+<p class="tags"><span>Muslim</span><span>Uighur</span><span>少数民族</span><span>新疆</span></p>
+<h2>为什么列出这篇</h2><ul class="meta"><li>脚本分类：A · 脚本检测到明确署名（文/安然 等）</li><li>署名线索：explicit 安然 byline</li><li>原文标签：Muslim|Uighur|少数民族|新疆</li><li>标题来源：none</li></ul>
+<h2>需要作者确认</h2><ul class="meta"><li>这篇文章是“一首诗 / 多首诗 / 非诗（评论、消息、摄影等）”？</li></ul>
+<div class="rv" id="review" data-candidate="C0082"><h2>作者审阅</h2><p class="hint">只需填写你要填的部分；填写后请点“保存审阅”。未保存前刷新页面不会丢失草稿，但只有“已保存”才算正式记录。</p><label for="f-status">① 审阅结论</label><select id="f-status" name="status"><option value="pending">待审阅</option><option value="keep">保留</option><option value="hold">暂缓</option><option value="exclude">排除</option></select><label for="f-nature">② 作品性质</label><select id="f-nature" name="nature"><option value="unset">（未填写）</option><option value="single_poem">一首诗</option><option value="multi_poem">多首诗</option><option value="non_poem">非诗（评论/消息/摄影等）</option><option value="unsure">尚不确定</option></select><label for="f-comment">③ 作者意见（版本问题、是否需修改、是否需与旧站比较等）</label><textarea id="f-comment" name="comment" placeholder="例如：与旧站版本不同，以本版为准；需要再核对第二段换行……"></textarea><p class="hint">可只填部分字段。意见最多 20000 字。</p><div class="rvbar"><button type="button" class="btn" id="f-save">保存审阅</button><span class="save-state" id="f-state" aria-live="polite">尚未保存</span><span class="last-saved" id="f-last"></span></div></div>
+<h2>原文（逐字保留）</h2>
+<div class="poem"><br/><br/>文/安然<br/><br/>离开喀什噶尔前，我匆匆去了一趟郊外的香妃墓。这完全是临时起意，本来行前我已决心绕开那个地方，我不愿去见那个让自己感到难言的情绪复杂的人物。<br/><br/>她被人们太多次的讲述，可她终究只是重重宫帷后的一道幻影，连名字也被历史的长河冲刷得漫漶不清。在乌鲁木齐的那几天，我偶然得知她的维吾尔本名：伊帕尔汗，那些热衷于研究清宫秘档的专家则喜欢叫她和卓氏、容妃。<br/><br/>和卓，圣裔也。讲述一位被迫进入清宫的圣裔，总有一丝尴尬与不敬，可这个严峻的时代不再容许我们沉默不言了。<br/><br/>由于生在一个特殊的国家里，我对官方记录存着根深蒂固的不信任，野史给她的名字叫起来太过香艳，可我宁愿如此，也不愿跟官家一起假正经。<br/><br/>那天，我从萧索的喀什大巴扎走出，南疆充沛的阳光立时如羊奶般倾泻下来，照得我眼花缭乱，却没能冲散我心头沉重的阴影。几日来沉浸在凋零的美、卑微的尘之中呼吸都变得涩滞，除此而外目光就光是与那些粗制滥造的现代化碰撞。盛夏之中我不止一次地感受着四伏在热浪中的城市寒意，这击碎了很久以来我对西域流着乳与蜜的想象。<br/><br/>我无法把想象套在面前这座面目全非的丑陋的蕞尔小城身上：这远在天边的喀什噶尔，这近在眼前的喀什噶尔，这是令人神往的喀什噶尔吗，它还是那座中亚圣城喀什噶尔吗？！一位维吾尔古代诗人在他们的光辉岁月里曾无比骄傲地唱道：<br/><br/>“朝觐为什么要去远方，<br/>喀什噶尔有的是圣徒的麻札！”<br/><br/>这是一座丢失了老灵魂的被开发的城市，我像一个寻亲的孤魂在这里已找不到回家的路，我本不该来这里。<br/>
+<br/>
+<br/>
+
+
+<br/>
+<br/>失落中我信步来到一个汽车站，仰望车牌，那上面用汉文书写着密密麻麻的沿途停靠的站名，但对我来说仍然毫无意义，我是这片土地陌生的闯入者，东西南北尚且需要指引，简单的命名意义并不大。这时，一个熟悉的名字跃入了眼帘：香妃墓。既然连想象都已遭颠覆，想象中的计划还有何用？一辆公共汽车疾驰而来，我未假思索就踏了上去。<br/><br/>我的记忆已模糊了：这辆车到底是正规的公交车还是维吾尔人经营的那种小巴？我只记得自己挤上过这种小巴，满车厢的维族人中间夹我一个老回回，偶有目光打量，但我既没有被偷也没有被捅！<br/><br/>我的记忆已模糊了：下车后我是循着街头的指示牌还是一路打问着走进那条绿荫小路的？越往里走，我越担心自己是走了一条错误的道路，因为两旁掩映的农舍让我感觉像是进村了。后来我从书上证得那就是“浩罕村”，它和浩罕汗国，和后来的阿古柏伯克有何渊源，我没深究，但听说阿古柏统治时期也曾修葺过香妃墓。<br/><br/>当我就要迷失的时候，那片高大的建筑如一千零一夜中的宫殿一样升起在了前方。<br/><br/>我是买票进去的，之所以我的记忆力在此处得到了特别的加强，是因为在库车大寺和艾提尕尔清真寺门前我都拒绝购票。这场旅行蓄谋已久，身上的钱虽不多，但足可支撑我游遍塔克拉玛干大沙漠周边的各处贫寒的绿洲。拒绝是为了彰显一种主人的姿态，夺回一种天经地义的权利：穆斯林可以不受阻碍地进出清真寺！<br/>
+<br/>
+
+
+<br/><br/>实际上，香妃墓旁也附设有礼拜堂和进行伊斯兰教育的经堂，很明显，这是典型的苏菲道堂的格局。但蒙尘的道堂年久失修，摇摇欲坠，被闲置在崭新的光阴里。“教经班”在新疆如同法轮功那般被打压，当局倒是对回族社会中存在的穆斯林学校采取漠视的态度，我的同胞满足于宗教上一知半解的争论，大概在当权者眼中是既可笑又无威胁的吧。<br/><br/>政治从某种意义上说就是记忆的力量与抹去的力量之间的角力，正如有人希望人们对文革失忆那样，也有人希望西域的往事如烟散去。可当我置身在那宏阔的穹顶之下时，我的记忆瞬时锐利地如鲜血漓漓的匕首一般！我甚至想去反驳讲解员向人们虚构的乾隆皇帝与伊帕尔汗之间的缠绵故事，我打心眼儿里不愿相信天朝的伪史！英国作家奥威尔在政治寓言小说《1984》中告诉人们，在未来的专制国家内有一个奇特的部门“真理部”，它的职能就是每天删改过去的报纸，以使旧闻符合现实政治宣传的需要，说谎已经成为一种工作和生存方式！其实，就像四大发明一样，据我考证，“真理部”的出处也在天朝。在编纂《四库全书》的名义下，那位虚伪的十全老人焚毁了多少禁书，虽已无从统计，但其在历代典籍上所做的手脚却一直为后世所诟病。<br/><br/>旅美的史学大家余英时先生曾写过这样一句诗：<br/><br/>“官书自古诬兼妄，<br/>实录唯凭野史传。”<br/><br/>《清朝野史大观》辑录了有清一代的各类史事，在“记回部香妃”辞条下有这样的一番记述：香妃为兆惠将军俘获，献于皇帝。香妃身怀利刃，坚拒不从，如此数年，每思故乡风物，默然泣下。孝圣宪皇后不忍，招之近前赐缢死。<br/>
+<br/>
+
+
+<br/><br/>我从故纸堆里搜得的一首香妃填词的木卡姆唱曲恰可为之做个注脚：<br/><br/>这，真像我的家乡：<br/>故国轻柔的语调飞扬，<br/>将我家乡的歌儿唱<br/>——在那晨曦初透的时光，<br/>高塔的后方。<br/>但，相似仅止于斯，<br/>那只让我，想家想得更痴，<br/>昔日同伴的语丝，<br/>才能将我把乡愁医治。<br/>这，真像我的家乡，<br/>却总让我更添愁肠，<br/>我呀，但愿能够遗忘。<br/>好意盖起的宫院，<br/>却是赝品一座。<br/>他要我的欢颜，<br/>我却卸不下心中的怨。<br/>为何翘首西盼？<br/>只为啊！我的家<br/>近在眼前，远在天边！<br/><br/>这近在眼前的家指的就是香妃寝宫外的回回营。为了安抚伊帕尔汗的思乡之情，乾隆不仅从西域迁其族属千余人进京，还将这些形同人质者安置在香妃所居的西内（今中南海）外，香妃每每登楼相望，以见父兄，此楼，古称宝月楼，今称中华门。<br/><br/>遥思千里，我在那座圣徒的麻札里，曾为她和她的72位族人接过都瓦，那里面的72座坟茔下睡着72位圣裔，72人之中生前最显赫的阿帕克和卓却被人有意无意地忽略着，这位曾经的“世界的主宰”更是一部难言的往事。<br/><br/>先知曾说：“当你处世彷徨时，便求教于墓中人吧！墓中有天堂的花园，也有地狱的火坑。”<br/><br/>祝先知和他清廉的后人们平安！<br/>
+<br/>
+
+
+<br/><br/></div>
+<p class="meta">如原页面与本页有任何差异，请以 <a href="https://www.ismaelan.com/2012/05/blog-post_26.html" rel="noopener">原始来源</a> 为准，并告知差异位置。</p>
+
+<script>
+(function(){
+  var root=document.getElementById('review');
+  if(!root) return;
+  var cid=root.getAttribute('data-candidate');
+  var elStatus=document.getElementById('f-status');
+  var elNature=document.getElementById('f-nature');
+  var elComment=document.getElementById('f-comment');
+  var elSave=document.getElementById('f-save');
+  var elState=document.getElementById('f-state');
+  var elLast=document.getElementById('f-last');
+  var api='/review/api/review/'+encodeURIComponent(cid);
+  var apiSave='/review/api/review';
+  var LS='reviewDraft:'+cid;
+  // ?test=1 routes writes to the isolated test journal so acceptance tests
+  // never touch the author's real review records.
+  var TEST=/[?&]test=1(&|$)/.test(location.search);
+  if(TEST){ api+='?test=1'; LS='reviewDraft-test:'+cid; }
+
+  function setState(kind,text){
+    elState.className='save-state'+(kind?' '+kind:'');
+    elState.textContent=text;
+  }
+  function fmt(ts){ return ts?('上次保存：'+ts.replace('T',' ').slice(0,16)):''; }
+
+  // restore unsaved draft (never treated as a saved record)
+  try{
+    var d=JSON.parse(localStorage.getItem(LS)||'null');
+    if(d){ if(d.status)elStatus.value=d.status; if(d.nature)elNature.value=d.nature;
+           if(d.comment)elComment.value=d.comment; setState('','有未保存的草稿'); }
+  }catch(e){}
+
+  function markDirty(){
+    try{localStorage.setItem(LS,JSON.stringify({status:elStatus.value,
+      nature:elNature.value,comment:elComment.value}));}catch(e){}
+    if(!elState.classList.contains('ok')) setState('','有未保存的修改');
+  }
+  [elStatus,elNature,elComment].forEach(function(el){
+    el.addEventListener('input',markDirty); el.addEventListener('change',markDirty);});
+
+  // load the saved record from the server
+  fetch(api,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.record){
+      if(!localStorage.getItem(LS)){
+        elStatus.value=j.record.status||'pending';
+        elNature.value=j.record.nature||'unset';
+        elComment.value=j.record.comment||'';
+      }
+      elLast.textContent=fmt(j.record.updated_at)+(j.record.rev?('（第 '+j.record.rev+' 版）'):'');
+      setState('ok','已保存');
+    }else{
+      setState('','尚未保存');
+    }
+  }).catch(function(){ setState('err','无法读取历史记录（服务器离线）'); });
+
+  elSave.addEventListener('click',function(){
+    elSave.disabled=true; setState('busy','正在保存…');
+    fetch(apiSave,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({candidate_id:cid,status:elStatus.value,
+        nature:elNature.value,comment:elComment.value,test:TEST})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+      elSave.disabled=false;
+      if(res.ok&&res.j&&res.j.ok){
+        try{localStorage.removeItem(LS);}catch(e){}
+        var rec=res.j.record||{};
+        elLast.textContent=fmt(rec.updated_at)+(rec.rev?('（第 '+rec.rev+' 版）'):'');
+        setState('ok','保存成功');
+      }else{
+        var msg=(res.j&&res.j.error)?res.j.error:'保存失败';
+        setState('err','保存失败：'+msg);
+      }
+    }).catch(function(){
+      elSave.disabled=false;
+      setState('err','保存失败：网络错误（未保存）');
+    });
+  });
+})();
+</script>
+
+<div class="foot">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div>
+</div><footer class="rv-foot"><div class="rv-foot-inner">安然诗歌档案 · 作者审阅材料 · 本页为审阅副本，非正式发表版本。原文版权归作者所有。</div></footer></body></html>

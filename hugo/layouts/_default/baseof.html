@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Locale | default "zh-CN" }}">
+<head>
+  {{ partial "head-meta.html" . }}
+</head>
+<body data-baseurl="{{ .Site.BaseURL }}">
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-name" href="{{ "/" | relURL }}">
+        <span class="site-name-zh">{{ .Site.Title }}</span>
+        <span class="site-name-en">Anran Poetry Archive</span>
+      </a>
+      <nav class="site-nav" aria-label="主导航">
+        {{- $first := true }}
+        {{- range .Site.Menus.main }}
+        {{- if not $first }}<span class="nav-sep" aria-hidden="true">·</span>{{ end }}
+        {{- $first = false }}
+        <a href="{{ .URL | relURL }}"{{ if or (eq $.RelPermalink (.URL | relURL)) (and (ne .URL "/") (hasPrefix $.RelPermalink (.URL | relURL))) }} aria-current="page"{{ end }}>{{ .Name }}</a>
+        {{- end }}
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="site-main">
+    {{ block "main" . }}{{ end }}
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <p class="footer-brand">{{ .Site.Title }}</p>
+      <p class="footer-en">Anran Poetry Archive</p>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h3>栏目</h3>
+          <ul>
+            <li><a href="{{ "/archive/" | relURL }}">卷目</a></li>
+            <li><a href="{{ "/years/" | relURL }}">年份</a></li>
+            <li><a href="{{ "/preface/" | relURL }}">题记</a></li>
+            <li><a href="{{ "/shi-ren-xiao-zhuan/" | relURL }}">诗人小传</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>档案</h3>
+          <ul>
+            <li><a href="{{ "/about/" | relURL }}">档案说明</a></li>
+            <li><a href="{{ "/search/" | relURL }}">搜索</a></li>
+            <li><a href="{{ "/legacy/" | relURL }}">旧版网站 · 历史存档</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">
+        © {{ now.Format "2006" }} {{ .Site.Params.author | default .Site.Title }} ·
+        {{ with .Site.Params.description }}{{ . }} · {{ end }}
+        公开目录收录已迁入的正式作品；尚待核对的候选材料保留在独立作者审阅区，不作为正式作品发布。
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,103 @@
+{{ define "main" }}
+{{- $poems := where .Site.RegularPages "Section" "posts" }}
+{{- $latest := first 5 ($poems.ByDate.Reverse) }}
+{{- $years := $poems.GroupByDate "2006" }}
+
+<section class="hero">
+  <div class="hero-inner">
+
+    <div class="hero-portrait">
+      {{ with .Site.Params.coverImage }}
+      <img
+        src="{{ . | relURL }}"
+        alt="安然肖像"
+        loading="eager"
+        decoding="async">
+      {{ end }}
+    </div>
+
+    <div class="hero-text">
+      <p class="hero-kicker">
+        {{ with .Site.Params.author }}{{ . }}{{ end }} · 诗歌档案
+      </p>
+
+      <h1 class="hero-title">
+        {{ .Site.Title }}
+        <span class="hero-title-en">
+          Anran · Poetry Archive
+        </span>
+      </h1>
+
+      <p class="hero-lead">
+        {{ with .Site.Params.tagline }}{{ . }}。<br>{{ end }}
+        {{ with .Site.Params.description }}{{ . }}。{{ end }}
+        收录诗作、创作年代与档案资料。
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<div class="wrap wrap--wide">
+  <div class="home-grid">
+    <section class="home-block span-left">
+      <div class="section-head">
+        <h2 class="section-title">最新作品</h2>
+        <span class="section-kicker">Recent</span>
+      </div>
+      <ul class="poem-list">
+        {{ range $latest }}
+        <li class="poem-item">
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+          {{ if not .Date.IsZero }}<time class="date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time>{{ end }}
+        </li>
+        {{ else }}
+        <li class="poem-item empty">尚无作品。</li>
+        {{ end }}
+      </ul>
+    </section>
+
+    <section class="home-block span-right">
+      <div class="section-head">
+        <h2 class="section-title">按年份浏览</h2>
+        <span class="section-kicker">Years</span>
+      </div>
+      <ul class="year-list">
+        {{ range ($poems.GroupByDate "2006") }}
+        <li>
+          <a href="{{ ("/years/" | relURL) }}#year-{{ .Key }}">
+            <span class="year-num">{{ .Key }}</span>
+          </a>
+          <span class="count">{{ len .Pages }} 篇</span>
+        </li>
+        {{ end }}
+      </ul>
+    </section>
+
+    <section class="home-block span-left">
+      <div class="section-head">
+        <h2 class="section-title">栏目入口</h2>
+        <span class="section-kicker">Sections</span>
+      </div>
+      <ul class="poem-list">
+        <li class="poem-item"><a href="{{ "/archive/" | relURL }}">卷目</a><span class="hint">全部作品列表</span></li>
+        <li class="poem-item"><a href="{{ "/preface/" | relURL }}">题记</a></li>
+        <li class="poem-item"><a href="{{ "/shi-ren-xiao-zhuan/" | relURL }}">诗人小传</a></li>
+        <li class="poem-item"><a href="{{ "/about/" | relURL }}">档案说明</a><span class="hint">作品整理原则</span></li>
+        {{ if .Site.Params.enableReview }}<li class="poem-item"><a href="{{ "/review/" | relURL }}">作者审阅材料</a><span class="hint">137 篇候选全文（预览专用）</span></li>{{ end }}
+        <li class="poem-item"><a href="{{ "/legacy/" | relURL }}">旧版网站 · 历史存档</a><span class="hint">原诗客栈只读快照</span></li>
+      </ul>
+    </section>
+
+    <section class="home-block span-right">
+      <div class="section-head">
+        <h2 class="section-title">说明</h2>
+        <span class="section-kicker">Note</span>
+      </div>
+      <p class="home-disclaimer">
+        本站收录已整理的正式诗作与档案资料。来自旧博客的候选文章另设作者审阅区，逐批核对后再决定是否收入正式作品目录。
+      </p>
+    </section>
+  </div>
+</div>
+{{ end }}
