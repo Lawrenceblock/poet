@@ -7,7 +7,7 @@
     </div>
   </header>
   <div class="wrap">
-    {{ with .Content }}<div class="page-sub" style="color:var(--ink-2);max-width:none;margin-bottom:1.6rem;">{{ . }}</div>{{ end }}
+    {{ with .Content }}<div class="page-sub">{{ . }}</div>{{ end }}
     <ul class="archive">
       {{ range .Paginator.Pages.ByDate.Reverse }}
       <li class="archive-item">
