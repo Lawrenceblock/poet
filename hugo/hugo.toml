@@ -78,14 +78,14 @@ title = "安然诗歌档案"
   isPlainText = true
   notAlternative = true
 
-# 站内搜索索引（纯前端使用，不依赖第三方服务）
+# 站内搜索索引（纯前端使用，不依赖第三方服务；只收录正式发布内容）
 [outputFormats.SearchIndex]
   mediaType = "application/json"
   baseName = "index"
   isPlainText = true
   notAlternative = true
 
-# 分页（当前为合成样例，未触发；保留以备扩展）
+# 分页：正式目录按发表日期分组；保留分页设置以备作品增加。
 [pagination]
   pagerSize = 10
 
