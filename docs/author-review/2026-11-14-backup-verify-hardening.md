@@ -278,3 +278,55 @@ python3 tools/author-review/verify_verbatim.py -> verbatim-identical : 137 / OK:
 
 **【事实·实测】** `python3 tools/review/test_backup_system.py` →
 **195 PASS / 0 FAIL / 0 SKIP**（原 113 项全部保留并通过，新增 82 项）。
+
+---
+
+## 9. journal 文件类型检查加固（symlink / 非普通文件）
+
+### 9.1 漏洞与根本原因
+
+**【事实】** 上一轮 `_records_dir_state()` 用 `os.path.lexists()` 判断 journal 是否存在，
+而 `store.read_journal()` 用 `os.path.exists()`（**会跟随符号链接**）。二者语义不一致：
+
+- `journal.jsonl` 为**断裂符号链接**时：`lexists()` 返回 **True**（状态检查以为 journal
+  存在），`exists()` 返回 **False**（`read_journal()` 把 journal 当成**空数据**）；
+- `journal.jsonl` 为**指向外部文件的有效符号链接**时：`exists()` 返回 True 并**跟随链接**
+  读到外部文件内容，外部文件被当作权威 journal，而后续写回可能触及链接指向的外部路径。
+
+**根本原因**：只判断“路径是否存在”，未判断“**文件类型是否为普通文件**”；使用了跟随链接
+的接口。修复原则：**journal 必须是 `os.lstat()` 下的普通文件**。
+
+### 9.2 修改内容
+
+新增纯检查函数 `_journal_type(path)`（`os.lstat`，**不跟随链接**），返回
+`"missing" | "regular" | "symlink" | "other"`；`_records_dir_state()` 增加
+`journal_type` / `journal_ok` / `journal_bad` 字段。`backup` 与 `restore` 在**任何刷新
+之前**先查 `journal_bad`：命中即非零退出，**不刷新、不重建、不覆盖、不创建备份目录、
+不删除/替换链接、不新建 journal**。
+
+### 9.3 `_records_dir_state()` 最终判断规则
+
+| `journal.jsonl` 类型（`os.lstat`） | `journal_type` | `journal_ok` | `journal_bad` | backup / restore 行为 |
+| --- | --- | --- | --- | --- |
+| 路径不存在 | `missing` | False | False | journal+派生均缺 → 允许空基线；journal 缺但派生在 → **拒绝** |
+| 普通文件（含零字节） | `regular` | **True** | False | 进入原有流程 |
+| 符号链接（有效/断裂/内外指向） | `symlink` | False | **True** | **一律拒绝** |
+| 目录 / FIFO / 套接字 / 设备 | `other` | False | **True** | **一律拒绝** |
+
+### 9.4 新增测试与结果
+
+`test_backup_system.py` 新增第 29–31 组（全部临时目录 + 合成数据）：
+
+- **组 A（backup 拒绝异常类型）**：`A1` 指向外部文件的符号链接、`A2` 指向内部文件的
+  符号链接、`A3` 断裂符号链接、`A4` 目录、`A5` 外部符号链接（无派生文件）、`A6` FIFO。
+  每组断言：分类器 `journal_bad=True`/`journal_ok=False`；backup 非零、输出含
+  “is not a regular file”；**无备份目录**；records 目录**逐项类型+SHA256 不变**；
+  外部链接文件哈希不变；注入桩证明 `store.rebuild`/`build_decisions.write` **调用为 0**。
+- **组 B（restore 拒绝异常类型）**：外部符号链接、断裂符号链接、目录、FIFO。断言：
+  restore 非零、提示类型异常、目标逐项类型+SHA256 不变、**符号链接本身未被删除/替换**、
+  外部文件不变、`store.rebuild`/`build_decisions.write` 未调用。
+- **组 C（正向兼容）**：零字节普通 journal 被分类为 `regular` 并**成功**备份（manifest
+  不声明缺失）且通过 verify；真正空目录仍产生**合法空基线**；普通 journal 备份+恢复正常。
+
+**【事实·实测】** 本轮 `python3 tools/review/test_backup_system.py` →
+**279 PASS / 0 FAIL / 0 SKIP**（原 195 项全部保留并通过，新增 84 项）。

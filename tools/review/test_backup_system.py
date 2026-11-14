@@ -44,6 +44,15 @@ Exercises tools/review/backup_review_data.py end to end in isolated temp dirs:
        files), never overwrites, never bypasses the safety backup; an empty
        target and a journalled target still restore; no --force flag exists
 
+  journal file-type protection (a symlink / non-regular file is NEVER the journal)
+   29. Group A: backup refuses a symlink (external/internal/broken), a directory
+       and a FIFO — with and without derived files — non-zero, clear message, no
+       refresh/rebuild, no backup dir, target + link + external file unchanged
+   30. Group B: restore refuses the same target types without overwriting,
+       deleting or replacing the link/file; no refresh is called
+   31. Group C: a zero-byte regular journal is accepted; a truly empty records dir
+       still yields a valid empty baseline; a normal journal backs up and restores
+
 Every test uses throwaway temp directories and a synthetic journal. The real
 author records under docs/author-review/review-records/ are never read or
 written. Exit code 0 = all tests passed.
@@ -54,6 +63,7 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -434,6 +444,212 @@ def _run_all(tmp):
     # 26-28. journal-missing data-protection (a missing journal is NEVER empty
     # data): backup/restore must refuse when derived files remain.
     _journal_missing_suite(tmp)
+
+    # 29-31. journal file-type protection (a symlink / non-regular file is NEVER
+    # the authoritative journal).
+    _journal_type_suite(tmp)
+
+
+def _journal_type_suite(tmp):
+    # journal.jsonl must be a real regular file. Build the abnormal cases purely
+    # from synthetic data + temp dirs. "derived" toggles whether derived files are
+    # also present (the refusal must not depend on them).
+    def make_records(tag, kind, with_derived):
+        records = os.path.join(tmp, f"jtype-{tag}")
+        os.makedirs(records, exist_ok=True)
+        jpath = os.path.join(records, "journal.jsonl")
+        ext = os.path.join(tmp, f"jtype-ext-{tag}.jsonl")
+        info = {}
+        if kind == "regular":
+            with open(jpath, "w", encoding="utf-8") as fh:
+                fh.write(json.dumps(rec("C0001", "keep", f"jtype-{tag}")) + "\n")
+        elif kind == "ext-symlink":
+            with open(ext, "w", encoding="utf-8") as fh:
+                fh.write("EXTERNAL-AUTHOR-DATA\n")
+            os.symlink(ext, jpath)
+            info["ext"] = ext
+        elif kind == "int-symlink":
+            target = os.path.join(records, "journal-real.jsonl")
+            with open(target, "w", encoding="utf-8") as fh:
+                fh.write(json.dumps(rec("C0001", "keep", "inner")) + "\n")
+            os.symlink(target, jpath)
+            info["target"] = target
+        elif kind == "broken-symlink":
+            os.symlink(os.path.join(tmp, f"nope-{tag}.jsonl"), jpath)
+        elif kind == "dir":
+            os.mkdir(jpath)
+        elif kind == "fifo":
+            os.mkfifo(jpath)
+        if with_derived:
+            for n in REQUIRED_FILES:
+                with open(os.path.join(records, n), "w", encoding="utf-8") as fh:
+                    fh.write(f"derived {n}\n")
+        return records, info
+
+    def lstat_snapshot(records, info):
+        """Filename -> (type, hash) for the records dir, plus the external file
+        hash, so we can prove nothing changed (link preserved, no new files)."""
+        snap = {}
+        for name in sorted(os.listdir(records)):
+            p = os.path.join(records, name)
+            st = os.lstat(p)
+            if stat.S_ISLNK(st.st_mode):
+                snap[name] = ("symlink", os.readlink(p))
+            elif stat.S_ISREG(st.st_mode):
+                snap[name] = ("regular", sha(p))
+            elif stat.S_ISDIR(st.st_mode):
+                snap[name] = ("dir", None)
+            else:
+                snap[name] = ("other", None)
+        if "ext" in info and os.path.exists(info["ext"]):
+            snap["<ext>"] = ("regular", sha(info["ext"]))
+        return snap
+
+    def backup_tracks(records, dest):
+        snippet = (
+            "calls = []\n"
+            "def boom(*a, **k):\n"
+            "    calls.append('x')\n"
+            "    raise RuntimeError('SHOULD-NOT-BE-CALLED')\n"
+            "store.rebuild = boom\n"
+            "B.build_decisions.write = boom\n"
+            f"rc = B.cmd_backup(type('A',(),{{'to':{dest!r},'allow_same_fs':True}})())\n"
+            "print('RC', rc)\n"
+            "print('REFRESH_CALLS', len(calls))\n")
+        return run_inproc(records, snippet)
+
+    def restore_tracks(target, backup_dir):
+        snippet = (
+            "calls = []\n"
+            "def boom(*a, **k):\n"
+            "    calls.append('x')\n"
+            "    raise RuntimeError('SHOULD-NOT-BE-CALLED')\n"
+            "store.rebuild = boom\n"
+            "B.build_decisions.write = boom\n"
+            f"rc = B.cmd_restore(type('A',(),{{'dir':{backup_dir!r},'yes':True}})())\n"
+            "print('RC', rc)\n"
+            "print('REFRESH_CALLS', len(calls))\n")
+        return run_inproc(target, snippet)
+
+    def state_of(records):
+        return run_inproc(records,
+                          "print('STATE', B._records_dir_state(" + repr(records) + "))")
+
+    fifo_ok = hasattr(os, "mkfifo")
+    cases = [
+        ("A1 symlink -> external file", "ext-symlink", True),
+        ("A2 symlink -> internal file", "int-symlink", True),
+        ("A3 broken symlink", "broken-symlink", True),
+        ("A4 path is a directory", "dir", True),
+        ("A5 symlink -> external (no derived)", "ext-symlink", False),
+    ]
+    if fifo_ok:
+        cases.append(("A6 FIFO", "fifo", True))
+
+    print("29. Group A: backup refuses a symlink / non-regular journal")
+    for i, (label, kind, with_derived) in enumerate(cases):
+        records, info = make_records(f"A{i}", kind, with_derived)
+        before = lstat_snapshot(records, info)
+        # classification sanity: the journal must be flagged bad, never "ok".
+        rc0, out0, _ = state_of(records)
+        check(f"{label}: classifier marks journal_bad",
+              "'journal_bad': True" in out0, out0)
+        check(f"{label}: classifier marks journal_ok False",
+              "'journal_ok': False" in out0, out0)
+        dest = os.path.join(tmp, f"jbkA{i}")
+        rc, out, err = run(TOOL, ["backup", "--to", dest, "--allow-same-fs"], records)
+        check(f"{label}: backup refuses (non-zero)", rc != 0, f"rc={rc} out={out}")
+        check(f"{label}: message flags a non-regular journal",
+              "is not a regular file" in out, out)
+        check(f"{label}: no backup directory written", first_backup_dir(dest) is None)
+        check(f"{label}: records dir (types+hashes) unchanged",
+              lstat_snapshot(records, info) == before)
+        if "ext" in info:
+            check(f"{label}: external linked file unchanged",
+                  lstat_snapshot(records, info).get("<ext>") == before.get("<ext>"))
+        rc2, out2, err2 = backup_tracks(records, os.path.join(tmp, f"jbkA{i}t"))
+        check(f"{label}: store.rebuild/build_decisions.write NOT called",
+              "REFRESH_CALLS 0" in out2 and "RC 1" in out2, f"out={out2} err={err2}")
+        check(f"{label}: tracked-call run wrote no backup",
+              first_backup_dir(os.path.join(tmp, f"jbkA{i}t")) is None)
+
+    # Group B: restore refuses the same target types.
+    print("30. Group B: restore refuses a symlink / non-regular target journal")
+    _, good_backup = mk_valid(tmp, "jtype-src")
+    rcases = [("B1 symlink -> external file", "ext-symlink"),
+              ("B2 broken symlink", "broken-symlink"),
+              ("B3 path is a directory", "dir")]
+    if fifo_ok:
+        rcases.append(("B4 FIFO", "fifo"))
+    for i, (label, kind) in enumerate(rcases):
+        target, info = make_records(f"B{i}", kind, True)
+        before = lstat_snapshot(target, info)
+        rc, out, err = run(TOOL, ["restore", good_backup, "--yes"], target,
+                           backup_dir=os.path.join(tmp, f"jsafetyB{i}"))
+        check(f"{label}: restore refused (non-zero)", rc != 0, f"rc={rc} out={out}")
+        check(f"{label}: message flags a non-regular journal",
+              "is not a regular file" in out, out)
+        check(f"{label}: target (types+hashes) unchanged",
+              lstat_snapshot(target, info) == before)
+        # the link/file must still be exactly what it was
+        jp = os.path.join(target, "journal.jsonl")
+        if kind.endswith("symlink"):
+            check(f"{label}: symlink itself not removed/replaced", os.path.islink(jp))
+        if "ext" in info:
+            check(f"{label}: external linked file unchanged",
+                  lstat_snapshot(target, info).get("<ext>") == before.get("<ext>"))
+        rc2, out2, err2 = restore_tracks(target, good_backup)
+        check(f"{label}: store.rebuild/build_decisions.write NOT called",
+              "REFRESH_CALLS 0" in out2 and "RC 1" in out2, f"out={out2} err={err2}")
+        check(f"{label}: tracked-call run left target unchanged",
+              lstat_snapshot(target, info) == before)
+
+    # Group C: positive compatibility — regular journals keep working.
+    print("31. Group C: zero-byte regular journal + normal flow still work")
+    # C1: a zero-byte REGULAR journal is accepted (not a symlink, not missing).
+    zero = os.path.join(tmp, "jtype-zero")
+    os.makedirs(zero, exist_ok=True)
+    open(os.path.join(zero, "journal.jsonl"), "w").close()
+    rc0, out0, _ = state_of(zero)
+    check("C1 zero-byte journal classified regular",
+          "'journal_type': 'regular'" in out0 and "'journal_ok': True" in out0, out0)
+    zdest = os.path.join(tmp, "jbk-zero")
+    rc, out, err = run(TOOL, ["backup", "--to", zdest, "--allow-same-fs"], zero)
+    check("C1 zero-byte journal backup exits 0", rc == 0, f"rc={rc} out={out} err={err}")
+    zdir = first_backup_dir(zdest)
+    check("C1 zero-byte journal backup created", zdir is not None)
+    if zdir:
+        m = load_manifest(zdir)
+        check("C1 journal captured (not declared missing)",
+              "journal.jsonl" in m.get("files", []) and
+              m.get("missing_files") == [], str(m))
+        rc, out, _ = run(TOOL, ["verify", zdir], zero)
+        check("C1 zero-byte journal backup verifies OK",
+              rc == 0 and "VERIFY OK" in out, out)
+    # C2: truly empty records dir -> legal empty baseline (regression guard).
+    truly = os.path.join(tmp, "jtype-empty")
+    os.makedirs(truly, exist_ok=True)
+    edest = os.path.join(tmp, "jbk-empty")
+    rc, out, err = run(TOOL, ["backup", "--to", edest, "--allow-same-fs"], truly)
+    check("C2 empty baseline backup exits 0", rc == 0, f"rc={rc} out={out} err={err}")
+    edir = first_backup_dir(edest)
+    check("C2 empty baseline created", edir is not None)
+    if edir:
+        rc, out, _ = run(TOOL, ["verify", edir], truly)
+        check("C2 empty baseline verifies OK", rc == 0 and "VERIFY OK" in out, out)
+    # C3: a normal regular journal backs up and restores normally.
+    nrec, nbackup = mk_valid(tmp, "jtype-normal")
+    check("C3 normal journal backup produced a dir", nbackup is not None)
+    tgt = os.path.join(tmp, "jtype-normal-tgt")
+    os.makedirs(tgt, exist_ok=True)
+    rc, out, err = run(TOOL, ["restore", nbackup, "--yes"], tgt)
+    check("C3 normal journal restores into an empty target",
+          rc == 0 and os.path.exists(os.path.join(tgt, "journal.jsonl")),
+          f"rc={rc} out={out} err={err}")
+    if os.path.exists(os.path.join(tgt, "journal.jsonl")):
+        check("C3 restored journal matches the backup",
+              sha(os.path.join(tgt, "journal.jsonl")) ==
+              sha(os.path.join(nbackup, "journal.jsonl")))
 
 
 def _journal_missing_suite(tmp):

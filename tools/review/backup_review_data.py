@@ -33,6 +33,13 @@ ambiguous — a lost journal over live data — and both `backup` and `restore`
 refuse before writing anything (no rebuild, no refresh, no overwrite). Only when
 the journal AND all derived files are absent is an empty baseline legitimate.
 
+journal.jsonl must also be a real regular file. A symbolic link (even one
+pointing at a real file, and including a broken link), a directory, a FIFO, a
+socket or a device file is ALWAYS abnormal and is refused by both `backup` and
+`restore`: os.path.exists() follows symlinks and store.read_journal() would then
+read empty data. A present-but-empty (zero-byte) regular file is legitimate and
+keeps its existing meaning; no size-based logic is used.
+
 Nothing here writes to poem text, the feed, or the candidate CSVs. A backup is
 plain text so it can be reviewed, diffed and (if the author chooses) committed
 to a PRIVATE repository. Do not commit it to the public repo.
@@ -42,6 +49,7 @@ import hashlib
 import json
 import os
 import shutil
+import stat
 import sys
 from datetime import datetime, timezone, timedelta
 
@@ -102,28 +110,65 @@ def _stats(records_dir):
     return {"journal_lines": lines, "unique_candidates": len(uniq)}
 
 
+def _journal_type(path):
+    """Classify a path WITHOUT following symlinks (os.lstat). One of:
+
+      "missing"  : the path does not exist at all
+      "regular"  : a real regular file (INCLUDING a zero-byte file)
+      "symlink"  : a symbolic link (valid or broken)
+      "other"    : any other non-regular file (directory, FIFO, socket, device)
+
+    Only "regular" is a legitimate authoritative journal. A symlink (even one
+    pointing at a real file) and every other non-regular type are abnormal:
+    os.path.exists()/isfile() must NOT be used here, because they follow
+    symlinks and would misreport a link or a missing target as a plain file.
+    """
+    try:
+        st = os.lstat(path)
+    except FileNotFoundError:
+        return "missing"
+    except OSError:
+        return "other"
+    if stat.S_ISLNK(st.st_mode):
+        return "symlink"
+    if stat.S_ISREG(st.st_mode):
+        return "regular"
+    return "other"
+
+
 def _records_dir_state(records_dir):
-    """Classify a records directory PURELY by file presence — no writes, no
+    """Classify a records directory PURELY by file presence/type — no writes, no
     rebuild, no repair. Shared by backup and restore so both apply the same rule.
 
     Returns a dict:
-      exists    : the directory itself exists
-      journal   : journal.jsonl is present
-      derived   : sorted list of present derived files (REQUIRED_FILES)
-      empty     : nothing we care about is present
+      exists      : the directory itself exists
+      journal     : journal.jsonl is present (any type; see journal_type)
+      journal_type: "missing" | "regular" | "symlink" | "other"
+      journal_ok  : journal is a real regular file (safe to treat as data)
+      journal_bad : journal is present but NOT a regular file (abnormal)
+      derived     : sorted list of present derived files (REQUIRED_FILES)
+      empty       : nothing we care about is present
 
-    A MISSING journal is never treated as "no data": if any derived file is
-    present while the journal is absent, the state is ambiguous (possibly a lost
-    journal over live data) and callers MUST refuse to write.
+    Rules callers rely on:
+      * a MISSING journal is never "no data": if any derived file is present it is
+        ambiguous (a lost journal over live data) and callers MUST refuse to write;
+      * a journal that is a symlink or any non-regular file is ALWAYS abnormal and
+        callers MUST refuse, regardless of derived files — os.path.exists() would
+        follow the link and store.read_journal() would then read empty data;
+      * a present-but-empty regular file is a legitimate authoritative journal.
     """
     journal = os.path.join(records_dir, "journal.jsonl")
+    jtype = _journal_type(journal)
     derived = [n for n in REQUIRED_FILES
                if os.path.lexists(os.path.join(records_dir, n))]
     return {
         "exists": os.path.isdir(records_dir),
-        "journal": os.path.lexists(journal),
+        "journal": jtype != "missing",
+        "journal_type": jtype,
+        "journal_ok": jtype == "regular",
+        "journal_bad": jtype in ("symlink", "other"),
         "derived": sorted(derived),
-        "empty": not os.path.lexists(journal) and not derived,
+        "empty": jtype == "missing" and not derived,
     }
 
 
@@ -302,10 +347,18 @@ def _unique_dest(dest_root):
 def cmd_backup(args):
     src = store.RECORDS
     # Integrity pre-check BEFORE any refresh. A missing journal is NOT an empty
-    # dataset: if any derived file still exists, the state is ambiguous (a lost
-    # journal over live data). Refuse and touch nothing — do not rebuild, do not
-    # write, do not create any directory.
+    # dataset, and a journal that is not a regular file is NEVER authoritative.
+    # Refuse and touch nothing — do not rebuild, do not write, do not create any
+    # directory, do not follow a link.
     st = _records_dir_state(src)
+    if st["journal_bad"]:
+        print(f"REFUSING: {src}/journal.jsonl is not a regular file "
+              f"(found: {st['journal_type']}).")
+        print("A symbolic link (even to a real file) or any non-regular file is "
+              "not a valid authoritative journal; refusing to back up so the "
+              "linked/external file is not read, overwritten or rebuilt as empty.")
+        print("no refresh, no rebuild, no write was performed (fail-closed).")
+        return 1
     if not st["journal"] and st["derived"]:
         print(f"REFUSING: {src}/journal.jsonl is missing while derived review "
               f"data still exists ({', '.join(st['derived'])}).")
@@ -437,11 +490,20 @@ def cmd_restore(args):
     # Safety: snapshot current records before overwriting. Fail-closed — if the
     # current records cannot be safely backed up, do not clobber them.
     #
-    # First classify the target PURELY (no writes): a missing journal is not an
-    # empty target. If the journal is gone but any derived file remains, the
-    # target is in an ambiguous/incomplete state — refuse rather than skip the
-    # safety backup or overwrite files that may hold the author's work.
+    # First classify the target PURELY (no writes). A journal that is a symlink or
+    # any non-regular file is ALWAYS abnormal (os.path.exists() would follow it and
+    # store.read_journal() would then read empty data), so refuse outright. A
+    # missing journal with derived files present is also ambiguous — refuse rather
+    # than skip the safety backup or overwrite files that may hold the author's
+    # work. Do NOT delete or replace the link, and do NOT create a new journal.
     tgt_state = _records_dir_state(store.RECORDS)
+    if tgt_state["journal_bad"]:
+        print(f"REFUSING: target {store.RECORDS}/journal.jsonl is not a regular "
+              f"file (found: {tgt_state['journal_type']}).")
+        print("The target directory is in an abnormal state; refusing to restore "
+              "so the link/file is not overwritten or removed. Inspect it by hand "
+              "— nothing was modified.")
+        return 1
     if not tgt_state["journal"] and tgt_state["derived"]:
         print(f"REFUSING: target {store.RECORDS} has no journal.jsonl but still "
               f"contains derived review data ({', '.join(tgt_state['derived'])}).")

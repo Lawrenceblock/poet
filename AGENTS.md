@@ -73,7 +73,11 @@ python3 tools/author-review/verify_verbatim.py                  # 137/137 poems 
   treated as empty data**: if `journal.jsonl` is absent while any derived file
   (snapshot/decisions/exports) exists, both `backup` and `restore` refuse before
   writing anything (no rebuild, no refresh, no overwrite) — only a records dir
-  with neither journal nor derived files is a legitimate empty baseline. Tests:
+  with neither journal nor derived files is a legitimate empty baseline. The
+  journal must also be a **regular file**: a symlink (valid/broken/internal/
+  external), directory, FIFO, socket or device is always refused (checked with
+  `os.lstat`, never `os.path.exists`/`isfile`, which follow links); a zero-byte
+  regular file is still a valid journal (no size-based logic). Tests:
   `python3 tools/review/test_backup_system.py` (isolated temp dirs; deterministic
   mock-based fault injection, no `chmod`/root dependence).
 

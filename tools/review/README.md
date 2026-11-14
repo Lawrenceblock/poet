@@ -99,6 +99,13 @@ python3 tools/review/backup_review_data.py restore ~/poet-review-backups/author-
 拒绝**（不刷新、不重建、不覆盖、不创建目录），返回非零并提示需人工检查。
 只有 journal **与全部派生文件都不存在**时，才允许建立合法空基线。
 
+**journal 必须是真正的普通文件**：`journal.jsonl` 若为**符号链接**（即使指向真实文件、
+或为断裂链接）、**目录**、**FIFO**、**套接字**或**设备文件**，一律视为**异常**，
+`backup` 与 `restore` 都会**拒绝**（非零退出、不刷新、不重建、不覆盖、不删除链接、
+不新建 journal）。判断使用 `os.lstat()`（**不跟随符号链接**），
+**绝不**用 `os.path.exists()` / `os.path.isfile()`（它们会跟随链接而误判）。
+**零字节的普通文件是合法 journal**，不受影响；**不使用文件大小**做判断。
+
 > ⚠️ **"不同文件系统" ≠ "异地"**。本沙盒里记录在 `/workspace`（ext4 挂载），
 > 默认备份目录 `/home/openhands/...` 在容器 overlay 上，二者**确属不同文件系统**，
 > 但**仍在同一个容器内**。**整个沙盒被回收时，两者会一起丢失。**
