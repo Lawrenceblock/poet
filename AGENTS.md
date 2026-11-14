@@ -46,6 +46,21 @@ python3 tools/author-review/verify_verbatim.py                  # 137/137 poems 
   to an isolated test journal so acceptance tests never touch real records.
 - **Never** weaken the gate or commit review records / tokens.
 
+## Review-record persistence & recovery
+
+- Records are private and the repo is public, so `journal.jsonl` /
+  `decisions.jsonl` / `snapshot.json` / exports are **gitignored** (only
+  `DESIGN.md`, `review-summary.md`, `recovery-report.md` are tracked). This means
+  a recycled sandbox loses them; Git shows nothing. The 2026-11-12 batch of
+  19 real decisions was lost this way (see
+  `docs/author-review/2026-11-14-review-recovery-report.md`).
+- `python3 tools/review/build_review_artifacts.py` regenerates `decisions.jsonl`
+  (canonical per-candidate ledger), `review-summary.md` (counts only) and
+  `recovery-report.md`. Run it after each review session.
+- `tools/review/backup_review_data.py backup|verify|restore` makes a checksummed
+  copy on a **different filesystem** (default `~/poet-review-backups/`); same-fs
+  targets are refused. Off-site (private repo/object store) is still TODO.
+
 ## Hard constraints for visual work
 
 - Do not modify poem text, biography, preface, archive text, or review records.

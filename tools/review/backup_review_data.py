@@ -31,7 +31,7 @@ import store  # noqa: E402
 
 TZ = timezone(timedelta(hours=8))
 # Files that make up the authoritative + derived record set.
-DATA_FILES = ["journal.jsonl", "snapshot.json",
+DATA_FILES = ["journal.jsonl", "snapshot.json", "decisions.jsonl",
               "export-review-records.csv", "export-review-records.json"]
 # Default backup destination. It MUST sit on a different filesystem from the
 # records (which live under /workspace), otherwise a recycled workspace would
@@ -69,9 +69,18 @@ def _stats(records_dir):
 
 def cmd_backup(args):
     src = store.RECORDS
+    # Refresh derived artefacts (snapshot + decisions + exports) from the
+    # authoritative journal first, so the backup always captures current state
+    # even when the author has never saved a record yet (baseline backup).
+    try:
+        import build_decisions
+        store.rebuild()
+        build_decisions.write()
+    except Exception as e:  # noqa: BLE001
+        print(f"warning: could not refresh derived records: {e}")
     if not os.path.exists(os.path.join(src, "journal.jsonl")):
-        print(f"no journal at {src}/journal.jsonl — nothing to back up")
-        return 1
+        print(f"note: no journal at {src}/journal.jsonl yet — backing up the "
+              f"empty baseline (decisions.jsonl marks all candidates pending)")
     dest_root = os.path.abspath(args.to)
     # Enforce an independent backup: refuse to treat a copy on the same
     # filesystem as the source as a real backup (a recycled workspace would

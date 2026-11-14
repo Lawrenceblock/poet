@@ -11,12 +11,17 @@
 | --- | --- |
 | `tools/review/store.py` | 存储层：追加式流水账 + 快照 + 导出 |
 | `tools/review/serve_review.py` | 静态预览 + `/api/*` JSON 接口 |
+| `tools/review/build_decisions.py` | 由 journal 生成规范台账 `decisions.jsonl` |
+| `tools/review/build_review_artifacts.py` | 生成进度摘要 `review-summary.md` 与恢复说明 `recovery-report.md` |
 | `tools/review/rebuild_snapshot.py` | 从流水账重建快照与导出（恢复用） |
 | `tools/review/backup_review_data.py` | 备份 / 校验 / 恢复审阅数据（独立副本 + SHA256） |
 | `tools/review/test_review_system.py` | 端到端验收测试 |
 | `docs/author-review/review-records/journal.jsonl` | 权威数据（每次保存追加一行，永不覆盖） |
+| `docs/author-review/review-records/decisions.jsonl` | 派生：每候选一行的规范台账（便于审计/备份/导入） |
 | `docs/author-review/review-records/snapshot.json` | 派生：每篇当前最新记录 |
 | `docs/author-review/review-records/export-review-records.{csv,json}` | 派生：导出文件 |
+| `docs/author-review/review-records/review-summary.md` | 进度摘要（无私人意见正文，**已提交**） |
+| `docs/author-review/review-records/recovery-report.md` | 持久化与恢复说明（**已提交**） |
 
 ## 启动（本地预览）
 
@@ -65,17 +70,40 @@ python3 tools/author-review/verify_verbatim.py  # 137 篇逐字一致 + 链接�
 但**工作区被回收（重新分配容器）后会丢失**，所以必须定期把数据拷到工作区之外。
 
 ```bash
-# 备份（在别的磁盘/目录生成带 SHA256 的独立副本）
-python3 tools/review/backup_review_data.py backup --to /workspace/backups/author-review
+# 备份（在**不同文件系统**的目录生成带 SHA256 的独立副本；默认 /home/openhands/...）
+python3 tools/review/backup_review_data.py backup --to ~/poet-review-backups/author-review
 
 # 校验一份备份是否完好
-python3 tools/review/backup_review_data.py verify /workspace/backups/author-review/<时间戳>
+python3 tools/review/backup_review_data.py verify ~/poet-review-backups/author-review/<时间戳>
 
 # 恢复（先自动给当前数据做一次安全备份，再从指定副本恢复）
-python3 tools/review/backup_review_data.py restore /workspace/backups/author-review/<时间戳> --yes
+python3 tools/review/backup_review_data.py restore ~/poet-review-backups/author-review/<时间戳> --yes
 ```
 
-恢复时若校验不通过会**拒绝执行**（除非加 `--force`）。
+恢复时若校验不通过会**拒绝执行**（除非加 `--force`）。若目标与源在**同一文件系统**，
+备份会被**拒绝**（除非显式 `--allow-same-fs`）——同盘副本不算真备份。
+
+## 记录追踪与恢复（沙盒重启后）
+
+每次审阅后重新生成台账与摘要：
+
+```bash
+python3 tools/review/build_review_artifacts.py   # 刷新 decisions.jsonl + review-summary.md + recovery-report.md
+```
+
+沙盒/工作区被回收后的恢复顺序：
+
+1. **先查 GitHub**：分支与提交是工作成果的正式记录（`git fetch && git branch -r`）。
+2. 若存在备份（`~/poet-review-backups/author-review/<时间戳>` 或私有远端），
+   先 `verify` 再 `restore`。
+3. `python3 tools/review/rebuild_snapshot.py` 由 journal 重放 snapshot。
+4. `python3 tools/review/build_review_artifacts.py` 重新生成台账与摘要。
+5. `REVIEW_ACCESS_TOKEN=... python3 tools/review/serve_review.py --port 12000` 重新打开审阅页。
+
+完整说明见 [`docs/author-review/review-records/recovery-report.md`](../../docs/author-review/review-records/recovery-report.md)。
+**注意**：`journal.jsonl` / `decisions.jsonl` / `snapshot.json` / 导出文件均为私人数据，
+**已被 `.gitignore` 忽略，切勿提交到公开仓库**；只有不含意见正文的
+`review-summary.md` 与 `recovery-report.md` 会提交。
 
 审阅数据与作品正文、候选 CSV **完全独立**；正式 Hugo 构建不含 `/review/`
 （`enableReview=false`），审阅数据不会进入生产站。**本仓库是公开仓库**，
