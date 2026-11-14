@@ -80,8 +80,19 @@ python3 tools/review/backup_review_data.py verify ~/poet-review-backups/author-r
 python3 tools/review/backup_review_data.py restore ~/poet-review-backups/author-review/<时间戳> --yes
 ```
 
-恢复时若校验不通过会**拒绝执行**（除非加 `--force`）。若目标与源在**同一文件系统**，
-备份会被**拒绝**（除非显式 `--allow-same-fs`）——同盘副本不算真备份。
+**备份是 fail-closed 的**：备份前会先从权威 `journal.jsonl` 刷新
+`snapshot` / `decisions` / 导出文件；**只要刷新失败就立即中止、返回非零、不写任何
+备份**，绝不把过期或残缺的派生文件当成成功备份。
+
+若目标与源在**同一文件系统**，备份会被**拒绝**（除非显式 `--allow-same-fs`）。
+目标若位于记录目录**内部**也会被拒绝。恢复时若校验不通过会**拒绝执行**
+（除非加 `--force`）；恢复前若无法为现有记录做安全备份，也会**拒绝覆盖**。
+
+> ⚠️ **"不同文件系统" ≠ "异地"**。本沙盒里记录在 `/workspace`（ext4 挂载），
+> 默认备份目录 `/home/openhands/...` 在容器 overlay 上，二者**确属不同文件系统**，
+> 但**仍在同一个容器内**。**整个沙盒被回收时，两者会一起丢失。**
+> 只有把备份**送出这台机器**（私有 Git 仓库或对象存储）才真正抵御沙盒回收。
+> 不要把本地另一个目录称作"异地备份"。
 
 ## 记录追踪与恢复（沙盒重启后）
 
@@ -94,8 +105,9 @@ python3 tools/review/build_review_artifacts.py   # 刷新 decisions.jsonl + revi
 沙盒/工作区被回收后的恢复顺序：
 
 1. **先查 GitHub**：分支与提交是工作成果的正式记录（`git fetch && git branch -r`）。
-2. 若存在备份（`~/poet-review-backups/author-review/<时间戳>` 或私有远端），
-   先 `verify` 再 `restore`。
+2. 若存在备份（`~/poet-review-backups/author-review/<时间戳>` 或**私有远端**），
+   先 `verify` 再 `restore`。注意本地默认目录与沙盒同容器，只能扛住工作区回收、
+   扛不住整沙盒回收；真正依赖的是私有远端副本。
 3. `python3 tools/review/rebuild_snapshot.py` 由 journal 重放 snapshot。
 4. `python3 tools/review/build_review_artifacts.py` 重新生成台账与摘要。
 5. `REVIEW_ACCESS_TOKEN=... python3 tools/review/serve_review.py --port 12000` 重新打开审阅页。
@@ -104,6 +116,12 @@ python3 tools/review/build_review_artifacts.py   # 刷新 decisions.jsonl + revi
 **注意**：`journal.jsonl` / `decisions.jsonl` / `snapshot.json` / 导出文件均为私人数据，
 **已被 `.gitignore` 忽略，切勿提交到公开仓库**；只有不含意见正文的
 `review-summary.md` 与 `recovery-report.md` 会提交。
+
+## 测试
+
+```bash
+python3 tools/review/test_backup_system.py   # 备份/恢复/隐私：11 组，全部用隔离临时目录
+```
 
 审阅数据与作品正文、候选 CSV **完全独立**；正式 Hugo 构建不含 `/review/`
 （`enableReview=false`），审阅数据不会进入生产站。**本仓库是公开仓库**，

@@ -1,6 +1,6 @@
 # 作者审阅记录 · 持久化与恢复说明
 
-> 生成时间：2026-11-14T08:42:15+08:00　|　由 `tools/review/build_review_artifacts.py` 生成
+> 生成时间：2026-11-14T09:46:01+08:00　|　由 `tools/review/build_review_artifacts.py` 生成
 
 ## 1. 记录保存在哪里
 
@@ -38,22 +38,29 @@ notes          作者本人意见（逐字）
 ## 3. 如何避免再次丢失（本次建立的机制）
 
 1. **规范台账**：`decisions.jsonl` 提供稳定、可校验、可导入的字段结构。
-2. **可校验备份**：
+2. **可校验备份（fail-closed）**：
    ```bash
-   python3 tools/review/backup_review_data.py backup --to <不同文件系统的目录>
+   python3 tools/review/backup_review_data.py backup --to <目录>
    python3 tools/review/backup_review_data.py verify <备份目录>
    python3 tools/review/backup_review_data.py restore <备份目录> --yes
    ```
-   备份包含 `SHA256SUMS.txt` 与 `manifest.json`，可逐文件校验。
+   备份包含 `SHA256SUMS.txt` 与 `manifest.json`，可逐文件校验。备份前先从权威
+   journal 刷新派生文件；**刷新失败即中止、返回非零、不写任何备份**（不会把过期
+   数据当成功备份）。同文件系统目标、以及位于记录目录内部的目标，都会被拒绝。
 3. **定期导出**：审阅页顶部可导出 CSV/JSON，供作者自行留档。
-4. **私有远端（建议，需作者授权）**：把备份目录推送到**私有**仓库或对象存储，
-   才能真正抵御整容器回收。公开仓库不得存放含私人意见的记录。
+4. **私有远端（建议，需作者授权）**：把备份推送到**私有**仓库或对象存储，
+   才能真正抵御整容器回收。
+
+> ⚠️ **本地"不同文件系统"≠"异地"。** 本沙盒里记录在 `/workspace`（ext4 挂载），
+> 默认备份目录在容器 overlay 上——**确属不同文件系统，但仍在同一容器内**。
+> 整个沙盒被回收时两者一起丢失。只有把备份**送出这台机器**（私有仓库/对象存储）
+> 才真正抵御沙盒回收。不要把本地另一个目录称为"异地备份"。
 
 ## 4. 沙盒重启后的恢复顺序
 
 1. 先查 GitHub 分支与提交（工作成果都在 Git 上）。
-2. 若存在备份（`~/poet-review-backups/author-review/<时间戳>` 或私有远端），
-   用 `backup_review_data.py verify` 校验后 `restore`。
+2. 若存在**私有远端**备份，`verify` 校验后 `restore`；本地默认目录只能扛住
+   工作区回收，扛不住整沙盒回收。
 3. `python3 tools/review/rebuild_snapshot.py` 重放 journal → snapshot。
 4. 重新生成台账与摘要：`python3 tools/review/build_review_artifacts.py`。
 5. 启动审阅服务：`REVIEW_ACCESS_TOKEN=... python3 tools/review/serve_review.py --port 12000`。
@@ -62,3 +69,4 @@ notes          作者本人意见（逐字）
 
 - 记录中不含任何令牌；令牌单独存放且已 gitignore。
 - 本机制不修改诗歌正文、作者小传、题记或既有 API。
+- 备份/恢复的自动化验收：`python3 tools/review/test_backup_system.py`（隔离临时目录）。

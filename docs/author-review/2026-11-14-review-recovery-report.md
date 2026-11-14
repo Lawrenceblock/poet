@@ -104,9 +104,17 @@ decision       reviewed_at      record_source   notes(作者意见逐字)
 ### 2.2 可校验备份（增强）
 
 **【事实】** `tools/review/backup_review_data.py` 已加入 `decisions.jsonl`；
-备份在**不同文件系统**生成 `SHA256SUMS.txt` + `manifest.json`，支持
-`backup / verify / restore`。同盘备份被**拒绝**（除非显式 `--allow-same-fs`）。
-已实测：备份 → `verify` **全部 OK** → 恢复到空目录 → 记录完整。
+备份生成 `SHA256SUMS.txt` + `manifest.json`，支持 `backup / verify / restore`。
+备份**fail-closed**：先从权威 journal 刷新派生文件，**刷新失败即中止、返回非零、
+不写任何备份**。同文件系统目标与记录目录内部目标均被**拒绝**；恢复在校验失败或
+无法为现有记录做安全备份时被**拒绝**。已实测：备份 → `verify` **全部 OK** →
+恢复到空目录 → 记录逐项一致。
+
+**【事实·重要限定】** 本沙盒中记录在 `/workspace`（ext4 挂载，设备号 66309），
+默认备份目录 `/home/openhands/...` 在容器 overlay 上（设备号 240）——**确属不同
+文件系统，但仍在同一容器内**。因此它只能扛住**工作区回收**，**扛不住整沙盒回收**。
+只有把备份送出本机（私有仓库或对象存储）才真正抵御沙盒回收。**不得**把本地另一个
+目录称为"异地备份"。（第二轮安全审查已就此修正文档措辞，见下方第二轮报告。）
 
 ### 2.3 进度摘要与恢复说明（新增，随仓库提交）
 

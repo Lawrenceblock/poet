@@ -59,7 +59,13 @@ python3 tools/author-review/verify_verbatim.py                  # 137/137 poems 
   `recovery-report.md`. Run it after each review session.
 - `tools/review/backup_review_data.py backup|verify|restore` makes a checksummed
   copy on a **different filesystem** (default `~/poet-review-backups/`); same-fs
-  targets are refused. Off-site (private repo/object store) is still TODO.
+  targets are refused. **A different filesystem in the SAME container is NOT
+  off-site** — it is lost with a full sandbox recycle. Only a copy that leaves the
+  machine (private repo / object store) survives. Backup is **fail-closed**:
+  a derived-file refresh error aborts the backup (non-zero, nothing written);
+  backup dirs are collision-safe (never overwrite an earlier backup); restore
+  regenerates `decisions.jsonl` and refuses to overwrite if the safety backup
+  fails. Tests: `python3 tools/review/test_backup_system.py` (isolated temp dirs).
 
 ## Hard constraints for visual work
 
