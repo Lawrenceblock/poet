@@ -7,6 +7,7 @@
 - 性质：PR #21 的**补充修复**（独立代码审查发现的校验缺陷）。只改
   `tools/review/` 与相关文档；不修改诗歌正文、审阅业务规则、审阅 API、
   令牌或访问控制；不上传任何私人数据；**不合并 PR、不部署生产环境**。
+- 后续补充：见文末 **第 8 节（journal 缺失时的数据保护与 fail-closed 加固）**。
 
 标记约定：**【事实】**=有直接证据；**【推断】**=由事实推导；**【建议】**=待作者决定。
 
@@ -213,3 +214,67 @@ python3 tools/author-review/verify_verbatim.py -> verbatim-identical : 137 / OK:
    （见 `2026-11-14-offsite-backup-plan.md`）。**本轮未上传任何数据。**
 3. **备份格式升级**：manifest 现为 `poet-review-backup/2`。若存在更早格式的历史备份，
    需按新规则重新生成（本仓库无已提交的旧格式备份，故无迁移负担）。
+
+---
+
+## 8. journal 缺失时的数据保护与 fail-closed 加固（本次补充）
+
+### 8.1 问题与根本原因
+
+**【事实】** `store.read_journal()` 在 `journal.jsonl` 不存在时返回空列表；
+`store.rebuild()` 与 `build_decisions.write()` 据此把 journal 缺失**当成空数据**，
+重建 `snapshot.json` / `decisions.jsonl` / 导出文件。于是当 **journal 丢失、派生文件
+仍在**时：
+
+- `cmd_backup()` 会先刷新（把派生文件**清空为 pending**），再把被清空的状态当作
+  **合法空基线**备份，把部分数据损坏**扩大为完整数据丢失**；
+- `cmd_restore()` 原逻辑以 `os.path.exists(journal)` 判断是否做安全备份；journal 不在
+  时**跳过安全备份**，直接覆盖目标目录中的现存文件。
+
+**根本原因**：把“文件不存在”与“数据为空”混为一谈；缺少“写入前的状态预检查”。
+
+**【事实·现场】** 本次检查发现**真实记录目录当前正处于该状态**：
+`docs/author-review/review-records/journal.jsonl` 缺失，而
+`decisions.jsonl`（137 行）/ `export-review-records.csv`（137 行）/ `snapshot.json`
+（count=0）/ `export-review-records.json` 仍然存在。当前这些记录全部为 `pending`
+（无作者决定），所以**尚无作者劳动成果可被销毁**；但若将来 journal 再次丢失且派生
+文件含真实决定，旧逻辑会静默清空它们。本次修复正是为封堵此路径。
+
+### 8.2 修改内容（逐项）
+
+新增**纯检查**函数 `_records_dir_state(records_dir)`（只读，不建目录、不写文件、
+不调用任何重建函数、不修复/清理异常文件），backup 与 restore 共用同一规则：
+
+| 场景 | 规则 |
+| --- | --- |
+| journal 存在 | 按原有流程刷新并备份（正常路径不变） |
+| journal 不存在 + 任一派生文件存在 | **异常**：拒绝，返回非零，明确提示，**不刷新、不重建、不覆盖、不建目录** |
+| journal 与全部派生文件均不存在 | 允许建立**合法空基线**（`format=poet-review-backup/2`，`missing_files=["journal.jsonl"]`，4 个必需派生文件，通过严格 verify） |
+
+- `cmd_backup()`：在**任何刷新之前**执行预检查；命中异常即 `return 1`，**绝不调用**
+  `store.rebuild()` / `build_decisions.write()`，**绝不**创建备份目录。
+- `cmd_restore()`：先对**目标目录**做同一纯检查；journal 缺失但派生文件存在 →
+  拒绝（不跳过安全备份、不覆盖、返回非零）；目标完全为空 → 允许恢复；
+  目标有 journal → 先安全备份，失败仍拒绝；**无 `--force` 或任何跳过通道**。
+- **不检查文件大小**：一个**存在但为空**的 journal 与一个**不存在**的 journal 是两种
+  不同情况，语义未被改动（存在即视为权威 journal，按原流程处理）。
+- 未改动严格备份校验逻辑（`verify_backup` 不变）。
+
+### 8.3 新增测试与结果
+
+`tools/review/test_backup_system.py` 新增第 26–28 组（全部临时目录 + 合成数据）：
+
+- **组 A（备份拒绝）**：journal 缺失且分别仅保留 `decisions.jsonl` / `snapshot.json` /
+  CSV / JSON / 全部派生文件。每组断言：backup 非零、输出含“journal.jsonl is missing”
+  与“abnormal state”、**无**“could not refresh”提示（证明预检查先于刷新触发）、
+  **不产生备份目录**、派生文件 SHA256 不变，并用**注入桩**证明
+  `store.rebuild` / `build_decisions.write` **调用次数为 0**。
+- **组 B（真正空基线）**：journal 与全部派生文件均不存在 → backup 成功、format 正确、
+  `missing_files` 声明 `journal.jsonl`、4 个必需文件齐全、verify 成功、137 条 pending 不变。
+- **组 C（restore 目标保护）**：目标无 journal 但有各派生文件 → 拒绝、目标逐文件哈希
+  不变、不新建 journal、`store.rebuild`/`build_decisions.write` 未调用；目标完全为空 →
+  正常恢复；目标有 journal → 安全备份成功后恢复；目标有 journal 但安全备份失败 →
+  拒绝且目标不变；`--force` 被解析器拒绝（无绕过通道）。
+
+**【事实·实测】** `python3 tools/review/test_backup_system.py` →
+**195 PASS / 0 FAIL / 0 SKIP**（原 113 项全部保留并通过，新增 82 项）。

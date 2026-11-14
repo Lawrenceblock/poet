@@ -35,6 +35,15 @@ Exercises tools/review/backup_review_data.py end to end in isolated temp dirs:
   positive control
    25. a valid backup restores over existing records
 
+  journal-missing data protection (a missing journal is NEVER empty data)
+   26. Group A: backup refuses when the journal is gone but derived files remain
+       (each: non-zero, clear message, hashes unchanged, no backup dir, and
+       store.rebuild/build_decisions.write are NOT called)
+   27. Group B: a truly empty records dir still yields a valid empty baseline
+   28. Group C: restore refuses an incomplete target (no journal but derived
+       files), never overwrites, never bypasses the safety backup; an empty
+       target and a journalled target still restore; no --force flag exists
+
 Every test uses throwaway temp directories and a synthetic journal. The real
 author records under docs/author-review/review-records/ are never read or
 written. Exit code 0 = all tests passed.
@@ -421,6 +430,196 @@ def _run_all(tmp):
                   sha(os.path.join(tgt2, "journal.jsonl")) == sha(os.path.join(vdest, "journal.jsonl")))
         finally:
             shutil.rmtree(safety, ignore_errors=True)
+
+    # 26-28. journal-missing data-protection (a missing journal is NEVER empty
+    # data): backup/restore must refuse when derived files remain.
+    _journal_missing_suite(tmp)
+
+
+def _journal_missing_suite(tmp):
+    # A missing journal with derived files present is the dangerous state. Build
+    # it by generating derived files, then deleting the journal (and optionally
+    # trimming the derived set).
+    def records_missing_journal(tag, keep):
+        records = os.path.join(tmp, f"records-{tag}")
+        write_journal(records, [rec("C0001", "keep", f"comment-{tag}")])
+        run(TOOL, ["backup", "--to", os.path.join(tmp, f"bkgen-{tag}"),
+                   "--allow-same-fs"], records)
+        os.remove(os.path.join(records, "journal.jsonl"))
+        for n in REQUIRED_FILES:
+            p = os.path.join(records, n)
+            if n not in keep and os.path.exists(p):
+                os.remove(p)
+        return records
+
+    def backup_tracks_calls(records, dest):
+        snippet = (
+            "calls = []\n"
+            "def boom(*a, **k):\n"
+            "    calls.append('x')\n"
+            "    raise RuntimeError('SHOULD-NOT-BE-CALLED')\n"
+            "store.rebuild = boom\n"
+            "B.build_decisions.write = boom\n"
+            f"rc = B.cmd_backup(type('A',(),{{'to':{dest!r},'allow_same_fs':True}})())\n"
+            "print('RC', rc)\n"
+            "print('REFRESH_CALLS', len(calls))\n")
+        return run_inproc(records, snippet)
+
+    def restore_tracks_calls(target, backup_dir):
+        snippet = (
+            "calls = []\n"
+            "def boom(*a, **k):\n"
+            "    calls.append('x')\n"
+            "    raise RuntimeError('SHOULD-NOT-BE-CALLED')\n"
+            "store.rebuild = boom\n"
+            "B.build_decisions.write = boom\n"
+            f"rc = B.cmd_restore(type('A',(),{{'dir':{backup_dir!r},'yes':True}})())\n"
+            "print('RC', rc)\n"
+            "print('REFRESH_CALLS', len(calls))\n")
+        return run_inproc(target, snippet)
+
+    # --- Group A: backup refuses when the journal is gone but derived files remain.
+    print("26. Group A: backup refuses when journal is missing but derived data remains")
+    group_a = [
+        ("A1 decisions only", ["decisions.jsonl"]),
+        ("A2 snapshot only", ["snapshot.json"]),
+        ("A3 CSV only", ["export-review-records.csv"]),
+        ("A4 JSON only", ["export-review-records.json"]),
+        ("A5 all derived", list(REQUIRED_FILES)),
+    ]
+    for i, (label, keep) in enumerate(group_a):
+        records = records_missing_journal(f"A{i}", keep)
+        before = tree_state(records)
+        dest = os.path.join(tmp, f"bkA{i}")
+        rc, out, err = run(TOOL, ["backup", "--to", dest, "--allow-same-fs"], records)
+        check(f"{label}: backup refuses (non-zero)", rc != 0, f"rc={rc} out={out}")
+        check(f"{label}: message names the missing journal",
+              "journal.jsonl is missing" in out, out)
+        check(f"{label}: message flags the abnormal state",
+              "abnormal state" in out, out)
+        check(f"{label}: no refresh/rebuild message (guard fired first)",
+              "could not refresh" not in out, out)
+        check(f"{label}: no backup directory written", first_backup_dir(dest) is None)
+        check(f"{label}: derived file hashes unchanged", tree_state(records) == before)
+        # Prove no rebuild / build_decisions.write was called.
+        rc2, out2, err2 = backup_tracks_calls(records, os.path.join(tmp, f"bkA{i}t"))
+        check(f"{label}: store.rebuild/build_decisions.write NOT called",
+              "REFRESH_CALLS 0" in out2 and "RC 1" in out2, f"out={out2} err={err2}")
+        check(f"{label}: tracked-call run wrote no backup",
+              first_backup_dir(os.path.join(tmp, f"bkA{i}t")) is None)
+
+    # --- Group B: a genuinely empty records dir still yields a valid baseline.
+    print("27. Group B: a truly empty records dir still yields a valid empty baseline")
+    empty = os.path.join(tmp, "records-trueempty")
+    os.makedirs(empty, exist_ok=True)
+    rc, out, err = run_inproc(
+        empty, f"print('EMPTY', B._records_dir_state({empty!r})['empty'])")
+    check("state classifies the dir as empty", "EMPTY True" in out, out)
+    ebk = os.path.join(tmp, "bk-trueempty")
+    rc, out, err = run(TOOL, ["backup", "--to", ebk, "--allow-same-fs"], empty)
+    check("empty baseline backup exits 0", rc == 0, f"rc={rc} out={out} err={err}")
+    edest = first_backup_dir(ebk)
+    check("baseline backup created", edest is not None)
+    if edest:
+        m = load_manifest(edest)
+        check("format is poet-review-backup/2",
+              m.get("format") == "poet-review-backup/2", str(m.get("format")))
+        check("journal.jsonl declared missing",
+              m.get("missing_files") == ["journal.jsonl"], str(m.get("missing_files")))
+        check("four required files present",
+              sorted(m.get("files", [])) == sorted(REQUIRED_FILES), str(m.get("files")))
+        rc, out, _ = run(TOOL, ["verify", edest], empty)
+        check("empty baseline verifies OK", rc == 0 and "VERIFY OK" in out, out)
+        dpath = os.path.join(edest, "decisions.jsonl")
+        n = len([ln for ln in open(dpath, encoding="utf-8").read().splitlines() if ln.strip()])
+        check("137 pending candidates preserved", n == 137, f"n={n}")
+
+    # --- Group C: restore target protection.
+    print("28. Group C: restore refuses an incomplete target and never overwrites")
+    _, good_backup = mk_valid(tmp, "c-refsrc")
+
+    def target_with(tag, keep, with_journal=False):
+        t = os.path.join(tmp, f"target-{tag}")
+        os.makedirs(t, exist_ok=True)
+        if with_journal:
+            write_journal(t, [rec("C0002", "hold", "target-journal")])
+        for n in keep:
+            with open(os.path.join(t, n), "w", encoding="utf-8") as fh:
+                fh.write(f"pre-existing {n}\n")
+        return t
+
+    refuse_cases = [
+        ("C1 no journal, decisions present", ["decisions.jsonl"]),
+        ("C2 no journal, snapshot present", ["snapshot.json"]),
+        ("C3 no journal, CSV present", ["export-review-records.csv"]),
+        ("C4 no journal, JSON present", ["export-review-records.json"]),
+    ]
+    for i, (label, keep) in enumerate(refuse_cases):
+        tgt = target_with(f"C{i}", keep)
+        before = tree_state(tgt)
+        rc, out, err = run(TOOL, ["restore", good_backup, "--yes"], tgt,
+                           backup_dir=os.path.join(tmp, f"safetyC{i}"))
+        check(f"{label}: restore refused (non-zero)", rc != 0, f"rc={rc} out={out}")
+        check(f"{label}: message flags incomplete target",
+              "incomplete" in out or "abnormal" in out, out)
+        check(f"{label}: target files/hashes unchanged", tree_state(tgt) == before)
+        check(f"{label}: no journal created in target",
+              not os.path.exists(os.path.join(tgt, "journal.jsonl")))
+        # Prove the refusal happens before any rebuild / safety backup side effects.
+        rc2, out2, err2 = restore_tracks_calls(tgt, good_backup)
+        check(f"{label}: store.rebuild/build_decisions.write NOT called",
+              "REFRESH_CALLS 0" in out2 and "RC 1" in out2, f"out={out2} err={err2}")
+        check(f"{label}: tracked-call run left target unchanged",
+              tree_state(tgt) == before)
+
+    # C5: a completely empty target is allowed to restore.
+    print("C5 no journal, no derived files -> restore allowed")
+    empty_tgt = os.path.join(tmp, "target-empty")
+    os.makedirs(empty_tgt, exist_ok=True)
+    rc, out, err = run(TOOL, ["restore", good_backup, "--yes"], empty_tgt)
+    check("C5: restore exits 0", rc == 0, f"rc={rc} out={out} err={err}")
+    check("C5: journal restored",
+          os.path.exists(os.path.join(empty_tgt, "journal.jsonl")))
+    check("C5: restored journal matches backup",
+          sha(os.path.join(empty_tgt, "journal.jsonl")) ==
+          sha(os.path.join(good_backup, "journal.jsonl")))
+
+    # C6: a target WITH a journal restores normally once the safety backup succeeds.
+    print("C6 target has a journal -> safety backup then restore (positive control)")
+    base = cross_fs_base(tmp)
+    if base is None:
+        print("  [SKIP] no writable cross-filesystem dir for the safety backup")
+    else:
+        tgt = target_with("C6", [], with_journal=True)
+        safety = os.path.join(base, f"poet-backup-test-c6-{os.getpid()}")
+        try:
+            rc, out, err = run(TOOL, ["restore", good_backup, "--yes"], tgt, backup_dir=safety)
+            check("C6: restore exits 0", rc == 0, f"rc={rc} out={out} err={err}")
+            check("C6: target matches the backup journal",
+                  sha(os.path.join(tgt, "journal.jsonl")) ==
+                  sha(os.path.join(good_backup, "journal.jsonl")))
+            check("C6: a safety backup of the prior state was written",
+                  first_backup_dir(safety) is not None)
+        finally:
+            shutil.rmtree(safety, ignore_errors=True)
+
+    # C7: a target WITH a journal but a failing safety backup is refused.
+    print("C7 target has a journal but safety backup fails -> restore refused")
+    tgt = target_with("C7", [], with_journal=True)
+    before = tree_state(tgt)
+    snippet = ("store.rebuild = lambda *a, **k: (_ for _ in ()).throw("
+               "RuntimeError('mock safety-backup failure')); "
+               f"raise SystemExit(B.cmd_restore(type('A',(),{{'dir':{good_backup!r},"
+               f"'yes':True}})()))")
+    rc, out, err = run_inproc(tgt, snippet)
+    check("C7: restore refused", "refusing to restore" in out, out)
+    check("C7: target unchanged after refusal", tree_state(tgt) == before)
+
+    # C8: no --force (or any bypass) exists on the restore parser.
+    print("C8 restore has no --force / bypass flag")
+    rc, out, err = run(TOOL, ["restore", good_backup, "--yes", "--force"], empty_tgt)
+    check("C8: --force is rejected as an unknown option", rc != 0, f"rc={rc} out={out}")
+    check("C8: error mentions force", "force" in (out + err).lower(), f"out={out} err={err}")
 
 
 def _verification_suite(tmp):

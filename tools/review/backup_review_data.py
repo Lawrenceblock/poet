@@ -27,6 +27,12 @@ universe), and match on disk. Any missing file, empty/duplicated checksum list,
 path traversal, absolute path, illegal name, symlink, uncovered file, or hash
 mismatch fails verification. `restore` depends on this check and has no bypass.
 
+A missing journal is NEVER treated as empty data. If journal.jsonl is absent
+while any derived file (snapshot/decisions/exports) still exists, the state is
+ambiguous — a lost journal over live data — and both `backup` and `restore`
+refuse before writing anything (no rebuild, no refresh, no overwrite). Only when
+the journal AND all derived files are absent is an empty baseline legitimate.
+
 Nothing here writes to poem text, the feed, or the candidate CSVs. A backup is
 plain text so it can be reviewed, diffed and (if the author chooses) committed
 to a PRIVATE repository. Do not commit it to the public repo.
@@ -94,6 +100,31 @@ def _stats(records_dir):
                 except (json.JSONDecodeError, KeyError):
                     pass
     return {"journal_lines": lines, "unique_candidates": len(uniq)}
+
+
+def _records_dir_state(records_dir):
+    """Classify a records directory PURELY by file presence — no writes, no
+    rebuild, no repair. Shared by backup and restore so both apply the same rule.
+
+    Returns a dict:
+      exists    : the directory itself exists
+      journal   : journal.jsonl is present
+      derived   : sorted list of present derived files (REQUIRED_FILES)
+      empty     : nothing we care about is present
+
+    A MISSING journal is never treated as "no data": if any derived file is
+    present while the journal is absent, the state is ambiguous (possibly a lost
+    journal over live data) and callers MUST refuse to write.
+    """
+    journal = os.path.join(records_dir, "journal.jsonl")
+    derived = [n for n in REQUIRED_FILES
+               if os.path.lexists(os.path.join(records_dir, n))]
+    return {
+        "exists": os.path.isdir(records_dir),
+        "journal": os.path.lexists(journal),
+        "derived": sorted(derived),
+        "empty": not os.path.lexists(journal) and not derived,
+    }
 
 
 class BackupInvalid(Exception):
@@ -270,6 +301,19 @@ def _unique_dest(dest_root):
 
 def cmd_backup(args):
     src = store.RECORDS
+    # Integrity pre-check BEFORE any refresh. A missing journal is NOT an empty
+    # dataset: if any derived file still exists, the state is ambiguous (a lost
+    # journal over live data). Refuse and touch nothing — do not rebuild, do not
+    # write, do not create any directory.
+    st = _records_dir_state(src)
+    if not st["journal"] and st["derived"]:
+        print(f"REFUSING: {src}/journal.jsonl is missing while derived review "
+              f"data still exists ({', '.join(st['derived'])}).")
+        print("This is an abnormal state (a lost journal over existing data); "
+              "refusing to back up so the existing files are not overwritten or "
+              "rebuilt as if the data were empty.")
+        print("no refresh, no rebuild, no write was performed (fail-closed).")
+        return 1
     # Refresh derived artefacts (snapshot + decisions + exports) from the
     # authoritative journal FIRST, so the backup always captures current state.
     # This is FAIL-CLOSED: if the refresh raises, we abort instead of copying a
@@ -282,7 +326,7 @@ def cmd_backup(args):
               f"from {src}: {type(e).__name__}: {e}")
         print("no backup was written (fail-closed).")
         return 1
-    if not os.path.exists(os.path.join(src, "journal.jsonl")):
+    if not st["journal"]:
         print(f"note: no journal at {src}/journal.jsonl yet — backing up the "
               f"empty baseline (decisions.jsonl marks all candidates pending)")
     dest_root = os.path.abspath(args.to)
@@ -392,7 +436,20 @@ def cmd_restore(args):
         return 0
     # Safety: snapshot current records before overwriting. Fail-closed — if the
     # current records cannot be safely backed up, do not clobber them.
-    if os.path.exists(os.path.join(store.RECORDS, "journal.jsonl")):
+    #
+    # First classify the target PURELY (no writes): a missing journal is not an
+    # empty target. If the journal is gone but any derived file remains, the
+    # target is in an ambiguous/incomplete state — refuse rather than skip the
+    # safety backup or overwrite files that may hold the author's work.
+    tgt_state = _records_dir_state(store.RECORDS)
+    if not tgt_state["journal"] and tgt_state["derived"]:
+        print(f"REFUSING: target {store.RECORDS} has no journal.jsonl but still "
+              f"contains derived review data ({', '.join(tgt_state['derived'])}).")
+        print("The target directory is in an incomplete/abnormal state; refusing "
+              "to restore. Inspect it by hand before proceeding — no file was "
+              "overwritten or removed.")
+        return 1
+    if tgt_state["journal"]:
         rc = cmd_backup(argparse.Namespace(to=DEFAULT_TO, allow_same_fs=False))
         if rc != 0:
             print("refusing to restore: could not back up the current records "

@@ -93,6 +93,12 @@ python3 tools/review/backup_review_data.py restore ~/poet-review-backups/author-
 目标若位于记录目录**内部**也会被拒绝。恢复**必须先通过校验**，**没有跳过校验的
 开关**（已移除 `--force`）；恢复前若无法为现有记录做安全备份，也会**拒绝覆盖**。
 
+**journal 缺失绝不当作空数据**：若 `journal.jsonl` 不存在，但任一派生文件
+（`snapshot.json` / `decisions.jsonl` / 导出文件）仍然存在，说明处于**异常状态**
+（journal 丢失、派生数据仍在）。此时 `backup` 与 `restore` 都会**在写入任何东西之前
+拒绝**（不刷新、不重建、不覆盖、不创建目录），返回非零并提示需人工检查。
+只有 journal **与全部派生文件都不存在**时，才允许建立合法空基线。
+
 > ⚠️ **"不同文件系统" ≠ "异地"**。本沙盒里记录在 `/workspace`（ext4 挂载），
 > 默认备份目录 `/home/openhands/...` 在容器 overlay 上，二者**确属不同文件系统**，
 > 但**仍在同一个容器内**。**整个沙盒被回收时，两者会一起丢失。**
