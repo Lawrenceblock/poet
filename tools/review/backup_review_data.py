@@ -13,16 +13,19 @@ inside the SAME container is still lost if the whole sandbox is recycled. Only a
 copy that leaves the machine — a PRIVATE git repo or object storage — actually
 survives a sandbox recycle. Do not call a local path "off-site".
 
-Nothing here writes to poem text, the feed, or the candidate CSVs. A backup is
-plain text so it can be reviewed, diffed and (if the author chooses) committed
-to a PRIVATE repository. Do not commit it to the public repo.
-
 Commands
 --------
   backup [--to DIR]     copy records to DIR/<timestamp>/ + SHA256SUMS + manifest
-  verify DIR            check checksums and record counts of a backup
-  restore DIR [--yes]   restore journal+snapshot from a backup (makes a safety
-                        backup of the current records first)
+  verify DIR            strictly verify a backup (fail-closed; see verify_backup)
+  restore DIR [--yes]   verify, then restore the backup's exact state (makes a
+                        safety backup of the current records first)
+
+Verification is strict and fail-closed: a backup is only accepted when it has a
+valid manifest.json and a non-empty, well-formed SHA256SUMS.txt that agree with
+each other, cover exactly the data files (present + declared-missing == the full
+universe), and match on disk. Any missing file, empty/duplicated checksum list,
+path traversal, absolute path, illegal name, symlink, uncovered file, or hash
+mismatch fails verification. `restore` depends on this check and has no bypass.
 
 Nothing here writes to poem text, the feed, or the candidate CSVs. A backup is
 plain text so it can be reviewed, diffed and (if the author chooses) committed
@@ -42,9 +45,21 @@ import store  # noqa: E402
 import build_decisions  # noqa: E402
 
 TZ = timezone(timedelta(hours=8))
-# Files that make up the authoritative + derived record set.
+# The complete universe of files a backup may contain.
 DATA_FILES = ["journal.jsonl", "snapshot.json", "decisions.jsonl",
               "export-review-records.csv", "export-review-records.json"]
+# Required files: produced by the pre-backup refresh, so they must ALWAYS be
+# present in a valid backup (even for an empty baseline).
+REQUIRED_FILES = ["snapshot.json", "decisions.jsonl",
+                  "export-review-records.csv", "export-review-records.json"]
+# Optional files: may legitimately be absent (journal.jsonl is missing until the
+# author saves the first review). Absence MUST be declared in the manifest.
+OPTIONAL_FILES = ["journal.jsonl"]
+# Manifest format tag. Verification refuses any other value, so the absence rule
+# is explicit and cannot be guessed.
+BACKUP_FORMAT = "poet-review-backup/2"
+CHECKSUM_NAME = "SHA256SUMS.txt"
+MANIFEST_NAME = "manifest.json"
 # Default backup destination. It MUST sit on a different filesystem from the
 # records (which live under /workspace), otherwise a recycled workspace would
 # take the source and its only backup down together. Here /workspace is an ext4
@@ -79,6 +94,147 @@ def _stats(records_dir):
                 except (json.JSONDecodeError, KeyError):
                     pass
     return {"journal_lines": lines, "unique_candidates": len(uniq)}
+
+
+class BackupInvalid(Exception):
+    """A backup failed strict integrity verification."""
+
+
+def _is_plain_name(name):
+    """True only for a bare, safe file name (no directory part, no traversal).
+
+    Rejects absolute paths, any '/' or '\\', '.' and '..', and empty names.
+    """
+    if not name or not isinstance(name, str):
+        return False
+    if name in (".", ".."):
+        return False
+    if "/" in name or "\\" in name or "\x00" in name:
+        return False
+    return os.path.basename(name) == name
+
+
+def _read_checksums(path):
+    """Parse SHA256SUMS.txt strictly. Returns an ordered list of (name, hex).
+
+    Raises BackupInvalid for a missing/empty/malformed file, an illegal or
+    duplicate name, or a non-hex digest. Never returns an empty list.
+    """
+    if not os.path.isfile(path):
+        raise BackupInvalid(f"missing {CHECKSUM_NAME}")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            raw = fh.read()
+    except OSError as e:
+        raise BackupInvalid(f"cannot read {CHECKSUM_NAME}: {e}")
+    if not raw.strip():
+        raise BackupInvalid(f"{CHECKSUM_NAME} is empty")
+    entries = []
+    seen = set()
+    for i, line in enumerate(raw.splitlines(), 1):
+        if not line.strip():
+            continue
+        digest, sep, name = line.partition("  ")
+        if not sep or not name:
+            raise BackupInvalid(f"{CHECKSUM_NAME} line {i} malformed: {line!r}")
+        if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest.lower()):
+            raise BackupInvalid(f"{CHECKSUM_NAME} line {i} has a non-hex digest")
+        if not _is_plain_name(name):
+            raise BackupInvalid(f"{CHECKSUM_NAME} line {i} has an unsafe file name: {name!r}")
+        if name in seen:
+            raise BackupInvalid(f"{CHECKSUM_NAME} has a duplicate entry: {name!r}")
+        seen.add(name)
+        entries.append((name, digest.lower()))
+    if not entries:
+        raise BackupInvalid(f"{CHECKSUM_NAME} lists no files")
+    return entries
+
+
+def _read_manifest(path):
+    """Parse manifest.json strictly and return (present, missing) file lists.
+
+    The present/missing split is explicit: `files` are the data files that must
+    exist, `missing_files` are the optional files declared absent. Raises
+    BackupInvalid on a missing file, bad JSON, wrong format tag, unknown file
+    names, overlap, or any inconsistency between the two lists and the universe
+    of data files.
+    """
+    if not os.path.isfile(path):
+        raise BackupInvalid(f"missing {MANIFEST_NAME}")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            m = json.load(fh)
+    except (OSError, json.JSONDecodeError) as e:
+        raise BackupInvalid(f"cannot parse {MANIFEST_NAME}: {e}")
+    if not isinstance(m, dict):
+        raise BackupInvalid(f"{MANIFEST_NAME} is not a JSON object")
+    if m.get("format") != BACKUP_FORMAT:
+        raise BackupInvalid(f"{MANIFEST_NAME} format is not {BACKUP_FORMAT!r}")
+    files = m.get("files")
+    missing = m.get("missing_files")
+    if not isinstance(files, list) or not isinstance(missing, list):
+        raise BackupInvalid(f"{MANIFEST_NAME} must list 'files' and 'missing_files'")
+    for name in files + missing:
+        if not _is_plain_name(name) or name not in DATA_FILES:
+            raise BackupInvalid(f"{MANIFEST_NAME} names an unknown/unsafe file: {name!r}")
+    if len(set(files)) != len(files) or len(set(missing)) != len(missing):
+        raise BackupInvalid(f"{MANIFEST_NAME} lists a file twice")
+    if set(files) & set(missing):
+        raise BackupInvalid(f"{MANIFEST_NAME} lists a file as both present and missing")
+    if set(files) | set(missing) != set(DATA_FILES):
+        raise BackupInvalid(
+            f"{MANIFEST_NAME} does not account for every data file "
+            f"(files={sorted(files)}, missing={sorted(missing)})")
+    if set(REQUIRED_FILES) - set(files):
+        raise BackupInvalid(
+            f"{MANIFEST_NAME} omits a required file: "
+            f"{sorted(set(REQUIRED_FILES) - set(files))}")
+    return files, missing
+
+
+def verify_backup(d):
+    """Strictly verify a backup directory. Returns (present_files, missing_files).
+
+    Fail-closed: raises BackupInvalid on ANY doubt, so a caller can never treat
+    an unverifiable backup as good. Enforces, in order:
+
+      * the directory exists;
+      * manifest.json exists, parses, has the right format and fully accounts
+        for every data file (present + declared-missing == the whole universe);
+      * SHA256SUMS.txt exists, is non-empty, well-formed, free of duplicates,
+        and contains only bare legal file names (no absolute paths, no '..');
+      * the checksum list names exactly the manifest's present files;
+      * every checksummed file exists, is a regular file (not a symlink) and
+        matches its digest;
+      * no unaccounted data file is present in the directory.
+    """
+    if not os.path.isdir(d):
+        raise BackupInvalid(f"not a directory: {d}")
+    files, missing = _read_manifest(os.path.join(d, MANIFEST_NAME))
+    entries = _read_checksums(os.path.join(d, CHECKSUM_NAME))
+    if [n for n, _ in entries] != sorted(files):
+        raise BackupInvalid(
+            f"{CHECKSUM_NAME} does not match {MANIFEST_NAME} "
+            f"(checksums={sorted(n for n, _ in entries)}, manifest={sorted(files)})")
+    for name in missing:
+        if os.path.lexists(os.path.join(d, name)):
+            raise BackupInvalid(
+                f"{name} is declared missing but exists in the backup")
+    for name, digest in entries:
+        p = os.path.join(d, name)
+        if os.path.islink(p):
+            raise BackupInvalid(f"{name} is a symlink, not a regular file")
+        if not os.path.isfile(p):
+            raise BackupInvalid(f"missing data file: {name}")
+        got = _sha256(p)
+        if got != digest:
+            raise BackupInvalid(f"{name} checksum mismatch")
+    # Nothing in the backup directory may be an unaccounted data file.
+    for entry in os.listdir(d):
+        if entry in DATA_FILES and entry not in files:
+            raise BackupInvalid(
+                f"{entry} is present but not covered by {MANIFEST_NAME}/{CHECKSUM_NAME}")
+    return files, missing
 
 
 def _probe_dev(path):
@@ -158,26 +314,40 @@ def cmd_backup(args):
     dest = _unique_dest(dest_root)
     os.makedirs(dest, exist_ok=False)
     copied = []
+    missing = []
     for name in DATA_FILES:
         p = os.path.join(src, name)
         if os.path.exists(p):
             shutil.copy2(p, os.path.join(dest, name))
             copied.append(name)
+        else:
+            missing.append(name)
+    # A valid backup must always contain the required (refreshed) files.
+    absent_required = [n for n in REQUIRED_FILES if n not in copied]
+    if absent_required:
+        shutil.rmtree(dest, ignore_errors=True)
+        print(f"ERROR: required file(s) missing from the source after refresh: "
+              f"{absent_required}; no backup was written (fail-closed).")
+        return 1
     sums = []
     for name in sorted(copied):
         sums.append(f"{_sha256(os.path.join(dest, name))}  {name}")
-    with open(os.path.join(dest, "SHA256SUMS.txt"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(dest, CHECKSUM_NAME), "w", encoding="utf-8") as fh:
         fh.write("\n".join(sums) + "\n")
     manifest = {
+        "format": BACKUP_FORMAT,
         "created_at": datetime.now(TZ).isoformat(timespec="seconds"),
         "source": src,
-        "files": copied,
+        "files": sorted(copied),
+        "missing_files": sorted(missing),
         **{f"source_{k}": v for k, v in _stats(src).items()},
     }
-    with open(os.path.join(dest, "manifest.json"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(dest, MANIFEST_NAME), "w", encoding="utf-8") as fh:
         json.dump(manifest, fh, ensure_ascii=False, indent=1)
     print(f"backup written: {dest}")
     print(f"  files        : {', '.join(copied)}")
+    if missing:
+        print(f"  declared absent: {', '.join(missing)}")
     print(f"  journal lines: {manifest['source_journal_lines']}")
     print(f"  candidates   : {manifest['source_unique_candidates']}")
     return 0
@@ -185,50 +355,39 @@ def cmd_backup(args):
 
 def cmd_verify(args):
     d = args.dir
-    if not os.path.isdir(d):
-        print(f"not a directory: {d}")
+    try:
+        files, missing = verify_backup(d)
+    except BackupInvalid as e:
+        print(f"  INVALID: {e}")
+        print("VERIFY FAILED")
         return 1
-    sums_path = os.path.join(d, "SHA256SUMS.txt")
-    if not os.path.exists(sums_path):
-        print(f"missing SHA256SUMS.txt in {d}")
-        return 1
-    ok = True
-    with open(sums_path, encoding="utf-8") as fh:
-        for line in fh:
-            line = line.strip()
-            if not line:
-                continue
-            want, _, name = line.partition("  ")
-            p = os.path.join(d, name)
-            if not os.path.exists(p):
-                print(f"  MISSING {name}")
-                ok = False
-                continue
-            got = _sha256(p)
-            if got == want:
-                print(f"  OK      {name}")
-            else:
-                print(f"  BAD     {name} (checksum mismatch)")
-                ok = False
+    for name in files:
+        print(f"  OK      {name}")
+    if missing:
+        print(f"  declared absent (per manifest): {', '.join(missing)}")
     st = _stats(d)
     print(f"  journal lines: {st['journal_lines']}  "
           f"unique candidates: {st['unique_candidates']}")
-    man = os.path.join(d, "manifest.json")
-    if os.path.exists(man):
-        m = json.load(open(man, encoding="utf-8"))
-        print(f"  manifest created_at: {m.get('created_at')}")
-    print("VERIFY OK" if ok else "VERIFY FAILED")
-    return 0 if ok else 1
+    m = json.load(open(os.path.join(d, MANIFEST_NAME), encoding="utf-8"))
+    print(f"  manifest created_at: {m.get('created_at')}")
+    print("VERIFY OK")
+    return 0
 
 
 def cmd_restore(args):
     d = args.dir
-    if cmd_verify(args) != 0 and not args.force:
-        print("refusing to restore from a backup that failed verification "
-              "(use --force to override)")
+    # Restore MUST depend on a passing integrity check. There is deliberately no
+    # --force bypass: an unverifiable backup is never restored over live records.
+    try:
+        present, declared_missing = verify_backup(d)
+    except BackupInvalid as e:
+        print(f"  INVALID: {e}")
+        print("refusing to restore from a backup that failed verification")
         return 1
     if not args.yes:
         print(f"would restore {d} -> {store.RECORDS}")
+        print(f"  files to copy   : {', '.join(present)}")
+        print(f"  declared absent : {', '.join(declared_missing) or '(none)'}")
         print("re-run with --yes to actually restore")
         return 0
     # Safety: snapshot current records before overwriting. Fail-closed — if the
@@ -240,10 +399,18 @@ def cmd_restore(args):
                   "first (see error above).")
             return 1
     os.makedirs(store.RECORDS, exist_ok=True)
-    for name in DATA_FILES:
+    for name in present:
         src = os.path.join(d, name)
-        if os.path.exists(src):
-            shutil.copy2(src, os.path.join(store.RECORDS, name))
+        tgt = os.path.join(store.RECORDS, name)
+        if os.path.islink(tgt):
+            os.unlink(tgt)
+        shutil.copy2(src, tgt)
+    # Files the backup explicitly declares absent are removed from the target, so
+    # a restore reproduces the backup's exact state (no stale journal survives).
+    for name in declared_missing:
+        tgt = os.path.join(store.RECORDS, name)
+        if os.path.lexists(tgt):
+            os.unlink(tgt)
     store.rebuild()
     build_decisions.write()  # regenerate the canonical ledger for the restored data
     print(f"restored from {d} -> {store.RECORDS}")
@@ -266,7 +433,6 @@ def main():
     r = sub.add_parser("restore")
     r.add_argument("dir")
     r.add_argument("--yes", action="store_true")
-    r.add_argument("--force", action="store_true")
     r.set_defaults(func=cmd_restore)
     args = ap.parse_args()
     sys.exit(args.func(args))

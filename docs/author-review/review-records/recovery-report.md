@@ -1,6 +1,6 @@
 # 作者审阅记录 · 持久化与恢复说明
 
-> 生成时间：2026-11-14T09:46:01+08:00　|　由 `tools/review/build_review_artifacts.py` 生成
+> 生成时间：2026-11-14T12:32:56+08:00　|　由 `tools/review/build_review_artifacts.py` 生成
 
 ## 1. 记录保存在哪里
 
@@ -38,15 +38,18 @@ notes          作者本人意见（逐字）
 ## 3. 如何避免再次丢失（本次建立的机制）
 
 1. **规范台账**：`decisions.jsonl` 提供稳定、可校验、可导入的字段结构。
-2. **可校验备份（fail-closed）**：
+2. **可校验备份（严格 fail-closed）**：
    ```bash
    python3 tools/review/backup_review_data.py backup --to <目录>
    python3 tools/review/backup_review_data.py verify <备份目录>
    python3 tools/review/backup_review_data.py restore <备份目录> --yes
    ```
-   备份包含 `SHA256SUMS.txt` 与 `manifest.json`，可逐文件校验。备份前先从权威
-   journal 刷新派生文件；**刷新失败即中止、返回非零、不写任何备份**（不会把过期
-   数据当成功备份）。同文件系统目标、以及位于记录目录内部的目标，都会被拒绝。
+   备份含 `SHA256SUMS.txt` + `manifest.json`（带 `format` 与 `missing_files` 声明）。
+   **校验严格且 fail-closed**：manifest 与清单必须存在、非空、无重复、逐文件一致，
+   且“存在 + 声明缺失”恰好覆盖全部数据文件；拒绝绝对路径/`../`/非法名/符号链接；
+   文件缺失或哈希不符即失败。**恢复必须先通过校验，没有跳过校验的开关。**
+   备份前先从权威 journal 刷新派生文件；**刷新失败即中止、返回非零、不写任何备份**。
+   同文件系统目标、以及位于记录目录内部的目标，都会被拒绝。
 3. **定期导出**：审阅页顶部可导出 CSV/JSON，供作者自行留档。
 4. **私有远端（建议，需作者授权）**：把备份推送到**私有**仓库或对象存储，
    才能真正抵御整容器回收。

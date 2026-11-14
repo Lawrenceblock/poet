@@ -65,7 +65,13 @@ python3 tools/author-review/verify_verbatim.py                  # 137/137 poems 
   a derived-file refresh error aborts the backup (non-zero, nothing written);
   backup dirs are collision-safe (never overwrite an earlier backup); restore
   regenerates `decisions.jsonl` and refuses to overwrite if the safety backup
-  fails. Tests: `python3 tools/review/test_backup_system.py` (isolated temp dirs).
+  fails. **Verification (`verify_backup`) is strict and fail-closed**: requires
+  `manifest.json` (format `poet-review-backup/2` + explicit `missing_files`) and a
+  non-empty, duplicate-free `SHA256SUMS.txt` that agrees with the manifest and
+  covers exactly the data files; rejects absolute/traversal/illegal names and
+  symlinks; `restore` has **no `--force` bypass**. Tests:
+  `python3 tools/review/test_backup_system.py` (isolated temp dirs; deterministic
+  mock-based fault injection, no `chmod`/root dependence).
 
 ## Hard constraints for visual work
 

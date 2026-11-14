@@ -3,15 +3,37 @@
 
 Exercises tools/review/backup_review_data.py end to end in isolated temp dirs:
 
-  1. a normal backup succeeds and is verifiable
-  2. a refresh failure aborts the backup (fail-closed, no stale backup)
-  3. a same-filesystem destination is refused
-  4. restore is refused when the backup fails verification
-  5. an empty dataset can still produce a baseline backup
-  6. restore into an empty directory is complete and consistent
-  7. private review comments never reach the public artefacts
-  8. no token / private data in tracked files, gitignore or the working tree
-  9. a repeat backup never overwrites an earlier valid backup
+  functional
+    1. a normal backup succeeds and is verifiable
+    2. a refresh failure aborts the backup (fail-closed, no stale backup)
+    3. a same-filesystem destination is refused
+    4. restore is refused when the backup fails verification
+    5. an empty dataset produces a valid baseline backup (explicit manifest rule)
+    6. restore into an empty directory is complete and consistent
+    7. private review comments never reach the public artefacts
+    8. no token / private data in tracked files, gitignore or the working tree
+    9. a repeat backup never overwrites an earlier valid backup
+   10. restoring over existing records is refused when the safety backup fails
+   11. repeated backup -> restore cycles stay consistent
+
+  strict verification (each tampered backup must FAIL verify and must NOT change
+  the restore target)
+   12. empty SHA256SUMS.txt
+   13. checksum list omits journal.jsonl
+   14. manifest and checksum file lists disagree
+   15. missing manifest.json
+   16. missing SHA256SUMS.txt
+   17. a checksummed data file is missing
+   18. a data file's content was changed (hash mismatch)
+   19. a duplicate checksum entry
+   20. a '../' path-traversal name
+   21. an absolute-path name
+   22. a data file declared missing but present
+   23. a data file replaced by a symlink
+   24. an unknown/illegal file name in the checksum list
+
+  positive control
+   25. a valid backup restores over existing records
 
 Every test uses throwaway temp directories and a synthetic journal. The real
 author records under docs/author-review/review-records/ are never read or
@@ -19,6 +41,8 @@ written. Exit code 0 = all tests passed.
 
   python3 tools/review/test_backup_system.py
 """
+import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -30,10 +54,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 TOOL = os.path.join(HERE, "backup_review_data.py")
 ARTIFACTS = os.path.join(HERE, "build_review_artifacts.py")
-REAL_RECORDS = os.path.join(ROOT, "docs", "author-review", "review-records")
 
 DATA_FILES = ["journal.jsonl", "snapshot.json", "decisions.jsonl",
               "export-review-records.csv", "export-review-records.json"]
+REQUIRED_FILES = ["snapshot.json", "decisions.jsonl",
+                  "export-review-records.csv", "export-review-records.json"]
 
 fails = []
 
@@ -42,6 +67,10 @@ def check(name, cond, detail=""):
     print(f"  [{'PASS' if cond else 'FAIL'}] {name}" + (f"  {detail}" if detail and not cond else ""))
     if not cond:
         fails.append(name)
+
+
+def sha(path):
+    return hashlib.sha256(open(path, "rb").read()).hexdigest()
 
 
 def run(tool, args, records_dir, backup_dir=None, extra_env=None):
@@ -55,11 +84,21 @@ def run(tool, args, records_dir, backup_dir=None, extra_env=None):
     return p.returncode, p.stdout, p.stderr
 
 
+def run_inproc(records_dir, snippet):
+    """Run `snippet` in-process with store/backup imported. Used for direct unit
+    checks and deterministic mock-based fault injection (no OS-permission tricks)."""
+    boot = (f"import sys; sys.path.insert(0, {HERE!r}); "
+            f"import store, backup_review_data as B; ")
+    p = subprocess.run([sys.executable, "-c", boot + snippet],
+                       env={**os.environ, "REVIEW_RECORDS_DIR": records_dir},
+                       capture_output=True, text=True)
+    return p.returncode, p.stdout, p.stderr
+
+
 def write_journal(records_dir, lines):
     os.makedirs(records_dir, exist_ok=True)
     with open(os.path.join(records_dir, "journal.jsonl"), "w", encoding="utf-8") as fh:
         for obj in lines:
-            import json
             fh.write(json.dumps(obj, ensure_ascii=False) + "\n")
 
 
@@ -77,18 +116,65 @@ def first_backup_dir(root):
     return os.path.join(root, entries[0]) if entries else None
 
 
+def tree_state(root):
+    """Map every file under `root` to its sha256, so partial overwrites show up."""
+    state = {}
+    for dirpath, _dirs, files in os.walk(root):
+        for name in files:
+            p = os.path.join(dirpath, name)
+            state[os.path.relpath(p, root)] = sha(p)
+    return state
+
+
+def load_manifest(d):
+    return json.load(open(os.path.join(d, "manifest.json"), encoding="utf-8"))
+
+
+def save_manifest(d, m):
+    with open(os.path.join(d, "manifest.json"), "w", encoding="utf-8") as fh:
+        json.dump(m, fh, ensure_ascii=False, indent=1)
+
+
+def write_checksums(d, names, extra_lines=()):
+    lines = [f"{sha(os.path.join(d, n))}  {n}" for n in sorted(names)]
+    lines += list(extra_lines)
+    with open(os.path.join(d, "SHA256SUMS.txt"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
+
+
+def mk_valid(tmp, tag):
+    """Create a records dir with one journal line and a valid backup."""
+    records = os.path.join(tmp, f"records-{tag}")
+    write_journal(records, [rec("C0001", "keep", f"comment-{tag}")])
+    bk = os.path.join(tmp, f"bk-{tag}")
+    rc, out, err = run(TOOL, ["backup", "--to", bk, "--allow-same-fs"], records)
+    assert rc == 0, f"setup backup for {tag} failed: {out} {err}"
+    return records, first_backup_dir(bk)
+
+
+def cross_fs_base(records_dir):
+    """A writable dir on a different filesystem from records_dir, or None."""
+    src_dev = os.stat(records_dir).st_dev
+    for cand in ["/workspace", "/dev/shm", "/run", "/home"]:
+        if not os.path.isdir(cand):
+            continue
+        try:
+            if os.stat(cand).st_dev == src_dev:
+                continue
+            probe = os.path.join(cand, f".backup-test-probe-{os.getpid()}")
+            os.makedirs(probe, exist_ok=True)
+            os.rmdir(probe)
+            return cand
+        except OSError:
+            continue
+    return None
+
+
 def main():
     tmp = tempfile.mkdtemp(prefix="backup-test-")
     try:
         _run_all(tmp)
     finally:
-        # Restore any read-only dirs before cleanup.
-        for dirpath, dirnames, _files in os.walk(tmp):
-            for d in dirnames:
-                try:
-                    os.chmod(os.path.join(dirpath, d), 0o755)
-                except OSError:
-                    pass
         shutil.rmtree(tmp, ignore_errors=True)
 
     print()
@@ -110,26 +196,25 @@ def _run_all(tmp):
     dest = first_backup_dir(backup)
     check("a backup directory was created", dest is not None)
     if dest:
-        for name in ["journal.jsonl", "snapshot.json", "decisions.jsonl",
-                     "SHA256SUMS.txt", "manifest.json"]:
+        for name in DATA_FILES + ["SHA256SUMS.txt", "manifest.json"]:
             check(f"backup contains {name}", os.path.exists(os.path.join(dest, name)))
         rc2, out2, _ = run(TOOL, ["verify", dest], records)
         check("verify exits 0", rc2 == 0 and "VERIFY OK" in out2, out2)
 
     # 2. A refresh failure aborts the backup (fail-closed).
+    #    Deterministic injection: patch store.rebuild to raise, so the test does
+    #    not depend on filesystem permissions or on running as root.
     print("2. a refresh failure aborts the backup (fail-closed)")
     ro_records = os.path.join(tmp, "records-ro")
     sentinel = f"PRIVATE-{uuid.uuid4().hex}"
     write_journal(ro_records, [rec("C0002", "keep", sentinel)])
     ro_backup = os.path.join(tmp, "backup-ro")
-    os.makedirs(ro_backup, exist_ok=True)
-    os.chmod(ro_records, 0o555)  # derived-file refresh must now fail
-    try:
-        rc, out, err = run(TOOL, ["backup", "--to", ro_backup, "--allow-same-fs"],
-                           ro_records)
-    finally:
-        os.chmod(ro_records, 0o755)
-    check("backup exits non-zero", rc != 0, f"rc={rc}")
+    snippet = ("store.rebuild = lambda *a, **k: (_ for _ in ()).throw("
+               "RuntimeError('mock refresh failure')); "
+               f"raise SystemExit(B.cmd_backup(type('A',(),{{'to':{ro_backup!r},"
+               f"'allow_same_fs':True}})()))")
+    rc, out, err = run_inproc(ro_records, snippet)
+    check("backup fails when refresh raises", rc == 1, f"rc={rc} out={out} err={err}")
     check("no backup directory written", first_backup_dir(ro_backup) is None)
     check("reports fail-closed", "fail-closed" in out, out)
     check("private comment not printed", sentinel not in out and sentinel not in err)
@@ -151,16 +236,15 @@ def _run_all(tmp):
         fh.write('{"tampered": true}\n')
     target = os.path.join(tmp, "records-target")
     write_journal(target, [rec("C0009", "hold", "keep me")])
-    before = open(os.path.join(target, "journal.jsonl"), encoding="utf-8").read()
+    before = tree_state(target)
     rc, out, err = run(TOOL, ["restore", bad, "--yes"], target,
                        backup_dir=os.path.join(tmp, "safety"))
-    check("verify of tampered backup fails", "VERIFY FAILED" in out, out)
+    check("restore reports the invalid backup", "INVALID" in out, out)
     check("restore refused (non-zero)", rc != 0, f"rc={rc} out={out}")
-    check("target records unchanged",
-          open(os.path.join(target, "journal.jsonl"), encoding="utf-8").read() == before)
+    check("target records unchanged", tree_state(target) == before)
 
-    # 5. An empty dataset can still produce a baseline backup.
-    print("5. an empty dataset can still produce a baseline backup")
+    # 5. An empty dataset produces a valid baseline backup (explicit manifest rule).
+    print("5. an empty dataset produces a valid baseline backup")
     empty = os.path.join(tmp, "records-empty")
     os.makedirs(empty, exist_ok=True)
     empty_bk = os.path.join(tmp, "backup-empty")
@@ -169,28 +253,35 @@ def _run_all(tmp):
     edest = first_backup_dir(empty_bk)
     check("baseline backup created", edest is not None)
     if edest:
+        m = load_manifest(edest)
+        check("manifest format tag is set",
+              m.get("format") == "poet-review-backup/2", str(m.get("format")))
+        check("journal.jsonl declared missing",
+              m.get("missing_files") == ["journal.jsonl"], str(m.get("missing_files")))
+        check("all required files declared present",
+              sorted(m.get("files", [])) == sorted(REQUIRED_FILES), str(m.get("files")))
         dpath = os.path.join(edest, "decisions.jsonl")
-        check("decisions.jsonl present", os.path.exists(dpath))
-        if os.path.exists(dpath):
-            n = len([ln for ln in open(dpath, encoding="utf-8").read().splitlines() if ln.strip()])
-            check("all 137 candidates listed as pending", n == 137, f"n={n}")
+        n = len([ln for ln in open(dpath, encoding="utf-8").read().splitlines() if ln.strip()])
+        check("all 137 candidates listed as pending", n == 137, f"n={n}")
+        rc, out, _ = run(TOOL, ["verify", edest], empty)
+        check("empty baseline verifies OK", rc == 0 and "VERIFY OK" in out, out)
+        rc, out, err = run_inproc(
+            empty, f"f, m = B.verify_backup({edest!r}); print(sorted(f)); print(sorted(m))")
+        check("verify_backup returns (required, ['journal.jsonl'])",
+              rc == 0 and str(sorted(REQUIRED_FILES)) in out and "['journal.jsonl']" in out,
+              f"rc={rc} out={out} err={err}")
 
     # 6. Restore into an empty directory is complete and consistent.
     print("6. restore into an empty directory is complete and consistent")
     src_records = os.path.join(tmp, "records-src")
     write_journal(src_records, [rec("C0003", "keep", "第一首"), rec("C0004", "exclude", "第二首")])
-    src_bk = os.path.join(tmp, "backup-src")
+    src_bk = os.path.join(tmp, "backup-src2")
     run(TOOL, ["backup", "--to", src_bk, "--allow-same-fs"], src_records)
     sdest = first_backup_dir(src_bk)
     fresh = os.path.join(tmp, "records-fresh")  # no journal -> no safety backup needed
     os.makedirs(fresh, exist_ok=True)
     rc, out, err = run(TOOL, ["restore", sdest, "--yes"], fresh)
     check("restore exits 0", rc == 0, f"rc={rc} out={out} err={err}")
-    import hashlib
-
-    def sha(p):
-        return hashlib.sha256(open(p, "rb").read()).hexdigest()
-
     for name in DATA_FILES:
         s, t = os.path.join(sdest, name), os.path.join(fresh, name)
         if os.path.exists(s):
@@ -213,7 +304,6 @@ def _run_all(tmp):
         if os.path.exists(p):
             body = open(p, encoding="utf-8").read()
             check(f"{doc} has no private comment", secret not in body)
-    # If a preview build exists, the comment must not be in it either.
     public = os.path.join(ROOT, "hugo", "public")
     if os.path.isdir(public):
         leaked = []
@@ -240,7 +330,6 @@ def _run_all(tmp):
                     if "review-records/" in f and
                     os.path.basename(f) in DATA_FILES + ["journal-test.jsonl"]]
     check("no private data file is tracked", not priv_tracked, str(priv_tracked))
-    # A token-looking assignment must not appear in any tracked text file.
     tok_re = re.compile(r"(X-Review-Token|review_token|REVIEW_ACCESS_TOKEN)\s*[:=]\s*[A-Za-z0-9_\-]{8,}")
     tok_hits = []
     for f in tracked:
@@ -252,7 +341,6 @@ def _run_all(tmp):
         if tok_re.search(txt):
             tok_hits.append(f)
     check("no hardcoded token in tracked files", not tok_hits, str(tok_hits))
-    # The synthetic secret must not appear anywhere tracked or in the diff.
     diff = subprocess.run(["git", "diff", "HEAD"], cwd=ROOT,
                           capture_output=True, text=True).stdout
     check("secret absent from working-tree diff", secret not in diff)
@@ -275,25 +363,21 @@ def _run_all(tmp):
     check("earlier backup content unchanged",
           os.path.exists(marker) and sha(os.path.join(d1, "journal.jsonl")) == old_hash)
 
-    # 10. Restoring over existing records is protected (fail-closed safety backup).
-    print("10. restoring over existing records is protected (fail-closed safety backup)")
+    # 10. Restoring over existing records is refused when the safety backup fails.
+    #     Deterministic injection: patch store.rebuild to raise, so the pre-restore
+    #     safety backup (cmd_backup) fails and the restore must abort.
+    print("10. restoring over existing records is refused when the safety backup fails")
     tgt = os.path.join(tmp, "records-overwrite")
     write_journal(tgt, [rec("C0007", "keep", "current authoritative")])
-    tgt_before = sha(os.path.join(tgt, "journal.jsonl"))
-    good_src = os.path.join(tmp, "backup-goodsrc")
-    write_journal(os.path.join(tmp, "records-goodsrc"), [rec("C0007", "exclude", "restored")])
-    run(TOOL, ["backup", "--to", good_src, "--allow-same-fs"],
-        os.path.join(tmp, "records-goodsrc"))
-    gdest = first_backup_dir(good_src)
-    # Force the pre-restore safety backup onto the SAME filesystem as the target
-    # records, so it must be refused and the restore must therefore abort.
-    same_fs_safety = os.path.join(tmp, "safety-same-fs")
-    os.makedirs(same_fs_safety, exist_ok=True)
-    rc, out, err = run(TOOL, ["restore", gdest, "--yes"], tgt,
-                       backup_dir=same_fs_safety)
-    check("restore refused when safety backup impossible", rc != 0, f"rc={rc} out={out}")
-    check("existing records untouched by refused restore",
-          sha(os.path.join(tgt, "journal.jsonl")) == tgt_before)
+    tgt_before = tree_state(tgt)
+    _, gdest = mk_valid(tmp, "goodsrc")
+    snippet = ("store.rebuild = lambda *a, **k: (_ for _ in ()).throw("
+               "RuntimeError('mock safety-backup failure')); "
+               f"raise SystemExit(B.cmd_restore(type('A',(),{{'dir':{gdest!r},"
+               f"'yes':True}})()))")
+    rc, out, err = run_inproc(tgt, snippet)
+    check("restore refused when safety backup fails", "refusing to restore" in out, out)
+    check("existing records untouched by refused restore", tree_state(tgt) == tgt_before)
 
     # 11. Repeated backup -> restore cycles stay consistent.
     print("11. repeated backup -> restore cycles stay consistent")
@@ -314,6 +398,113 @@ def _run_all(tmp):
         check(f"cycle {i}: decisions.jsonl matches backup",
               sha(os.path.join(fresh2, "decisions.jsonl")) == hashes[-1])
     check("two cycles produced identical decisions", hashes[0] == hashes[1])
+
+    # 12-24. Strict verification: each tampered backup must fail verify AND must
+    # not change the restore target.
+    _verification_suite(tmp)
+
+    # 25. Positive control: a valid backup DOES restore over existing records
+    # (using a cross-filesystem safety-backup target so the guard can proceed).
+    print("25. a valid backup restores over existing records (positive control)")
+    base = cross_fs_base(tmp)
+    if base is None:
+        print("  [SKIP] no writable cross-filesystem dir available for the safety backup")
+    else:
+        tgt2 = os.path.join(tmp, "records-pos")
+        write_journal(tgt2, [rec("C0001", "hold", "old")])
+        _, vdest = mk_valid(tmp, "pos-src")
+        safety = os.path.join(base, f"poet-backup-test-safety-{os.getpid()}")
+        try:
+            rc, out, err = run(TOOL, ["restore", vdest, "--yes"], tgt2, backup_dir=safety)
+            check("valid restore exits 0", rc == 0, f"rc={rc} out={out} err={err}")
+            check("target now matches the backup journal",
+                  sha(os.path.join(tgt2, "journal.jsonl")) == sha(os.path.join(vdest, "journal.jsonl")))
+        finally:
+            shutil.rmtree(safety, ignore_errors=True)
+
+
+def _verification_suite(tmp):
+    def m_empty_checksum(d):
+        open(os.path.join(d, "SHA256SUMS.txt"), "w").close()
+
+    def m_drop_journal_checksum(d):
+        write_checksums(d, [n for n in DATA_FILES if n != "journal.jsonl"])
+
+    def m_list_mismatch(d):
+        write_checksums(d, ["snapshot.json", "decisions.jsonl"])
+        for n in ["export-review-records.csv", "export-review-records.json", "journal.jsonl"]:
+            os.remove(os.path.join(d, n))
+
+    def m_rm_manifest(d):
+        os.remove(os.path.join(d, "manifest.json"))
+
+    def m_rm_checksum(d):
+        os.remove(os.path.join(d, "SHA256SUMS.txt"))
+
+    def m_rm_file(d):
+        os.remove(os.path.join(d, "decisions.jsonl"))
+
+    def m_corrupt(d):
+        with open(os.path.join(d, "decisions.jsonl"), "a", encoding="utf-8") as fh:
+            fh.write('{"tampered": true}\n')
+
+    def m_dup(d):
+        line = open(os.path.join(d, "SHA256SUMS.txt"), encoding="utf-8").read().strip().splitlines()[0]
+        with open(os.path.join(d, "SHA256SUMS.txt"), "a", encoding="utf-8") as fh:
+            fh.write(line + "\n")
+
+    def m_traversal(d):
+        write_checksums(d, DATA_FILES, extra_lines=[f"{'a'*64}  ../evil"])
+
+    def m_absolute(d):
+        write_checksums(d, DATA_FILES, extra_lines=[f"{'a'*64}  /etc/passwd"])
+
+    def m_declared_missing_present(d):
+        m = load_manifest(d)
+        m["files"] = [n for n in m["files"] if n != "journal.jsonl"]
+        m["missing_files"] = sorted(m["missing_files"] + ["journal.jsonl"])
+        save_manifest(d, m)
+        write_checksums(d, [n for n in DATA_FILES if n != "journal.jsonl"])
+
+    def m_symlink(d):
+        real = os.path.join(d, "_real.jsonl")
+        shutil.move(os.path.join(d, "journal.jsonl"), real)
+        os.symlink(real, os.path.join(d, "journal.jsonl"))
+
+    def m_unknown_name(d):
+        write_checksums(d, DATA_FILES, extra_lines=[f"{'a'*64}  evil.txt"])
+
+    cases = [
+        ("12 empty checksum list", m_empty_checksum, "empty"),
+        ("13 checksum omits journal.jsonl", m_drop_journal_checksum, "does not match"),
+        ("14 manifest/checksum list mismatch", m_list_mismatch, "does not match"),
+        ("15 missing manifest.json", m_rm_manifest, "missing manifest.json"),
+        ("16 missing SHA256SUMS.txt", m_rm_checksum, "missing SHA256SUMS.txt"),
+        ("17 missing data file", m_rm_file, "missing data file"),
+        ("18 content changed (hash mismatch)", m_corrupt, "checksum mismatch"),
+        ("19 duplicate checksum entry", m_dup, "duplicate"),
+        ("20 '../' path traversal", m_traversal, "unsafe file name"),
+        ("21 absolute path", m_absolute, "unsafe file name"),
+        ("22 declared missing but present", m_declared_missing_present, "declared missing"),
+        ("23 data file replaced by symlink", m_symlink, "symlink"),
+        ("24 unknown/illegal file name", m_unknown_name, "does not match"),
+    ]
+
+    for label, mutate, expect in cases:
+        print(f"{label}: must fail verification and never touch the target")
+        tag = label.split()[0]
+        src_records, dest = mk_valid(tmp, f"v{tag}")
+        mutate(dest)
+        rc, out, err = run(TOOL, ["verify", dest], src_records)
+        check(f"{label}: verify fails", rc != 0 and "VERIFY FAILED" in out, out)
+        check(f"{label}: message mentions '{expect}'", expect in out, out)
+        target = os.path.join(tmp, f"target-{tag}")
+        write_journal(target, [rec("C0099", "keep", "must survive")])
+        before = tree_state(target)
+        rc2, out2, err2 = run(TOOL, ["restore", dest, "--yes"], target,
+                              backup_dir=os.path.join(tmp, f"safety-{tag}"))
+        check(f"{label}: restore refused", rc2 != 0, f"rc={rc2} out={out2}")
+        check(f"{label}: target unchanged", tree_state(target) == before)
 
 
 if __name__ == "__main__":

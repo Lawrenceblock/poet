@@ -84,9 +84,14 @@ python3 tools/review/backup_review_data.py restore ~/poet-review-backups/author-
 `snapshot` / `decisions` / 导出文件；**只要刷新失败就立即中止、返回非零、不写任何
 备份**，绝不把过期或残缺的派生文件当成成功备份。
 
+**校验是严格、fail-closed 的**（`verify_backup`）：必须有 `manifest.json` 与
+`SHA256SUMS.txt`；清单**非空、格式正确、无重复**；manifest 与清单**逐文件严格一致**，
+且二者的“存在 + 声明缺失”必须**恰好覆盖全部数据文件**；只接受**预定义文件名**
+（拒绝绝对路径、`../` 穿越、非法名、符号链接）；文件缺失或哈希不符即失败。
+
 若目标与源在**同一文件系统**，备份会被**拒绝**（除非显式 `--allow-same-fs`）。
-目标若位于记录目录**内部**也会被拒绝。恢复时若校验不通过会**拒绝执行**
-（除非加 `--force`）；恢复前若无法为现有记录做安全备份，也会**拒绝覆盖**。
+目标若位于记录目录**内部**也会被拒绝。恢复**必须先通过校验**，**没有跳过校验的
+开关**（已移除 `--force`）；恢复前若无法为现有记录做安全备份，也会**拒绝覆盖**。
 
 > ⚠️ **"不同文件系统" ≠ "异地"**。本沙盒里记录在 `/workspace`（ext4 挂载），
 > 默认备份目录 `/home/openhands/...` 在容器 overlay 上，二者**确属不同文件系统**，
@@ -120,8 +125,12 @@ python3 tools/review/build_review_artifacts.py   # 刷新 decisions.jsonl + revi
 ## 测试
 
 ```bash
-python3 tools/review/test_backup_system.py   # 备份/恢复/隐私：11 组，全部用隔离临时目录
+python3 tools/review/test_backup_system.py   # 备份/恢复/严格校验/隐私：113 断言，全部用隔离临时目录
 ```
+
+**备份格式**：`manifest.json` 带 `format` 标签与 `missing_files` 声明；必需文件
+（4 个派生文件）必须存在，可选文件（`journal.jsonl`）若不存在必须**显式声明**。
+详见 [`docs/author-review/2026-11-14-backup-verify-hardening.md`](../../docs/author-review/2026-11-14-backup-verify-hardening.md)。
 
 审阅数据与作品正文、候选 CSV **完全独立**；正式 Hugo 构建不含 `/review/`
 （`enableReview=false`），审阅数据不会进入生产站。**本仓库是公开仓库**，
