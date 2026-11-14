@@ -46,6 +46,41 @@ python3 tools/author-review/verify_verbatim.py                  # 137/137 poems 
   to an isolated test journal so acceptance tests never touch real records.
 - **Never** weaken the gate or commit review records / tokens.
 
+## Review-record persistence & recovery
+
+- Records are private and the repo is public, so `journal.jsonl` /
+  `decisions.jsonl` / `snapshot.json` / exports are **gitignored** (only
+  `DESIGN.md`, `review-summary.md`, `recovery-report.md` are tracked). This means
+  a recycled sandbox loses them; Git shows nothing. The 2026-11-12 batch of
+  19 real decisions was lost this way (see
+  `docs/author-review/2026-11-14-review-recovery-report.md`).
+- `python3 tools/review/build_review_artifacts.py` regenerates `decisions.jsonl`
+  (canonical per-candidate ledger), `review-summary.md` (counts only) and
+  `recovery-report.md`. Run it after each review session.
+- `tools/review/backup_review_data.py backup|verify|restore` makes a checksummed
+  copy on a **different filesystem** (default `~/poet-review-backups/`); same-fs
+  targets are refused. **A different filesystem in the SAME container is NOT
+  off-site** — it is lost with a full sandbox recycle. Only a copy that leaves the
+  machine (private repo / object store) survives. Backup is **fail-closed**:
+  a derived-file refresh error aborts the backup (non-zero, nothing written);
+  backup dirs are collision-safe (never overwrite an earlier backup); restore
+  regenerates `decisions.jsonl` and refuses to overwrite if the safety backup
+  fails. **Verification (`verify_backup`) is strict and fail-closed**: requires
+  `manifest.json` (format `poet-review-backup/2` + explicit `missing_files`) and a
+  non-empty, duplicate-free `SHA256SUMS.txt` that agrees with the manifest and
+  covers exactly the data files; rejects absolute/traversal/illegal names and
+  symlinks; `restore` has **no `--force` bypass**. **A missing journal is never
+  treated as empty data**: if `journal.jsonl` is absent while any derived file
+  (snapshot/decisions/exports) exists, both `backup` and `restore` refuse before
+  writing anything (no rebuild, no refresh, no overwrite) — only a records dir
+  with neither journal nor derived files is a legitimate empty baseline. The
+  journal must also be a **regular file**: a symlink (valid/broken/internal/
+  external), directory, FIFO, socket or device is always refused (checked with
+  `os.lstat`, never `os.path.exists`/`isfile`, which follow links); a zero-byte
+  regular file is still a valid journal (no size-based logic). Tests:
+  `python3 tools/review/test_backup_system.py` (isolated temp dirs; deterministic
+  mock-based fault injection, no `chmod`/root dependence).
+
 ## Hard constraints for visual work
 
 - Do not modify poem text, biography, preface, archive text, or review records.
